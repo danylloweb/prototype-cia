@@ -2177,7 +2177,7 @@ function typeInput(id, val, cb) {
       clearInterval(t);
       cb && cb();
     }
-  }, 75);
+  }, 150);
 }
 
 function runSimulation() {
@@ -2192,6 +2192,10 @@ function runSimulation() {
   goStep(1);
   
   setTimeout(() => {
+    // Scroll to plans
+    const plansGrid = document.querySelector('.plans-grid');
+    if (plansGrid) plansGrid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
     // 1. Select semestral plan card
     const cards = document.querySelectorAll('.plans-grid .plan-card');
     if (cards.length >= 3) {
@@ -2204,6 +2208,10 @@ function runSimulation() {
       if (contBtn) contBtn.click();
       
       setTimeout(() => {
+        // Scroll to location selector
+        const view2 = document.getElementById('view2');
+        if (view2) view2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
         // 2. Select Location
         const est = document.getElementById('estado');
         if (est) {
@@ -2228,6 +2236,10 @@ function runSimulation() {
                   if (btn2) btn2.click();
                   
                   setTimeout(() => {
+                    // Scroll to personal form
+                    const nomeInput = document.getElementById('nome');
+                    if (nomeInput) nomeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
                     // 3. Autofill inputs with typewriter effect
                     typeInput('nome', 'GIOVANNA PIERONI', () => {
                       typeInput('email', 'giovanna.pieroni@example.com', () => {
@@ -2241,7 +2253,8 @@ function runSimulation() {
                             if (sex) sex.value = 'Feminino';
                             
                             // Scroll down to coupon area
-                            window.scrollBy({ top: 250, behavior: 'smooth' });
+                            const couponCode = document.getElementById('couponCode');
+                            if (couponCode) couponCode.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             
                             // Apply Coupon
                             typeInput('couponCode', 'CIANET10', () => {
@@ -2263,8 +2276,9 @@ function runSimulation() {
                                   }
                                   
                                   setTimeout(() => {
-                                    // Scroll down to credit card area
-                                    window.scrollBy({ top: 350, behavior: 'smooth' });
+                                    // Scroll down to credit card area to show both virtual cards
+                                    const cardContainer = document.getElementById('virtualCardContainer');
+                                    if (cardContainer) cardContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     
                                     // Fill Card Info 1
                                     typeInput('cardNumberInput', '5522883399440011', () => {
@@ -2277,7 +2291,8 @@ function runSimulation() {
                                               typeInput('cardExpiryInput2', '0831', () => {
                                                 
                                                 // Scroll down to show the finalize button
-                                                window.scrollBy({ top: 300, behavior: 'smooth' });
+                                                const btnFinalize = document.getElementById('btnFinalize');
+                                                if (btnFinalize) btnFinalize.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                 
                                                 // Focus Card 2 CVV to trigger flip
                                                 const cvvInput2 = document.getElementById('cardCvvInput2');
