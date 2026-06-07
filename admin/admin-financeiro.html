@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Financeiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:256px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:38px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .client-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .client-info-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .client-info-sub{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--orange);color:white;font-size:10px;font-weight:700;border-radius:100px;padding:1px 6px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .date-btn{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--t3);font-family:var(--font);}
+    .date-btn.active{background:var(--orange);color:white;border-color:var(--orange);}
+    .content{padding:22px 26px;}
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+    .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 18px;box-shadow:var(--sh-sm);}
+    .kpi-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .kpi-icon svg{width:17px;height:17px;fill:currentColor;}
+    .kpi-badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;}
+    .up{background:var(--green-l);color:var(--green);}
+    .dn{background:var(--red-l);color:var(--red);}
+    .kpi-val{font-size:24px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px;}
+    .kpi-label{font-size:12px;color:var(--t3);}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:14px;font-weight:700;color:var(--t1);}
+    .card-body{padding:18px;}
+    .chart-wrap{height:220px;position:relative;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .grid-big{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:var(--bg3);}
+    th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;}
+    td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--t2);}
+    tr:last-child td{border-bottom:none;}
+    tbody tr:hover td{background:rgba(0,0,0,.01);}
+    .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;display:inline-block;}
+    .b-paid{background:var(--green-l);color:var(--green);}
+    .b-pending{background:var(--amber-l);color:var(--amber);}
+    .b-overdue{background:var(--red-l);color:var(--red);}
+    .plan-breakdown{display:flex;flex-direction:column;gap:8px;padding:4px 0;}
+    .pb-row{display:flex;align-items:center;gap:10px;}
+    .pb-label{font-size:12px;font-weight:500;color:var(--t2);width:90px;flex-shrink:0;}
+    .pb-bar-wrap{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+    .pb-bar-fill{height:100%;border-radius:4px;}
+    .pb-val{font-size:12px;font-weight:700;color:var(--t1);white-space:nowrap;}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+    @media(max-width:1024px){.grid-big{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .topbar{padding:0 14px;}
+      .content{padding:14px 16px;}
+      .kpi-row{grid-template-columns:repeat(2,1fr);}
+      .btn-ghost{display:none;}
+    }
+    @media(max-width:560px){
+      .kpi-val{font-size:20px;}
+      .topbar-title{font-size:15px;}
+      .date-btn{padding:4px 8px;font-size:11px;}
+      th,td{padding:8px 10px;font-size:12px;}
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+
+    <div class="client-info"><div class="client-info-name">Academia CIA do Corpo</div><div class="client-info-sub">Painel Admin · 6 Unidades</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Visão Geral</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a>
+    <div class="nav-label">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Campanhas<span class="nav-badge">6</span></a>
+    <a href="admin-analytics.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Analytics & BI</a>
+    <a href="admin-funil.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Funil de Captação</a>
+    <div class="nav-label">Operações</div>
+    <a href="admin-unidades.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Unidades</a>
+    <a href="admin-alunos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Alunos</a>
+    <a href="admin-financeiro.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro</a>
+    <div class="nav-label">Produto</div>
+    <a href="../checkout/index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 6H17c0-2.21-1.79-4-4-4S9 3.79 9 6H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>Checkout</a>
+    <a href="../aluno/aluno-login.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+  </nav>
+  <div class="sdb-footer"><div class="user-row"><div class="user-av">RC</div><div><div class="user-name">Ticyane Chyarelly</div><div class="user-role">Diretora Comercial</div></div></div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+      <div class="topbar-title">Financeiro</div>
+    </div>
+    <div class="topbar-right">
+      <div style="display:flex;gap:4px;"><button class="date-btn">7d</button><button class="date-btn active">30d</button><button class="date-btn">90d</button><button class="date-btn">1 ano</button></div>
+      <button class="btn btn-ghost">Exportar</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><span class="kpi-badge up">+11.8%</span></div><div class="kpi-val">R$ 198k</div><div class="kpi-label">MRR Junho</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div><span class="kpi-badge up">+11.8%</span></div><div class="kpi-val">R$ 2.376k</div><div class="kpi-label">ARR (projetado)</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:var(--red-l);color:var(--red);"><svg viewBox="0 0 24 24"><path d="M13 2.05V4.05c3.95.49 7 3.85 7 7.95s-3.05 7.46-7 7.95v2c5.05-.5 9-4.76 9-9.95S18.05 2.55 13 2.05z"/></svg></div><span class="kpi-badge up">-0.3pp</span></div><div class="kpi-val">R$ 8.400</div><div class="kpi-label">Churn MRR / mês</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:var(--amber-l);color:var(--amber);"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div><span class="kpi-badge dn">+2</span></div><div class="kpi-val">38</div><div class="kpi-label">Cobranças em aberto</div></div>
+    </div>
+
+    <div class="grid-big">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Receita Recorrente — Evolução</div></div>
+        <div class="card-body"><div class="chart-wrap"><canvas id="revChart"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Distribuição por Plano</div></div>
+        <div class="card-body">
+          <div class="plan-breakdown">
+            <div class="pb-row"><div class="pb-label">Anual</div><div class="pb-bar-wrap"><div class="pb-bar-fill" style="width:35%;background:#059669;"></div></div><div class="pb-val">35% · 996</div></div>
+            <div class="pb-row"><div class="pb-label">Semestral</div><div class="pb-bar-wrap"><div class="pb-bar-fill" style="width:28%;background:var(--orange);"></div></div><div class="pb-val">28% · 797</div></div>
+            <div class="pb-row"><div class="pb-label">Trimestral</div><div class="pb-bar-wrap"><div class="pb-bar-fill" style="width:22%;background:#2563EB;"></div></div><div class="pb-val">22% · 626</div></div>
+            <div class="pb-row"><div class="pb-label">Mensal</div><div class="pb-bar-wrap"><div class="pb-bar-fill" style="width:15%;background:var(--amber);"></div></div><div class="pb-val">15% · 427</div></div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:var(--green-l);border-radius:9px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:var(--green);">R$ 69,70</div><div style="font-size:11px;color:var(--t3);">Ticket médio</div></div>
+              <div style="background:var(--orange-l);border-radius:9px;padding:10px 12px;"><div style="font-size:16px;font-weight:800;color:var(--orange);">R$ 1.847</div><div style="font-size:11px;color:var(--t3);">LTV médio</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">Movimentações Recentes</div><span style="font-size:12px;color:var(--t3);">Junho 2025</span></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Descrição</th><th>Unidade</th><th>Vencimento</th><th>Valor</th><th>Método</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Boa Viagem</td><td>Boa Viagem</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 42.816</td><td>PIX / Cartão</td><td><span class="badge b-paid">✓ Recebido</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Boa Viagem II</td><td>Boa Viagem II</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 38.312</td><td>PIX / Cartão</td><td><span class="badge b-paid">✓ Recebido</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Madalena</td><td>Madalena</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 34.101</td><td>PIX / Cartão</td><td><span class="badge b-paid">✓ Recebido</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Caruaru</td><td>Caruaru</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 33.280</td><td>PIX / Cartão</td><td><span class="badge b-paid">✓ Recebido</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Olinda</td><td>Olinda</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 27.890</td><td>PIX / Cartão</td><td><span class="badge b-pending">⏳ Parcial</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidades Caruaru II</td><td>Caruaru II</td><td>06/06/2025</td><td style="font-weight:700;color:var(--t1);">R$ 21.601</td><td>PIX / Cartão</td><td><span class="badge b-overdue">Inadimpl.</span></td></tr>
+            <tr style="background:var(--orange-l);"><td style="font-weight:700;color:var(--orange);">Total Junho</td><td>6 unidades</td><td>—</td><td style="font-weight:800;color:var(--orange);">R$ 198.000</td><td>—</td><td><span class="badge b-paid">✓ Consolidado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+Chart.defaults.font.family = "'Inter', sans-serif";
+const ctx = document.getElementById('revChart').getContext('2d');
+const grad = ctx.createLinearGradient(0,0,0,220);
+grad.addColorStop(0,'rgba(249,115,22,.15)');
+grad.addColorStop(1,'rgba(249,115,22,0)');
+new Chart(ctx,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{data:[148000,159000,164000,172000,188000,198000],borderColor:'#F97316',backgroundColor:grad,borderWidth:2.5,pointBackgroundColor:'#F97316',pointRadius:4,fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>'R$'+Math.round(v/1000)+'k'}},x:{grid:{display:false}}}}});
+</script>
+</body>
+</html>

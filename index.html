@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Proposta Comercial · Academia CIA do Corpo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --orange:#F97316;--orange-2:#EA6C00;
+      --bg:#06091A;--bg2:#0C1033;--bg3:#111640;--bg4:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.09);--border-h:rgba(255,255,255,.18);
+      --t1:#FFFFFF;--t2:rgba(255,255,255,.8);--t3:rgba(255,255,255,.5);--t4:rgba(255,255,255,.3);
+      --green:#10B981;--purple:#818CF8;
+      --font:'Inter',sans-serif;
+      --img-gym:'https://static.wixstatic.com/media/837beb_404fa4604f4f4a49b83a89f308971e71~mv2.jpg/v1/fill/w_1905,h_562,fp_0.49_0.55,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/837beb_404fa4604f4f4a49b83a89f308971e71~mv2.jpg';
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;}
+
+    /* SLIDES WRAPPER */
+    .slides{position:fixed;inset:0;overflow:hidden;}
+
+    /* SLIDE BASE */
+    .slide{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;justify-content:center;
+      padding:80px 96px 100px;
+      background:var(--bg);
+      opacity:0;
+      transform:translateX(60px);
+      transition:opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .slide.active{
+      opacity:1;transform:translateX(0);
+      pointer-events:auto;
+    }
+    .slide.exit-left{
+      opacity:0;transform:translateX(-60px);
+    }
+    .slide.alt{background:var(--bg);}
+    .slide.center{align-items:center;text-align:center;}
+
+    /* GRID BG */
+    .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+
+    /* TOP BAR */
+    .topbar{position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(6,9,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);z-index:200;}
+    .topbar-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+    .topbar-logo img{width:30px;height:30px;object-fit:contain;}
+    .topbar-logo-name{font-size:12px;font-weight:800;letter-spacing:.8px;color:var(--t1);line-height:1.1;}
+    .topbar-logo-sub{font-size:7px;font-weight:700;letter-spacing:2px;color:var(--t4);}
+    .slide-counter{font-size:12px;font-weight:600;color:var(--t4);letter-spacing:.5px;}
+    .slide-counter span{color:var(--t2);}
+    .topbar-demo{padding:6px 14px;background:var(--orange);color:white;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;transition:.15s;}
+    .topbar-demo:hover{background:var(--orange-2);}
+
+    /* BOTTOM NAV */
+    .bottom-nav{
+      position:fixed;bottom:0;left:0;right:0;height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 32px;
+      background:rgba(6,9,26,.9);backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);z-index:200;
+    }
+    .nav-btn{
+      display:flex;align-items:center;gap:7px;
+      padding:8px 18px;border-radius:8px;
+      background:var(--bg4);border:1px solid var(--border);
+      color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;
+      transition:.15s;font-family:var(--font);
+      user-select:none;
+    }
+    .nav-btn:hover{background:rgba(255,255,255,.08);border-color:var(--border-h);color:var(--t1);}
+    .nav-btn:disabled{opacity:.25;cursor:default;pointer-events:none;}
+    .nav-btn svg{width:14px;height:14px;fill:currentColor;}
+    .nav-btn-next{background:var(--orange);border-color:transparent;color:white;}
+    .nav-btn-next:hover{background:var(--orange-2);}
+    .nav-dots{display:flex;gap:7px;align-items:center;}
+    .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--t4);cursor:pointer;border:none;padding:0;transition:.3s;}
+    .nav-dot.active{background:var(--orange);transform:scale(1.5);}
+    .nav-dot:hover{background:var(--t2);}
+    .hint{font-size:10px;color:var(--t4);letter-spacing:.5px;display:flex;align-items:center;gap:5px;}
+    .hint svg{width:11px;height:11px;fill:currentColor;}
+
+    /* SECTION TYPOGRAPHY */
+    .slide-tag{font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+    .slide-title{font-size:clamp(28px,3.5vw,48px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:12px;}
+    .slide-title span{color:var(--orange);}
+    .slide-sub{font-size:15px;color:var(--t3);max-width:520px;line-height:1.75;margin-bottom:40px;}
+
+    /* GLOW */
+    .glow{position:absolute;border-radius:50%;pointer-events:none;}
+    .glow-orange{background:radial-gradient(circle,rgba(249,115,22,.18) 0%,rgba(249,115,22,.04) 50%,transparent 70%);}
+    .glow-green{background:radial-gradient(circle,rgba(16,185,129,.1) 0%,transparent 70%);}
+
+    /* ====== SLIDE CONTENT STYLES ====== */
+
+    /* HERO */
+    .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);border-radius:100px;padding:6px 14px;font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;}
+    .hero-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .hero-logo{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 28px rgba(249,115,22,.5));margin-bottom:20px;}
+    .hero-title{font-size:clamp(38px,5.5vw,70px);font-weight:900;line-height:1.07;letter-spacing:-3px;margin-bottom:14px;}
+    .hero-title span{background:linear-gradient(135deg,#F97316,#FBBF24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-sub{font-size:clamp(16px,2vw,20px);color:var(--t2);max-width:560px;margin:0 auto 10px;line-height:1.6;}
+    .hero-client{font-size:13px;color:var(--t3);margin-bottom:32px;}
+    .hero-client strong{color:var(--t2);}
+    .hero-pills{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:36px;}
+    .hero-pill{display:flex;align-items:center;gap:5px;background:var(--bg4);border:1px solid var(--border);border-radius:100px;padding:6px 12px;font-size:11.5px;font-weight:500;color:var(--t2);}
+    .hero-pill svg{width:10px;height:10px;fill:var(--orange);flex-shrink:0;}
+    .hero-cta{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;background:var(--orange);color:white;border-radius:9px;font-size:14px;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 8px 28px rgba(249,115,22,.35);}
+    .hero-cta:hover{background:var(--orange-2);transform:translateY(-2px);}
+    .hero-cta svg{width:14px;height:14px;fill:white;}
+
+    /* OVERVIEW GRID */
+    .pillars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px;}
+    .pillar-card{background:var(--bg4);border:1px solid var(--border);border-radius:18px;padding:24px;position:relative;overflow:hidden;cursor:pointer;transition:.2s;display:block;text-decoration:none;}
+    .pillar-card:hover{border-color:var(--border-h);background:rgba(255,255,255,.06);transform:translateY(-3px);}
+    .pillar-num-bg{font-size:72px;font-weight:900;position:absolute;right:-4px;top:-18px;opacity:.035;color:var(--t1);line-height:1;pointer-events:none;}
+    .pillar-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+    .pillar-icon svg{width:20px;height:20px;fill:currentColor;}
+    .pillar-num-label{font-size:9.5px;font-weight:700;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+    .pillar-name{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:5px;letter-spacing:-.2px;}
+    .pillar-desc{font-size:12.5px;color:var(--t3);line-height:1.55;}
+
+    /* PILAR LAYOUT */
+    .pilar-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;}
+    .pilar-label{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+    .pilar-num-tag{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;}
+    .pilar-bar{width:18px;height:2px;border-radius:1px;}
+    .pilar-title{font-size:clamp(22px,2.8vw,36px);font-weight:800;letter-spacing:-1px;line-height:1.18;margin-bottom:12px;}
+    .pilar-desc{font-size:14px;color:var(--t3);line-height:1.78;margin-bottom:24px;}
+    .pilar-items{display:flex;flex-direction:column;gap:9px;}
+    .pilar-item{display:flex;align-items:flex-start;gap:9px;}
+    .pi-dot{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .pi-dot svg{width:9px;height:9px;fill:currentColor;}
+    .pi-text{font-size:13.5px;color:var(--t2);line-height:1.5;}
+
+    /* VISUAL BOX */
+    .visual-box{background:var(--bg3);border:1px solid var(--border);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px;}
+
+    /* FUNNEL */
+    .funnel-row{display:grid;grid-template-columns:76px 1fr 34px;align-items:center;gap:8px;}
+    .funnel-key{font-size:9.5px;font-weight:600;color:var(--t4);text-align:right;}
+    .funnel-bar-bg{height:28px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden;}
+    .funnel-bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 9px;font-size:10.5px;font-weight:700;color:white;}
+    .funnel-pct{font-size:9.5px;font-weight:700;color:var(--t4);}
+
+    /* LP MOCK */
+    .lp-mock{background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+    .lp-bar{height:24px;background:rgba(255,255,255,.05);display:flex;align-items:center;gap:5px;padding:0 9px;}
+    .lp-d{width:6px;height:6px;border-radius:50%;}
+    .lp-url{flex:1;background:rgba(255,255,255,.05);border-radius:3px;height:11px;margin:0 8px;}
+    .lp-body{padding:16px;}
+    .lp-accent{height:4px;background:linear-gradient(90deg,var(--orange),transparent);border-radius:3px;margin-bottom:9px;}
+    .lp-h1{height:16px;background:rgba(255,255,255,.12);border-radius:3px;margin-bottom:5px;width:72%;}
+    .lp-h2{height:11px;background:rgba(255,255,255,.07);border-radius:2px;margin-bottom:12px;width:52%;}
+    .lp-btn-m{height:28px;background:var(--orange);border-radius:6px;width:36%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:white;margin-bottom:14px;}
+    .lp-stats-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+    .lp-stat-c{background:rgba(255,255,255,.05);border-radius:5px;padding:6px;text-align:center;}
+    .lp-stat-v{font-size:12px;font-weight:800;color:var(--orange);}
+    .lp-stat-k{font-size:7.5px;color:var(--t4);}
+
+    /* PLATFORM MOCK */
+    .pm-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+    .pm-top{background:rgba(255,255,255,.07);padding:8px 12px;display:flex;align-items:center;gap:7px;}
+    .pm-log{font-size:9px;font-weight:800;color:var(--orange);}
+    .pm-nav-d{display:flex;gap:3px;margin-left:auto;}
+    .pm-nd{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.2);}
+    .pm-body{display:grid;grid-template-columns:52px 1fr;background:rgba(255,255,255,.03);min-height:160px;}
+    .pm-sidebar-c{background:rgba(255,255,255,.05);padding:7px;display:flex;flex-direction:column;gap:4px;}
+    .pm-si{width:100%;height:18px;background:rgba(255,255,255,.07);border-radius:3px;}
+    .pm-si.on{background:rgba(249,115,22,.25);}
+    .pm-content-c{padding:9px;display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+    .pm-c{background:rgba(255,255,255,.06);border-radius:5px;padding:6px;}
+    .pm-cv{font-size:10.5px;font-weight:800;color:var(--t1);}
+    .pm-ck{font-size:7px;color:var(--t4);}
+    .pm-chart-c{grid-column:1/-1;background:rgba(255,255,255,.05);border-radius:4px;height:40px;display:flex;align-items:flex-end;padding:4px;gap:3px;}
+    .pm-b{flex:1;background:rgba(249,115,22,.35);border-radius:2px 2px 0 0;}
+
+    /* WA MOCK */
+    .wa-wrap{background:#111b21;border-radius:12px;overflow:hidden;max-width:260px;border:1px solid rgba(255,255,255,.08);}
+    .wa-top{background:#202c33;padding:9px 12px;display:flex;align-items:center;gap:9px;}
+    .wa-av{width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+    .wa-nm{font-size:11.5px;font-weight:600;color:white;}
+    .wa-st{font-size:9px;color:rgba(255,255,255,.5);}
+    .wa-body{padding:11px;display:flex;flex-direction:column;gap:7px;background:#0b141a;}
+    .wa-b{background:#202c33;border-radius:6px 6px 6px 0;padding:7px 9px;max-width:90%;}
+    .wa-b.r{background:#005c4b;border-radius:6px 6px 0 6px;align-self:flex-end;}
+    .wa-b p{font-size:10px;color:rgba(255,255,255,.9);line-height:1.5;}
+    .wa-b .wa-t{font-size:8px;color:rgba(255,255,255,.3);text-align:right;margin-top:2px;}
+    .wa-typing{display:flex;align-items:center;gap:3px;padding:7px 9px;background:#202c33;border-radius:6px;width:44px;}
+    .wa-typing span{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.3);animation:wt 1.4s infinite;}
+    .wa-typing span:nth-child(2){animation-delay:.2s;}
+    .wa-typing span:nth-child(3){animation-delay:.4s;}
+    @keyframes wt{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+    /* BENEFITS GRID */
+    .benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px;}
+    .benefit-card{background:var(--bg4);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;}
+    .benefit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--clr,var(--orange)),transparent);}
+    .benefit-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+    .benefit-icon svg{width:20px;height:20px;fill:currentColor;}
+    .benefit-num{font-size:34px;font-weight:900;letter-spacing:-1.5px;line-height:1;margin-bottom:2px;}
+    .benefit-label{font-size:12.5px;font-weight:700;color:var(--t2);margin-bottom:5px;}
+    .benefit-desc{font-size:11.5px;color:var(--t3);line-height:1.6;}
+
+    /* TIMELINE */
+    .tl-wrap{position:relative;margin-top:40px;}
+    .tl-line{position:absolute;top:21px;left:0;right:0;height:2px;background:var(--border);}
+    .tl-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--orange),rgba(249,115,22,.2));width:33%;}
+    .tl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative;}
+    .tl-item{display:flex;flex-direction:column;align-items:center;text-align:center;}
+    .tl-dot{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;z-index:1;flex-shrink:0;}
+    .tl-dot.done{border-color:var(--orange);background:rgba(249,115,22,.14);}
+    .tl-dot svg{width:16px;height:16px;fill:var(--t4);}
+    .tl-dot.done svg{fill:var(--orange);}
+    .tl-week{font-size:8px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+    .tl-name{font-size:11px;font-weight:700;color:var(--t2);line-height:1.3;margin-bottom:2px;}
+    .tl-dur{font-size:9.5px;color:var(--t4);}
+    .tl-stats{margin-top:36px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .tl-stat{background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+    .tl-stat-val{font-size:19px;font-weight:800;}
+    .tl-stat-key{font-size:9px;color:var(--t4);margin-top:2px;}
+
+    /* CTA SLIDE */
+    #s9{padding:56px 96px 80px;}
+    .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(249,115,22,.15) 0%,transparent 65%);pointer-events:none;}
+    .cta-glow-2{position:absolute;top:30%;left:25%;width:300px;height:300px;background:radial-gradient(circle,rgba(129,140,248,.08) 0%,transparent 70%);pointer-events:none;}
+    .cta-glow-3{position:absolute;bottom:20%;right:20%;width:250px;height:250px;background:radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 70%);pointer-events:none;}
+    .cta-logo-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:80px;height:80px;margin:0 auto 20px;z-index:1;}
+    .cta-logo-ring{position:absolute;inset:-8px;border-radius:50%;border:1.5px solid rgba(249,115,22,.25);animation:ctaPulse 2.5s ease-in-out infinite;}
+    .cta-logo-ring-2{position:absolute;inset:-18px;border-radius:50%;border:1px solid rgba(249,115,22,.1);animation:ctaPulse 2.5s ease-in-out infinite .6s;}
+    @keyframes ctaPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+    .cta-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;position:relative;z-index:1;}
+    .cta-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:ctaBlink 1.4s ease-in-out infinite;}
+    @keyframes ctaBlink{0%,100%{opacity:1}50%{opacity:.3}}
+    .cta-title{font-size:clamp(30px,4.5vw,56px);font-weight:900;letter-spacing:-2px;line-height:1.1;margin-bottom:12px;position:relative;z-index:1;}
+    .cta-title span{background:linear-gradient(135deg,#F97316,#FBBF24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .cta-sub{font-size:16px;color:var(--t3);margin-bottom:28px;max-width:420px;line-height:1.6;position:relative;z-index:1;}
+    .cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;position:relative;z-index:1;}
+    .btn-big{padding:13px 22px;border-radius:10px;font-size:13.5px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:.2s;cursor:pointer;}
+    .btn-primary{background:linear-gradient(135deg,#F97316,#EA6C00);color:white;box-shadow:0 8px 32px rgba(249,115,22,.4);}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(249,115,22,.5);}
+    .btn-outline{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--t2);}
+    .btn-outline:hover{background:rgba(255,255,255,.08);border-color:var(--border-h);transform:translateY(-2px);}
+    .btn-big svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .cta-divider{width:48px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);margin:0 auto 20px;position:relative;z-index:1;}
+    .cta-contacts{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:16px;}
+    .cta-contact{display:flex;align-items:center;gap:6px;color:var(--t3);font-size:12px;transition:.15s;}
+    .cta-contact:hover{color:var(--t2);}
+    .cta-contact svg{width:13px;height:13px;fill:var(--orange);}
+    .cta-footer{text-align:center;font-size:10px;color:var(--t4);position:relative;z-index:1;}
+
+    /* TRANSITION ANIMATION */
+    @keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+    .slide.active .anim{animation:slideIn .5s cubic-bezier(.4,0,.2,1) both;}
+    .slide.active .anim-1{animation-delay:.05s;}
+    .slide.active .anim-2{animation-delay:.12s;}
+    .slide.active .anim-3{animation-delay:.2s;}
+    .slide.active .anim-4{animation-delay:.28s;}
+    .slide.active .anim-5{animation-delay:.36s;}
+
+    /* Content above background overlays */
+    .anim,.pilar-inner,.pillars-grid,.benefits-grid,.tl-wrap,.tl-stats,
+    .slide-tag,.slide-title,.slide-sub,
+    .hero-tag,.hero-logo,.hero-title,.hero-sub,.hero-client,.hero-pills,.hero-cta,
+    .cta-title,.cta-sub,.cta-btns,.cta-contacts,.cta-glow,.cta-footer,.cta-badge,.cta-logo-wrap,.cta-divider{position:relative;z-index:3;}
+    .glow{z-index:2;}
+
+    @media(max-width:900px){
+      .slide{padding:70px 24px 90px;}
+      .pilar-inner{grid-template-columns:1fr;gap:28px;}
+      .pillars-grid{grid-template-columns:1fr;}
+      .benefits-grid{grid-template-columns:1fr 1fr;}
+      .tl-grid{grid-template-columns:1fr 1fr;gap:16px;}
+      .tl-line{display:none;}
+      .tl-stats{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a href="#" class="topbar-logo">
+    <img src="logo-cia.png" alt="CIA do Corpo">
+    <div>
+      <div class="topbar-logo-name">CIA DO CORPO</div>
+      <div class="topbar-logo-sub">GYM</div>
+    </div>
+  </a>
+  <div class="slide-counter"><span id="slideNum">1</span> / 9</div>
+  <a href="admin/" class="topbar-demo">Ver Demo →</a>
+</header>
+
+<!-- SLIDES -->
+<div class="slides">
+
+  <!-- SLIDE 1: HERO -->
+  <section class="slide center active" id="s1">
+    <div class="grid-bg"></div>
+    <div class="glow glow-orange" style="width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-60%);"></div>
+    <div class="glow glow-green" style="width:360px;height:360px;top:60%;left:28%;transform:translate(-50%,-50%);"></div>
+    <div class="hero-tag anim anim-1"><span class="hero-dot"></span>Proposta Comercial Exclusiva</div>
+    <img src="logo-cia.png" alt="CIA do Corpo" class="hero-logo anim anim-2">
+    <h1 class="hero-title anim anim-2">Transformação Digital<br><span>e Aceleração de Vendas</span></h1>
+    <p class="hero-sub anim anim-3">Uma proposta completa para modernizar a operação comercial e digital da Academia CIA do Corpo.</p>
+    <p class="hero-client anim anim-3">Preparado exclusivamente para <strong>Academia CIA do Corpo</strong></p>
+    <div class="hero-pills anim anim-4">
+      <div class="hero-pill"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Marketing Avançado</div>
+      <div class="hero-pill"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Landing Pages</div>
+      <div class="hero-pill"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Plataforma CIA NET</div>
+      <div class="hero-pill"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>WhatsApp com IA</div>
+    </div>
+    <a href="#" class="hero-cta anim anim-5" onclick="nextSlide();return false;">
+      Ver proposta <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+    </a>
+  </section>
+
+  <!-- SLIDE 2: OVERVIEW -->
+  <section class="slide alt" id="s2">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="slide-tag anim anim-1">Nossa Proposta</div>
+    <h2 class="slide-title anim anim-2">4 Pilares de <span>Transformação</span></h2>
+    <p class="slide-sub anim anim-2">Uma estratégia integrada que combina marketing, tecnologia, automação e inteligência artificial para acelerar o crescimento da CIA do Corpo.</p>
+    <div class="pillars-grid">
+      <div class="pillar-card anim anim-2" onclick="goToSlide(3)">
+        <div class="pillar-num-bg">01</div>
+        <div class="pillar-icon" style="background:rgba(249,115,22,.12);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10zm-10 7.93V18c0-.55-.45-1-1-1s-1 .45-1 1v1.93C7.06 19.48 4.52 16.94 4.07 14H6c.55 0 1-.45 1-1s-.45-1-1-1H4.07C4.52 9.06 7.06 6.52 10 6.07V8c0 .55.45 1 1 1s1-.45 1-1V6.07C14.94 6.52 17.48 9.06 17.93 12H16c-.55 0-1 .45-1 1s.45 1 1 1h1.93C17.48 16.94 14.94 19.48 12 19.93z"/></svg></div>
+        <div class="pillar-num-label">Pilar 01</div>
+        <div class="pillar-name">Estratégia de Marketing</div>
+        <div class="pillar-desc">Jornada do cliente, funil, GA4 + Meta Pixel, dashboards e remarketing.</div>
+      </div>
+      <div class="pillar-card anim anim-3" onclick="goToSlide(4)">
+        <div class="pillar-num-bg">02</div>
+        <div class="pillar-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg></div>
+        <div class="pillar-num-label">Pilar 02</div>
+        <div class="pillar-name">Landing Pages de Alta Conversão</div>
+        <div class="pillar-desc">Páginas otimizadas para campanhas, matrículas, eventos e promoções.</div>
+      </div>
+      <div class="pillar-card anim anim-4" onclick="goToSlide(5)">
+        <div class="pillar-num-bg">03</div>
+        <div class="pillar-icon" style="background:rgba(129,140,248,.12);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L20 8.5v7L12 19.82 4 15.5v-7L12 4.18z"/></svg></div>
+        <div class="pillar-num-label">Pilar 03</div>
+        <div class="pillar-name">Plataforma CIA NET</div>
+        <div class="pillar-desc">Checkout digital, área do aluno, dashboard, BI e financeiro integrados.</div>
+      </div>
+      <div class="pillar-card anim anim-5" onclick="goToSlide(6)">
+        <div class="pillar-num-bg">04</div>
+        <div class="pillar-icon" style="background:rgba(52,211,153,.1);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 0C5.373 0 0 5.373 0 12c0 2.072.527 4.02 1.453 5.726L0 24l6.436-1.425A11.936 11.936 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.847 0-3.575-.5-5.063-1.37L3.5 21.5l.9-3.345A9.956 9.956 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg></div>
+        <div class="pillar-num-label">Pilar 04</div>
+        <div class="pillar-name">WhatsApp com IA</div>
+        <div class="pillar-desc">Assistente virtual para vendas, atendimento 24/7 e qualificação de leads.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: MARKETING -->
+  <section class="slide" id="s3">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="pilar-inner">
+      <div>
+        <div class="pilar-label anim anim-1"><span class="pilar-num-tag" style="color:var(--orange);">01 — Marketing</span><div class="pilar-bar" style="background:var(--orange);"></div></div>
+        <h2 class="pilar-title anim anim-2">Estratégia Avançada de Marketing e Jornada de Vendas</h2>
+        <p class="pilar-desc anim anim-2">Estruturamos toda a inteligência de captação e conversão, do primeiro clique até a matrícula — com rastreamento completo e dados em tempo real.</p>
+        <div class="pilar-items">
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Mapeamento completo da jornada do cliente</div></div>
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Funil de vendas com rastreamento de conversões</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Google Analytics 4, Meta Pixel e GTM configurados</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Remarketing e retargeting de visitantes</div></div>
+          <div class="pilar-item anim anim-5"><div class="pi-dot" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Dashboards gerenciais com KPIs em tempo real</div></div>
+        </div>
+      </div>
+      <div class="visual-box anim anim-3">
+        <div style="font-size:9px;font-weight:700;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;">Funil de Captação</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div class="funnel-row"><div class="funnel-key">Visitantes</div><div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:100%;background:rgba(249,115,22,.8);">4.200 / mês</div></div><div class="funnel-pct"></div></div>
+          <div class="funnel-row"><div class="funnel-key">Leads</div><div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:62%;background:rgba(249,115,22,.62);">890</div></div><div class="funnel-pct">21%</div></div>
+          <div class="funnel-row"><div class="funnel-key">Contatos</div><div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:40%;background:rgba(249,115,22,.46);">347</div></div><div class="funnel-pct">39%</div></div>
+          <div class="funnel-row"><div class="funnel-key">Visitas</div><div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:22%;background:rgba(249,115,22,.32);">156</div></div><div class="funnel-pct">45%</div></div>
+          <div class="funnel-row"><div class="funnel-key">Matrículas</div><div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:11%;background:var(--green);">89</div></div><div class="funnel-pct" style="color:var(--green);">57%</div></div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;gap:14px;">
+          <div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:var(--orange);">2,1%</div><div style="font-size:8.5px;color:var(--t4);">Conversão atual</div></div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:var(--green);">4,5%+</div><div style="font-size:8.5px;color:var(--t4);">Meta com CIA NET</div></div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:#FBBF24;">+114%</div><div style="font-size:8.5px;color:var(--t4);">Crescimento previsto</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: LANDING PAGES -->
+  <section class="slide alt" id="s4">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="pilar-inner" style="direction:rtl;">
+      <div style="direction:ltr;">
+        <div class="pilar-label anim anim-1"><span class="pilar-num-tag" style="color:var(--green);">02 — Landing Pages</span><div class="pilar-bar" style="background:var(--green);"></div></div>
+        <h2 class="pilar-title anim anim-2">Landing Pages de Alta Conversão</h2>
+        <p class="pilar-desc anim anim-2">Páginas criadas para converter visitantes em leads e leads em alunos, otimizadas para cada campanha e público.</p>
+        <div class="pilar-items">
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Design focado em conversão com CTA's estratégicos</div></div>
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Páginas por campanha: matrícula, eventos, promoções</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">A/B testing para otimização contínua de conversão</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Integração com pixels de rastreamento e CRM</div></div>
+          <div class="pilar-item anim anim-5"><div class="pi-dot" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Mobile-first com carregamento ultra-rápido</div></div>
+        </div>
+      </div>
+      <div style="direction:ltr;" class="anim anim-3">
+        <div class="visual-box">
+          <div class="lp-mock">
+            <div class="lp-bar"><div class="lp-d" style="background:#ff5f57;"></div><div class="lp-d" style="background:#ffbd2e;"></div><div class="lp-d" style="background:#28c840;"></div><div class="lp-url"></div></div>
+            <div class="lp-body">
+              <div class="lp-accent"></div>
+              <div class="lp-h1"></div>
+              <div class="lp-h2"></div>
+              <div class="lp-btn-m">Garanta sua vaga →</div>
+              <div class="lp-stats-g">
+                <div class="lp-stat-c"><div class="lp-stat-v">6</div><div class="lp-stat-k">Unidades</div></div>
+                <div class="lp-stat-c"><div class="lp-stat-v">2k+</div><div class="lp-stat-k">Alunos</div></div>
+                <div class="lp-stat-c"><div class="lp-stat-v">★4.9</div><div class="lp-stat-k">Nota</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:2px;">
+            <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:17px;font-weight:800;color:var(--green);">+127%</div><div style="font-size:9px;color:var(--t4);">Taxa de conversão</div></div>
+            <div style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:17px;font-weight:800;color:var(--orange);">-43%</div><div style="font-size:9px;color:var(--t4);">Custo por lead</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: CIA NET -->
+  <section class="slide" id="s5">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="pilar-inner">
+      <div>
+        <div class="pilar-label anim anim-1"><span class="pilar-num-tag" style="color:var(--purple);">03 — Plataforma</span><div class="pilar-bar" style="background:var(--purple);"></div></div>
+        <h2 class="pilar-title anim anim-2">Plataforma CIA NET Proprietária</h2>
+        <p class="pilar-desc anim anim-2">Uma plataforma completa desenvolvida especificamente para academias — do checkout digital à gestão avançada com BI integrado.</p>
+        <div class="pilar-items">
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Checkout digital com PIX e cartão de crédito</div></div>
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Área do aluno com treinos, agenda e financeiro</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Dashboard administrativo com KPIs e BI</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Gestão financeira, funil e análise de retenção</div></div>
+          <div class="pilar-item anim anim-5"><div class="pi-dot" style="background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Campanhas automáticas e analytics avançado</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;" class="anim anim-5">
+          <a href="admin/" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(129,140,248,.14);border:1px solid rgba(129,140,248,.3);border-radius:7px;font-size:11px;font-weight:700;color:#A5B4FC;text-decoration:none;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Admin Demo</a>
+          <a href="aluno/" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);border-radius:7px;font-size:11px;font-weight:700;color:#FBB98B;text-decoration:none;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:currentColor;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+          <a href="checkout/" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:7px;font-size:11px;font-weight:700;color:#6EE7B7;text-decoration:none;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:currentColor;"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>Checkout</a>
+        </div>
+      </div>
+      <div class="visual-box anim anim-3">
+        <div class="pm-wrap">
+          <div class="pm-top"><img src="logo-cia.png" style="width:16px;height:16px;object-fit:contain;"><div class="pm-log">CIA NET</div><div class="pm-nav-d"><div class="pm-nd"></div><div class="pm-nd"></div><div class="pm-nd"></div></div></div>
+          <div class="pm-body">
+            <div class="pm-sidebar-c"><div class="pm-si on"></div><div class="pm-si"></div><div class="pm-si"></div><div class="pm-si"></div></div>
+            <div class="pm-content-c">
+              <div class="pm-c"><div class="pm-cv">R$198k</div><div class="pm-ck">MRR</div></div>
+              <div class="pm-c"><div class="pm-cv">2.847</div><div class="pm-ck">Alunos</div></div>
+              <div class="pm-chart-c">
+                <div class="pm-b" style="height:38%;"></div><div class="pm-b" style="height:52%;"></div><div class="pm-b" style="height:46%;"></div><div class="pm-b" style="height:64%;"></div><div class="pm-b" style="height:72%;"></div><div class="pm-b" style="height:82%;background:rgba(249,115,22,.7);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
+          <div style="background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.15);border-radius:7px;padding:8px;text-align:center;"><div style="font-size:11px;font-weight:800;color:#A5B4FC;">Admin</div><div style="font-size:8px;color:var(--t4);">Dashboard</div></div>
+          <div style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.15);border-radius:7px;padding:8px;text-align:center;"><div style="font-size:11px;font-weight:800;color:#FBB98B;">Aluno</div><div style="font-size:8px;color:var(--t4);">Área digital</div></div>
+          <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:7px;padding:8px;text-align:center;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;">Checkout</div><div style="font-size:8px;color:var(--t4);">Matrícula</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: WHATSAPP IA -->
+  <section class="slide alt" id="s6">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="pilar-inner" style="direction:rtl;">
+      <div style="direction:ltr;">
+        <div class="pilar-label anim anim-1"><span class="pilar-num-tag" style="color:#34D399;">04 — WhatsApp IA</span><div class="pilar-bar" style="background:#34D399;"></div></div>
+        <h2 class="pilar-title anim anim-2">WhatsApp com Inteligência Artificial</h2>
+        <p class="pilar-desc anim anim-2">Um assistente virtual treinado com o DNA da CIA do Corpo — que vende, atende e recupera oportunidades sem intervenção humana, 24 horas por dia.</p>
+        <div class="pilar-items">
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">IA treinada para qualificação de leads com contexto</div></div>
+          <div class="pilar-item anim anim-3"><div class="pi-dot" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Atendimento automático 24/7 sem equipe adicional</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Recuperação automática de oportunidades perdidas</div></div>
+          <div class="pilar-item anim anim-4"><div class="pi-dot" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Sequências inteligentes de nutrição de leads</div></div>
+          <div class="pilar-item anim anim-5"><div class="pi-dot" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#34D399;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="pi-text">Integração nativa com CRM e plataforma CIA NET</div></div>
+        </div>
+      </div>
+      <div style="direction:ltr;display:flex;justify-content:center;" class="anim anim-3">
+        <div class="wa-wrap">
+          <div class="wa-top"><div class="wa-av">IA</div><div><div class="wa-nm">CIA do Corpo · IA</div><div class="wa-st">● Online agora</div></div></div>
+          <div class="wa-body">
+            <div class="wa-b"><p>Oi! Tenho interesse em fazer matrícula. Qual o valor do plano mensal?</p><div class="wa-t">09:14 ✓✓</div></div>
+            <div class="wa-b r"><p>Olá! Bem-vindo à *CIA do Corpo*! 💪<br><br>Nossos planos:<br>• Mensal: R$89,90<br>• Trimestral: R$79,90/mês<br>• Semestral: R$69,90/mês<br><br>Qual unidade fica mais perto de você?</p><div class="wa-t">09:14 ✓✓</div></div>
+            <div class="wa-b"><p>Boa Viagem! Posso visitar hoje?</p><div class="wa-t">09:15 ✓✓</div></div>
+            <div class="wa-b r"><p>Claro! Boa Viagem funciona até 22h 🏋️<br>Quer uma *aula experimental gratuita*? Qual horário prefere?</p><div class="wa-t">09:15 ✓✓</div></div>
+            <div class="wa-typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: BENEFÍCIOS -->
+  <section class="slide" id="s7">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="slide-tag anim anim-1">Resultados Esperados</div>
+    <h2 class="slide-title anim anim-2">O que <span>vamos alcançar</span> juntos</h2>
+    <p class="slide-sub anim anim-2">Benefícios mensuráveis baseados em projetos similares implementados pelo nosso time.</p>
+    <div class="benefits-grid">
+      <div class="benefit-card anim anim-2" style="--clr:var(--orange);">
+        <div class="benefit-icon" style="background:rgba(249,115,22,.12);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
+        <div class="benefit-num" style="color:var(--orange);" data-target="40">+0%</div>
+        <div class="benefit-label">Mais leads qualificados</div>
+        <div class="benefit-desc">Aumento na geração de leads através de marketing digital e funil otimizado.</div>
+      </div>
+      <div class="benefit-card anim anim-3" style="--clr:var(--green);">
+        <div class="benefit-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
+        <div class="benefit-num" style="color:var(--green);" data-target="25">+0%</div>
+        <div class="benefit-label">Melhoria na conversão</div>
+        <div class="benefit-desc">Landing pages + checkout + IA no WhatsApp aumentam a taxa de matrícula.</div>
+      </div>
+      <div class="benefit-card anim anim-4" style="--clr:var(--purple);">
+        <div class="benefit-icon" style="background:rgba(129,140,248,.12);color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg></div>
+        <div class="benefit-num" style="color:var(--purple);">24/7</div>
+        <div class="benefit-label">Atendimento automático</div>
+        <div class="benefit-desc">IA no WhatsApp garante respostas imediatas a qualquer hora, sem equipe adicional.</div>
+      </div>
+      <div class="benefit-card anim anim-2" style="--clr:#FBBF24;">
+        <div class="benefit-icon" style="background:rgba(251,191,36,.1);color:#FBBF24;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+        <div class="benefit-num" style="color:#FBBF24;" data-target="30">+0%</div>
+        <div class="benefit-label">Redução de custos operacionais</div>
+        <div class="benefit-desc">Automação de processos, cobranças e gestão centralizada reduzem despesas.</div>
+      </div>
+      <div class="benefit-card anim anim-3" style="--clr:var(--orange);">
+        <div class="benefit-icon" style="background:rgba(249,115,22,.12);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+        <div class="benefit-num" style="color:var(--orange);">6x</div>
+        <div class="benefit-label">Operações centralizadas</div>
+        <div class="benefit-desc">Todas as unidades, alunos, campanhas e finanças em um único dashboard.</div>
+      </div>
+      <div class="benefit-card anim anim-4" style="--clr:var(--green);">
+        <div class="benefit-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+        <div class="benefit-num" style="color:var(--green);" data-target="15">+0%</div>
+        <div class="benefit-label">Crescimento do MRR</div>
+        <div class="benefit-desc">Receita recorrente ampliada com mais matrículas, retenção e upsell inteligente.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: CRONOGRAMA -->
+  <section class="slide alt" id="s8">
+    <div class="grid-bg" style="opacity:.5;"></div>
+    <div class="slide-tag anim anim-1">Cronograma Estimado</div>
+    <h2 class="slide-title anim anim-2">Do planejamento ao <span>Go Live</span></h2>
+    <p class="slide-sub anim anim-2">Implementação em fases para entregas rápidas e resultados progressivos — sem paralisar a operação.</p>
+    <div class="tl-wrap anim anim-3">
+      <div class="tl-line"><div class="tl-fill"></div></div>
+      <div class="tl-grid">
+        <div class="tl-item"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div><div class="tl-week">Sem. 1–2</div><div class="tl-name">Planejamento</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2z"/></svg></div><div class="tl-week">Sem. 3–4</div><div class="tl-name">Landing Pages</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10z"/></svg></div><div class="tl-week">Sem. 5–6</div><div class="tl-name">Marketing & Rastreamento</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg></div><div class="tl-week">Sem. 7–18</div><div class="tl-name">CIA NET Plataforma</div><div class="tl-dur">8–12 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606z"/></svg></div><div class="tl-week">Sem. 19–20</div><div class="tl-name">IA WhatsApp</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="tl-week">Sem. 21–22</div><div class="tl-name">Testes & Go Live</div><div class="tl-dur">2 semanas</div></div>
+      </div>
+    </div>
+    <div class="tl-stats anim anim-4">
+      <div class="tl-stat"><div class="tl-stat-val" style="color:var(--orange);">22 sem.</div><div class="tl-stat-key">Total estimado</div></div>
+      <div class="tl-stat"><div class="tl-stat-val" style="color:var(--green);">4</div><div class="tl-stat-key">Entregas principais</div></div>
+      <div class="tl-stat"><div class="tl-stat-val" style="color:var(--purple);">Semanal</div><div class="tl-stat-key">Reporte de progresso</div></div>
+      <div class="tl-stat"><div class="tl-stat-val" style="color:#FBBF24;">Ágil</div><div class="tl-stat-key">Metodologia</div></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: CTA -->
+  <section class="slide center" id="s9">
+    <div class="grid-bg"></div>
+    <div class="cta-logo-wrap anim anim-1">
+      <div class="cta-logo-ring"></div>
+      <div class="cta-logo-ring-2"></div>
+      <img src="logo-cia.png" alt="CIA do Corpo" style="width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(249,115,22,.5));position:relative;z-index:1;">
+    </div>
+
+    <div class="cta-badge anim anim-2">
+      <span class="cta-badge-dot"></span>
+      Próximos Passos
+    </div>
+
+    <h2 class="cta-title anim anim-2">Vamos <span>transformar</span><br>a CIA do Corpo juntos?</h2>
+    <p class="cta-sub anim anim-3">Esta proposta representa o início de uma parceria estratégica. Estamos prontos para começar na próxima semana.</p>
+
+    <div class="cta-btns anim anim-4">
+      <a href="admin/index.html"  target="_blank" class="btn-big btn-primary"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Painel Admin</a>
+      <a href="checkout/index.html" target="_blank" class="btn-big btn-outline" style="border-color:rgba(16,185,129,.3);color:#6EE7B7;"><svg viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-2c1.1 0 2 .9 2 2H10c0-1.1.9-2 2-2zm7 16H7V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>Checkout Demo</a>
+      <a href="aluno/index.html" target="_blank" class="btn-big btn-outline"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+    </div>
+
+    <div class="cta-divider anim anim-5"></div>
+
+    <div class="cta-contacts anim anim-5">
+      <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.148-.2.47-.248.644-.15l.16.087m0 0a15.9 15.9 0 003.461 1.4c.263.06.535.09.81.09.47 0 .93-.1 1.37-.3l.16-.08"/></svg>(81) 99999-0000</div>
+      <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>contato@cianet.com.br</div>
+      <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Recife, Pernambuco</div>
+    </div>
+
+    <div class="cta-footer anim anim-5">© 2026 CIA NET · Proposta exclusiva para Academia CIA do Corpo</div>
+  </section>
+
+</div><!-- /slides -->
+
+<!-- BOTTOM NAVIGATION -->
+<footer class="bottom-nav">
+  <button class="nav-btn" id="btnPrev" onclick="prevSlide()" disabled>
+    <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+    Anterior
+  </button>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <div class="nav-dots" id="navDots"></div>
+    <div class="hint"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> ← → setas do teclado <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></div>
+  </div>
+
+  <button class="nav-btn nav-btn-next" id="btnNext" onclick="nextSlide()">
+    Próximo
+    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+  </button>
+</footer>
+
+<script>
+const TOTAL = 9;
+let cur = 1;
+
+// Build dots
+const dotsEl = document.getElementById('navDots');
+for(let i = 1; i <= TOTAL; i++){
+  const d = document.createElement('button');
+  d.className = 'nav-dot' + (i===1?' active':'');
+  d.title = `Slide ${i}`;
+  d.addEventListener('click', ()=> goToSlide(i));
+  dotsEl.appendChild(d);
+}
+
+function goToSlide(n){
+  if(n < 1 || n > TOTAL || n === cur) return;
+  const fromEl = document.getElementById('s'+cur);
+  const toEl   = document.getElementById('s'+n);
+  const forward = n > cur;
+
+  // 1. Snap incoming slide to its start position (no transition)
+  toEl.style.transition = 'none';
+  toEl.style.transform  = forward ? 'translateX(60px)' : 'translateX(-60px)';
+  toEl.style.opacity    = '0';
+
+  // 2. Force reflow so the browser registers the position
+  toEl.getBoundingClientRect();
+
+  // 3. Exit current slide via CSS classes (CSS handles the animation)
+  fromEl.classList.remove('active');
+  if(forward) fromEl.classList.add('exit-left');
+  // going back: CSS default non-active exits to translateX(60px) = right ✓
+
+  // 4. Re-enable transition on incoming slide, mark it active
+  toEl.style.transition = '';
+  toEl.classList.add('active');
+
+  // 5. Clear inline overrides so CSS active state (opacity:1, transform:0) takes effect
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      toEl.style.transform = '';
+      toEl.style.opacity   = '';
+    });
+  });
+
+  // 6. Clean up exit class after transition completes
+  setTimeout(()=>{
+    fromEl.classList.remove('exit-left');
+  }, 560);
+
+  cur = n;
+  updateUI();
+  if(cur === 7) setTimeout(triggerCountUp, 300);
+}
+
+function nextSlide(){ goToSlide(cur + 1); }
+function prevSlide(){ goToSlide(cur - 1); }
+
+function updateUI(){
+  document.getElementById('slideNum').textContent = cur;
+  const dots = dotsEl.querySelectorAll('.nav-dot');
+  dots.forEach((d,i) => d.classList.toggle('active', i+1===cur));
+  document.getElementById('btnPrev').disabled = cur === 1;
+  const nextBtn = document.getElementById('btnNext');
+  if(cur === TOTAL){
+    nextBtn.textContent = 'Início';
+    nextBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Início';
+  } else {
+    nextBtn.innerHTML = 'Próximo <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>';
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+  if(e.key === 'Home') goToSlide(1);
+  if(e.key === 'End') goToSlide(TOTAL);
+});
+
+// CountUp animation
+function countUp(el, target){
+  let v = 0;
+  const step = target / 45;
+  const t = setInterval(()=>{
+    v = Math.min(v+step, target);
+    el.textContent = '+' + Math.round(v) + '%';
+    if(v>=target) clearInterval(t);
+  }, 22);
+}
+let countedUp = false;
+function triggerCountUp(){
+  if(countedUp) return;
+  countedUp = true;
+  document.querySelectorAll('[data-target]').forEach(el => {
+    countUp(el, parseInt(el.dataset.target));
+  });
+}
+
+// Touch/swipe support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  if(Math.abs(dx) > 50) dx > 0 ? nextSlide() : prevSlide();
+}, {passive:true});
+
+// Init
+updateUI();
+</script>
+</body>
+</html>

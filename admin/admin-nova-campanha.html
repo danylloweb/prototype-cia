@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Nova Campanha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--border-h:#CBD5E1;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:256px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:16px 14px 14px;border-bottom:1px solid var(--border);}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-section{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:14px 10px 5px;}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--orange);color:white;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:100px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:32px;height:32px;border-radius:8px;background:var(--t1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 28px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-back{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex-shrink:0;transition:.15s;}
+    .topbar-back:hover{background:var(--bg4);}
+    .topbar-back svg{width:16px;height:16px;fill:var(--t3);}
+    .topbar-info{flex:1;}
+    .topbar-title{font-size:16px;font-weight:700;color:var(--t1);}
+    .topbar-sub{font-size:12px;color:var(--t3);}
+    .content{flex:1;padding:28px 32px;max-width:900px;margin:0 auto;width:100%;}
+
+    /* Progress steps */
+    .steps-bar{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+    .step-item{display:flex;align-items:center;flex:1;}
+    .step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:.3s;border:2px solid var(--border);background:var(--bg2);color:var(--t4);}
+    .step-dot.active{background:var(--orange);border-color:var(--orange);color:white;}
+    .step-dot.done{background:var(--green);border-color:var(--green);color:white;}
+    .step-label{font-size:11px;font-weight:600;color:var(--t4);margin-left:8px;white-space:nowrap;transition:.3s;}
+    .step-label.active{color:var(--orange);}
+    .step-label.done{color:var(--green);}
+    .step-line{flex:1;height:2px;background:var(--border);margin:0 8px;transition:.3s;}
+    .step-line.done{background:var(--green);}
+
+    /* Step panels */
+    .step-panel{display:none;animation:fadeIn .25s ease;}
+    .step-panel.visible{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+    .step-title{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:6px;}
+    .step-sub{font-size:14px;color:var(--t3);margin-bottom:24px;}
+
+    /* Type cards */
+    .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+    .type-card{border:2px solid var(--border);border-radius:12px;padding:18px 16px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--bg2);}
+    .type-card:hover{border-color:var(--border-h);background:var(--bg3);}
+    .type-card.selected{border-color:var(--orange);background:var(--orange-l);}
+    .type-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+    .type-icon svg{width:20px;height:20px;fill:currentColor;}
+    .type-name{font-size:13px;font-weight:700;color:var(--t1);}
+    .type-desc{font-size:11px;color:var(--t3);}
+
+    /* Objective */
+    .field-group{margin-bottom:20px;}
+    .field-label{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:7px;display:block;}
+    select,input[type=text],input[type=date],input[type=time],input[type=number],textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;color:var(--t1);background:var(--bg2);outline:none;transition:border-color .15s;}
+    select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.08);}
+    textarea{resize:vertical;min-height:100px;line-height:1.6;}
+    input::placeholder,textarea::placeholder{color:var(--t4);}
+
+    /* Audience */
+    .aud-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+    .aud-card{border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.15s;background:var(--bg2);}
+    .aud-card:hover{border-color:var(--border-h);}
+    .aud-card.selected{border-color:var(--orange);background:var(--orange-l);}
+    .aud-card-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+    .aud-card-sub{font-size:11px;color:var(--t3);}
+    .aud-count{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+    .aud-count-val{font-size:22px;font-weight:800;color:var(--orange);}
+    .aud-count-label{font-size:12px;color:var(--t3);}
+    .aud-count-sub{font-size:11px;color:var(--t4);}
+
+    /* Filters */
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+    .filter-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:100px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;transition:.15s;background:var(--bg2);}
+    .filter-chip:hover{border-color:var(--border-h);color:var(--t2);}
+    .filter-chip.on{border-color:var(--orange);background:var(--orange-m);color:var(--orange);}
+    .filter-chip input{display:none;}
+
+    /* Content step */
+    .vars-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+    .var-chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);color:var(--t2);cursor:pointer;transition:.15s;font-family:monospace;}
+    .var-chip:hover{background:var(--orange-m);border-color:var(--orange-b);color:var(--orange);}
+    .preview-card{background:var(--t1);border-radius:14px;padding:20px;color:white;margin-top:20px;}
+    .preview-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+    .preview-bubble{background:#1e293b;border-radius:12px 12px 12px 2px;padding:12px 14px;max-width:280px;}
+    .preview-bubble p{font-size:13px;color:rgba(255,255,255,.9);line-height:1.6;}
+    .preview-time{font-size:10px;color:rgba(255,255,255,.4);margin-top:6px;text-align:right;}
+
+    /* Schedule step */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .recurrence-grid{display:flex;gap:8px;flex-wrap:wrap;}
+    .rec-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;background:var(--bg2);color:var(--t2);font-family:var(--font);}
+    .rec-btn.active{border-color:var(--orange);background:var(--orange-m);color:var(--orange);}
+
+    /* Review step */
+    .review-section{background:var(--bg2);border:1px solid var(--border);border-radius:13px;margin-bottom:14px;overflow:hidden;}
+    .review-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3);}
+    .review-head-title{font-size:12px;font-weight:700;color:var(--t2);}
+    .review-edit{font-size:11px;color:var(--orange);font-weight:600;cursor:pointer;}
+    .review-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+    .review-row{display:flex;justify-content:space-between;align-items:center;}
+    .review-key{font-size:12px;color:var(--t3);}
+    .review-val{font-size:13px;font-weight:600;color:var(--t1);}
+
+    /* Actions */
+    .step-actions{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);}
+    .btn{padding:10px 20px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;display:inline-flex;align-items:center;gap:7px;}
+    .btn svg{width:15px;height:15px;fill:currentColor;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .btn-ghost{background:var(--bg3);color:var(--t2);border:1px solid var(--border);}
+    .btn-ghost:hover{background:var(--bg4);}
+    .btn-green{background:var(--green);color:white;}
+    .btn-green:hover{background:#047857;}
+
+    /* Success */
+    .success-screen{display:none;text-align:center;padding:60px 20px;}
+    .success-screen.visible{display:block;}
+    .success-icon{width:72px;height:72px;background:var(--green-l);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+    .success-icon svg{width:36px;height:36px;fill:var(--green);}
+    .success-title{font-size:24px;font-weight:800;color:var(--t1);margin-bottom:8px;}
+    .success-sub{font-size:15px;color:var(--t3);margin-bottom:28px;}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+    /* MOBILE MENU */
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .topbar{padding:0 14px;}
+      .content{padding:20px 16px;}
+      .type-grid{grid-template-columns:1fr 1fr;}
+      .aud-grid{grid-template-columns:1fr;}
+      .grid-2{grid-template-columns:1fr;}
+      .step-label{display:none;}
+      .steps-bar{gap:0;}
+      .step-actions{padding-top:14px;margin-top:18px;}
+    }
+    @media(max-width:520px){
+      .type-grid{grid-template-columns:1fr 1fr;}
+      .step-title{font-size:17px;}
+      .step-sub{font-size:13px;}
+      .topbar-title{font-size:15px;}
+      .topbar-sub{display:none;}
+      .content{padding:14px 12px;}
+      .review-section{margin-bottom:10px;}
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" style="display:flex;align-items:center;gap:9px;text-decoration:none;margin-bottom:4px;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:36px;height:36px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-section">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Campanhas<span class="nav-badge">6</span></a>
+    <a href="admin-analytics.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Analytics & BI</a>
+    <a href="admin-funil.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Funil de Captação</a>
+    <div class="nav-section">Operações</div>
+    <a href="admin-unidades.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3L12 3z"/></svg>Unidades</a>
+    <a href="admin-alunos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Alunos</a>
+    <a href="admin-financeiro.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro</a>
+    <div class="nav-section">Acesso</div>
+    <a href="../checkout/index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm0 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>Checkout</a>
+    <a href="../aluno/aluno-login.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">AD</div><div><div class="user-name">Admin CIA NET</div><div class="user-role">Administrador</div></div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <a href="admin-campanhas.html" class="topbar-back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+    <div class="topbar-info">
+      <div class="topbar-title">Nova Campanha</div>
+      <div class="topbar-sub">Crie e configure uma nova campanha de marketing</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Progress Steps -->
+    <div class="steps-bar" id="stepsBar">
+      <div class="step-item">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-label active" id="lbl1">Tipo</div>
+        <div class="step-line" id="line1"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-label" id="lbl2">Público</div>
+        <div class="step-line" id="line2"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="dot3">3</div>
+        <div class="step-label" id="lbl3">Conteúdo</div>
+        <div class="step-line" id="line3"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="dot4">4</div>
+        <div class="step-label" id="lbl4">Agendamento</div>
+        <div class="step-line" id="line4" style="display:none;"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="dot5">5</div>
+        <div class="step-label" id="lbl5">Revisão</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Tipo -->
+    <div class="step-panel visible" id="step1">
+      <div class="step-title">Tipo de campanha</div>
+      <div class="step-sub">Escolha o canal e defina o objetivo da campanha</div>
+
+      <div class="type-grid">
+        <div class="type-card selected" onclick="selectType(this,'WhatsApp')">
+          <div class="type-icon" style="background:#d1fae5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 0C5.373 0 0 5.373 0 12c0 2.072.527 4.02 1.453 5.726L0 24l6.436-1.425A11.936 11.936 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.847 0-3.575-.5-5.063-1.37L3.5 21.5l.9-3.345A9.956 9.956 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg></div>
+          <div class="type-name">WhatsApp em Massa</div>
+          <div class="type-desc">Envio direto via API WhatsApp Business</div>
+        </div>
+        <div class="type-card" onclick="selectType(this,'Email')">
+          <div class="type-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+          <div class="type-name">Email Marketing</div>
+          <div class="type-desc">Campanha de e-mail com design profissional</div>
+        </div>
+        <div class="type-card" onclick="selectType(this,'SMS')">
+          <div class="type-icon" style="background:#F5F3FF;color:#7C3AED;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+          <div class="type-name">SMS</div>
+          <div class="type-desc">Mensagem de texto direta no celular</div>
+        </div>
+        <div class="type-card" onclick="selectType(this,'Push')">
+          <div class="type-icon" style="background:var(--orange-l);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+          <div class="type-name">Push Notification</div>
+          <div class="type-desc">Notificação no app e navegador</div>
+        </div>
+        <div class="type-card" onclick="selectType(this,'Social')">
+          <div class="type-icon" style="background:#FDF2F8;color:#9D174D;"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg></div>
+          <div class="type-name">Social Media</div>
+          <div class="type-desc">Post agendado no Instagram e Facebook</div>
+        </div>
+        <div class="type-card" onclick="selectType(this,'Sequência')">
+          <div class="type-icon" style="background:var(--amber-l);color:var(--amber);"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div>
+          <div class="type-name">Sequência Automática</div>
+          <div class="type-desc">Cadência multi-etapa com gatilhos</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Objetivo da campanha</label>
+        <select id="objetivo">
+          <option value="">Selecione o objetivo...</option>
+          <option>Reativação de alunos inativos</option>
+          <option>Captação de novos leads</option>
+          <option>Renovação de planos vencendo</option>
+          <option>Promoção especial / desconto</option>
+          <option>Divulgação de nova modalidade</option>
+          <option>Indicação / programa de referência</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Nome interno da campanha</label>
+        <input type="text" id="campNome" placeholder="Ex: Reativação Junho 2025 — WhatsApp" value="Reativação Junho 2025 — WhatsApp">
+      </div>
+    </div>
+
+    <!-- STEP 2: Público -->
+    <div class="step-panel" id="step2">
+      <div class="step-title">Público-alvo</div>
+      <div class="step-sub">Defina quem vai receber essa campanha</div>
+
+      <div class="aud-grid">
+        <div class="aud-card selected" onclick="selectAud(this)">
+          <div class="aud-card-title">Alunos inativos</div>
+          <div class="aud-card-sub">Não frequentam há 15+ dias</div>
+        </div>
+        <div class="aud-card" onclick="selectAud(this)">
+          <div class="aud-card-title">Leads não convertidos</div>
+          <div class="aud-card-sub">Visitaram mas não matricularam</div>
+        </div>
+        <div class="aud-card" onclick="selectAud(this)">
+          <div class="aud-card-title">Planos vencendo em breve</div>
+          <div class="aud-card-sub">Vencimento nos próximos 30 dias</div>
+        </div>
+        <div class="aud-card" onclick="selectAud(this)">
+          <div class="aud-card-title">Toda a base</div>
+          <div class="aud-card-sub">Todos os alunos ativos</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Filtrar por unidade</label>
+        <div class="filter-row" id="unitFilters">
+          <label class="filter-chip on"><input type="checkbox" checked onchange="updateCount()"> Boa Viagem</label>
+          <label class="filter-chip on"><input type="checkbox" checked onchange="updateCount()"> Madalena</label>
+          <label class="filter-chip"><input type="checkbox" onchange="updateCount()"> Caruaru</label>
+          <label class="filter-chip"><input type="checkbox" onchange="updateCount()"> Olinda</label>
+          <label class="filter-chip"><input type="checkbox" onchange="updateCount()"> Caruaru II</label>
+          <label class="filter-chip"><input type="checkbox" onchange="updateCount()"> Paulista</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Filtrar por plano</label>
+        <div class="filter-row">
+          <label class="filter-chip on"><input type="checkbox" checked> Mensal</label>
+          <label class="filter-chip on"><input type="checkbox" checked> Trimestral</label>
+          <label class="filter-chip on"><input type="checkbox" checked> Semestral</label>
+          <label class="filter-chip on"><input type="checkbox" checked> Anual</label>
+        </div>
+      </div>
+
+      <div class="aud-count">
+        <div>
+          <div class="aud-count-val" id="countVal">347</div>
+          <div class="aud-count-label">contatos selecionados</div>
+          <div class="aud-count-sub" style="margin-top:2px;">Boa Viagem (189) + Madalena (158)</div>
+        </div>
+        <svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:var(--orange);opacity:.6;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
+    </div>
+
+    <!-- STEP 3: Conteúdo -->
+    <div class="step-panel" id="step3">
+      <div class="step-title">Conteúdo da mensagem</div>
+      <div class="step-sub">Escreva a mensagem e adicione personalização</div>
+
+      <div class="field-group">
+        <label class="field-label">Variáveis disponíveis</label>
+        <div class="vars-row">
+          <span class="var-chip" onclick="insertVar('{nome}')">{'{'}{nome}{'}'}</span>
+          <span class="var-chip" onclick="insertVar('{plano}')">{'{'}{plano}{'}'}</span>
+          <span class="var-chip" onclick="insertVar('{unidade}')">{'{'}{unidade}{'}'}</span>
+          <span class="var-chip" onclick="insertVar('{vencimento}')">{'{'}{vencimento}{'}'}</span>
+          <span class="var-chip" onclick="insertVar('{link}')">{'{'}{link}{'}'}</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Mensagem</label>
+        <textarea id="msgContent" rows="6" oninput="updatePreview()" placeholder="Olá {nome}! Sentimos sua falta na CIA do Corpo...">Olá {nome}! 👋
+
+Sentimos sua falta na *Academia CIA do Corpo* ({unidade})!
+
+Que tal voltar a treinar? Temos uma condição especial esperando por você. Acesse agora e renove com desconto exclusivo:
+
+{link}
+
+Qualquer dúvida estamos aqui! 💪
+_Equipe CIA do Corpo_</textarea>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-label">Pré-visualização · WhatsApp</div>
+        <div class="preview-bubble">
+          <p id="previewText">Olá João! 👋<br><br>Sentimos sua falta na <b>Academia CIA do Corpo</b> (Boa Viagem)!<br><br>Que tal voltar a treinar? Temos uma condição especial esperando por você. Acesse agora e renove com desconto exclusivo:<br><br>cia.net/renovar/abc123<br><br>Qualquer dúvida estamos aqui! 💪<br><i>Equipe CIA do Corpo</i></p>
+          <div class="preview-time">Agora ✓✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Agendamento -->
+    <div class="step-panel" id="step4">
+      <div class="step-title">Agendamento e orçamento</div>
+      <div class="step-sub">Defina quando e como a campanha será enviada</div>
+
+      <div class="grid-2">
+        <div class="field-group">
+          <label class="field-label">Data de início</label>
+          <input type="date" id="dataInicio" value="2025-06-15">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Horário de envio</label>
+          <input type="time" id="horaEnvio" value="10:00">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Data de encerramento (opcional)</label>
+          <input type="date" id="dataFim">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Investimento estimado (R$)</label>
+          <input type="number" id="investimento" placeholder="0,00" value="500">
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:4px;">
+        <label class="field-label">Recorrência</label>
+        <div class="recurrence-grid">
+          <button class="rec-btn active" onclick="setRec(this)">Envio único</button>
+          <button class="rec-btn" onclick="setRec(this)">Diário</button>
+          <button class="rec-btn" onclick="setRec(this)">Semanal</button>
+          <button class="rec-btn" onclick="setRec(this)">Mensal</button>
+        </div>
+      </div>
+
+      <div style="background:var(--orange-l);border:1px solid var(--orange-b);border-radius:10px;padding:14px 16px;margin-top:16px;display:flex;gap:10px;align-items:flex-start;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--orange);flex-shrink:0;margin-top:1px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <div style="font-size:13px;color:var(--orange-2);line-height:1.5;">O disparo será realizado em lotes para evitar bloqueios. Para 347 contatos, o envio completo leva aproximadamente <strong>35 minutos</strong>.</div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Revisão -->
+    <div class="step-panel" id="step5">
+      <div class="step-title">Revisão final</div>
+      <div class="step-sub">Confirme os detalhes antes de lançar a campanha</div>
+
+      <div class="review-section">
+        <div class="review-head"><div class="review-head-title">Tipo e Objetivo</div><span class="review-edit" onclick="goTo(1)">Editar</span></div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Canal</span><span class="review-val" id="rv-tipo">WhatsApp em Massa</span></div>
+          <div class="review-row"><span class="review-key">Objetivo</span><span class="review-val">Reativação de alunos inativos</span></div>
+          <div class="review-row"><span class="review-key">Nome da campanha</span><span class="review-val">Reativação Junho 2025 — WhatsApp</span></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-head"><div class="review-head-title">Público-alvo</div><span class="review-edit" onclick="goTo(2)">Editar</span></div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Segmento</span><span class="review-val">Alunos inativos (15+ dias)</span></div>
+          <div class="review-row"><span class="review-key">Unidades</span><span class="review-val">Boa Viagem + Madalena</span></div>
+          <div class="review-row"><span class="review-key">Total de contatos</span><span class="review-val" style="color:var(--orange);font-size:15px;">347 destinatários</span></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-head"><div class="review-head-title">Conteúdo</div><span class="review-edit" onclick="goTo(3)">Editar</span></div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Canal</span><span class="review-val">WhatsApp Business API</span></div>
+          <div class="review-row"><span class="review-key">Personalizações</span><span class="review-val">{nome}, {unidade}, {link}</span></div>
+          <div class="review-row"><span class="review-key">Tamanho da msg</span><span class="review-val">248 caracteres</span></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-head"><div class="review-head-title">Agendamento</div><span class="review-edit" onclick="goTo(4)">Editar</span></div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Data de envio</span><span class="review-val">15/06/2025 às 10:00</span></div>
+          <div class="review-row"><span class="review-key">Recorrência</span><span class="review-val">Envio único</span></div>
+          <div class="review-row"><span class="review-key">Investimento estimado</span><span class="review-val">R$500,00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+      <div class="success-title">Campanha criada com sucesso!</div>
+      <div class="success-sub">A campanha <strong>Reativação Junho 2025 — WhatsApp</strong> foi agendada para 15/06/2025 às 10:00 e será enviada para <strong>347 contatos</strong>.</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <a href="admin-campanhas.html" class="btn btn-ghost">Ver todas as campanhas</a>
+        <a href="admin-nova-campanha.html" class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Nova campanha</a>
+      </div>
+    </div>
+
+    <!-- Step Actions -->
+    <div class="step-actions" id="stepActions">
+      <button class="btn btn-ghost" id="btnBack" onclick="prevStep()" style="visibility:hidden;"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Voltar</button>
+      <div style="font-size:12px;color:var(--t4);" id="stepCounter">Etapa 1 de 5</div>
+      <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Próximo<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+let cur = 1;
+let selectedType = 'WhatsApp';
+
+function selectType(el, type) {
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = type;
+  document.getElementById('rv-tipo').textContent = type + (type==='WhatsApp'?' em Massa':type==='Email'?' Marketing':'');
+}
+
+function selectAud(el) {
+  document.querySelectorAll('.aud-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function updateCount() {
+  const checked = document.querySelectorAll('#unitFilters input:checked').length;
+  const counts = [0,189,347,412,489,542,590];
+  document.getElementById('countVal').textContent = counts[Math.min(checked,6)];
+}
+
+function setRec(el) {
+  document.querySelectorAll('.rec-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function insertVar(v) {
+  const ta = document.getElementById('msgContent');
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.substring(0,s) + v + ta.value.substring(e);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = s + v.length;
+  updatePreview();
+}
+
+function updatePreview() {
+  const msg = document.getElementById('msgContent').value
+    .replace(/{nome}/g,'João')
+    .replace(/{unidade}/g,'Boa Viagem')
+    .replace(/{plano}/g,'Semestral')
+    .replace(/{vencimento}/g,'15/07/2025')
+    .replace(/{link}/g,'cia.net/renovar/abc123')
+    .replace(/\*([^*]+)\*/g,'<b>$1</b>')
+    .replace(/_([^_]+)_/g,'<i>$1</i>')
+    .replace(/\n/g,'<br>');
+  document.getElementById('previewText').innerHTML = msg;
+}
+
+function updateStepUI() {
+  for(let i=1;i<=5;i++){
+    const dot=document.getElementById('dot'+i);
+    const lbl=document.getElementById('lbl'+i);
+    const line=document.getElementById('line'+i);
+    dot.className='step-dot'+(i<cur?' done':i===cur?' active':'');
+    lbl.className='step-label'+(i<cur?' done':i===cur?' active':'');
+    dot.textContent = i<cur ? '✓' : i;
+    if(line) line.className='step-line'+(i<cur?' done':'');
+  }
+  document.getElementById('stepCounter').textContent=`Etapa ${cur} de 5`;
+  document.getElementById('btnBack').style.visibility=cur>1?'visible':'hidden';
+  document.getElementById('btnNext').innerHTML=cur<5
+    ?'Próximo<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>'
+    :'<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Lançar campanha';
+  document.getElementById('btnNext').className='btn '+(cur<5?'btn-primary':'btn-green');
+}
+
+function nextStep() {
+  if(cur===5){
+    document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('visible'));
+    document.getElementById('stepsBar').style.display='none';
+    document.getElementById('stepActions').style.display='none';
+    document.getElementById('successScreen').classList.add('visible');
+    return;
+  }
+  document.getElementById('step'+cur).classList.remove('visible');
+  cur++;
+  document.getElementById('step'+cur).classList.add('visible');
+  updateStepUI();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function prevStep() {
+  if(cur===1) return;
+  document.getElementById('step'+cur).classList.remove('visible');
+  cur--;
+  document.getElementById('step'+cur).classList.add('visible');
+  updateStepUI();
+}
+
+function goTo(step) {
+  document.getElementById('step'+cur).classList.remove('visible');
+  cur=step;
+  document.getElementById('step'+cur).classList.add('visible');
+  updateStepUI();
+}
+
+updateStepUI();
+</script>
+</body>
+</html>

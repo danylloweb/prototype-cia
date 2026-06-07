@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Campanhas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --font:'Inter',sans-serif;
+      --orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;
+      --orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);
+      --bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;
+      --border:#E2E8F0;--border-h:#CBD5E1;
+      --t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;
+      --green:#059669;--green-l:#ECFDF5;--green-b:rgba(5,150,105,.2);
+      --amber:#D97706;--amber-l:#FFFBEB;--amber-b:rgba(217,119,6,.2);
+      --red:#DC2626;--red-l:#FEF2F2;--red-b:rgba(220,38,38,.2);
+      --blue:#2563EB;--blue-l:#EFF6FF;
+      --sidebar:256px;
+      --sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);
+      --sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:38px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .client-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .client-info-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .client-info-sub{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--orange);color:white;font-size:10px;font-weight:700;border-radius:100px;padding:1px 6px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;}
+    .user-row:hover{background:var(--bg3);}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .btn-ghost:hover{background:var(--bg4);}
+    .content{padding:22px 26px;}
+
+    /* KPIs */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+    .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 18px;box-shadow:var(--sh-sm);}
+    .kpi-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .kpi-icon svg{width:17px;height:17px;fill:currentColor;}
+    .kpi-badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;}
+    .up{background:var(--green-l);color:var(--green);}
+    .dn{background:var(--red-l);color:var(--red);}
+    .kpi-val{font-size:24px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px;}
+    .kpi-label{font-size:12px;color:var(--t3);}
+
+    /* FILTERS */
+    .filters-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+    .tab-group{display:flex;background:var(--bg3);border-radius:9px;padding:3px;gap:2px;}
+    .tab{padding:6px 14px;border-radius:7px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;transition:all .15s;}
+    .tab.active{background:var(--bg2);color:var(--t1);font-weight:600;box-shadow:var(--sh-sm);}
+    .search-box{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;}
+    .search-box svg{width:14px;height:14px;fill:var(--t4);}
+    .search-box input{border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--t1);background:transparent;width:200px;}
+    .search-box input::placeholder{color:var(--t4);}
+
+    /* CAMPAIGN CARDS */
+    .camp-grid{display:flex;flex-direction:column;gap:10px;}
+    .camp-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 20px;box-shadow:var(--sh-sm);transition:box-shadow .2s;}
+    .camp-card:hover{box-shadow:var(--sh);}
+    .camp-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+    .camp-ch-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .camp-ch-icon svg{width:17px;height:17px;fill:currentColor;}
+    .camp-name{font-size:15px;font-weight:700;color:var(--t1);}
+    .camp-meta{font-size:12px;color:var(--t3);margin-top:1px;}
+    .camp-status{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px;}
+    .s-active{background:var(--green-l);color:var(--green);}
+    .s-paused{background:var(--amber-l);color:var(--amber);}
+    .s-draft{background:var(--bg3);color:var(--t3);}
+    .camp-metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px;}
+    .metric{text-align:center;padding:8px 6px;background:var(--bg3);border-radius:8px;}
+    .metric-val{font-size:15px;font-weight:700;color:var(--t1);}
+    .metric-label{font-size:10px;color:var(--t4);margin-top:2px;}
+    .budget-row{display:flex;align-items:center;gap:10px;}
+    .budget-label{font-size:12px;color:var(--t3);white-space:nowrap;}
+    .budget-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+    .budget-fill{height:100%;border-radius:3px;background:var(--orange);}
+    .budget-pct{font-size:12px;font-weight:600;color:var(--t2);white-space:nowrap;}
+    .camp-actions{display:flex;gap:6px;margin-left:auto;}
+    .act-btn{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--t2);transition:.15s;}
+    .act-btn:hover{background:var(--bg4);}
+    .act-btn.orange{background:var(--orange-m);border-color:var(--orange-b);color:var(--orange);}
+
+    /* EMPTY STATE */
+    .empty{text-align:center;padding:48px;color:var(--t4);}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+    /* MOBILE MENU */
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .topbar{padding:0 14px;}
+      .content{padding:14px 16px;}
+      .kpi-row{grid-template-columns:repeat(2,1fr);}
+      .btn-ghost{display:none;}
+      .search-box input{width:140px;}
+      .filters-row{flex-direction:column;align-items:stretch;}
+      .tab-group{overflow-x:auto;}
+    }
+    @media(max-width:600px){
+      .kpi-row{grid-template-columns:1fr 1fr;}
+      .camp-metrics{grid-template-columns:repeat(3,1fr);}
+      .budget-row{flex-wrap:wrap;gap:6px;}
+      .camp-actions{margin-left:0;width:100%;}
+      .act-btn{flex:1;text-align:center;}
+      .topbar-title{font-size:15px;}
+      .filters-row > div:last-child{display:flex;flex-direction:column;gap:8px;}
+      .filters-row > div:last-child select{width:100%;}
+    }
+    @media(max-width:400px){
+      .kpi-row{grid-template-columns:1fr 1fr;gap:8px;}
+      .kpi-val{font-size:20px;}
+      .search-box{display:none;}
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    
+    <div class="client-info"><div class="client-info-name">Academia CIA do Corpo</div><div class="client-info-sub">Painel Admin · 6 Unidades</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Visão Geral</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a>
+    <div class="nav-label">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Campanhas<span class="nav-badge">6</span></a>
+    <a href="admin-analytics.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Analytics & BI</a>
+    <a href="admin-funil.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Funil de Captação</a>
+    <div class="nav-label">Operações</div>
+    <a href="admin-unidades.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Unidades</a>
+    <a href="admin-alunos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Alunos</a>
+    <a href="admin-financeiro.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro</a>
+    <div class="nav-label">Produto</div>
+    <a href="../checkout/index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 6H17c0-2.21-1.79-4-4-4S9 3.79 9 6H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>Checkout</a>
+    <a href="../aluno/aluno-login.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+  </nav>
+  <div class="sdb-footer"><div class="user-row"><div class="user-av">RC</div><div><div class="user-name">Ticyane Chyarelly</div><div class="user-role">Diretor Comercial</div></div></div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+      <div class="topbar-title">Campanhas</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" placeholder="Buscar campanha..."></div>
+      <button class="btn btn-ghost">Exportar</button>
+      <a href="admin-nova-campanha.html" class="btn btn-primary" style="text-decoration:none;">+ Nova campanha</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-head"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><span class="kpi-badge up">+18%</span></div>
+        <div class="kpi-val">R$ 24.800</div><div class="kpi-label">Investimento total / mês</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-head"><div class="kpi-icon" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div><span class="kpi-badge up">-12%</span></div>
+        <div class="kpi-val">R$ 52</div><div class="kpi-label">CPA médio</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-head"><div class="kpi-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><span class="kpi-badge up">+22%</span></div>
+        <div class="kpi-val">1.243</div><div class="kpi-label">Leads gerados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-head"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div><span class="kpi-badge up">+0.4x</span></div>
+        <div class="kpi-val">3.2×</div><div class="kpi-label">ROAS médio</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-row">
+      <div class="tab-group">
+        <div class="tab active" onclick="filterCamps(this,'all')">Todas</div>
+        <div class="tab" onclick="filterCamps(this,'active')">Ativas <span style="background:var(--green-l);color:var(--green);font-size:10px;padding:1px 5px;border-radius:100px;margin-left:4px;">4</span></div>
+        <div class="tab" onclick="filterCamps(this,'paused')">Pausadas <span style="background:var(--amber-l);color:var(--amber);font-size:10px;padding:1px 5px;border-radius:100px;margin-left:4px;">1</span></div>
+        <div class="tab" onclick="filterCamps(this,'draft')">Rascunhos <span style="background:var(--bg4);color:var(--t3);font-size:10px;padding:1px 5px;border-radius:100px;margin-left:4px;">1</span></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <select style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--t2);background:var(--bg2);outline:none;"><option>Todos os canais</option><option>Instagram</option><option>Facebook</option><option>Google</option><option>WhatsApp</option></select>
+        <select style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--t2);background:var(--bg2);outline:none;"><option>Todas as unidades</option><option>Boa Viagem</option><option>Madalena</option><option>Olinda</option><option>Caruaru</option></select>
+      </div>
+    </div>
+
+    <!-- Campaign cards -->
+    <div class="camp-grid" id="campGrid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+const campaigns = [
+  {name:'Verão Boa Viagem',meta:'Instagram Ads · Boa Viagem · Recife',channel:'instagram',status:'active',reach:84200,leads:312,cpa:48,roas:3.8,budget:8000,spent:6240},
+  {name:'Matrícula Recife',meta:'Facebook Ads · Boa Viagem II · Recife',channel:'facebook',status:'active',reach:61800,leads:198,cpa:52,roas:2.9,budget:6000,spent:4320},
+  {name:'Google Search PE',meta:'Google Ads · Todas as unidades',channel:'google',status:'active',reach:45100,leads:287,cpa:61,roas:2.4,budget:7500,spent:5700},
+  {name:'WhatsApp Fidelização',meta:'WhatsApp Business · Retorno de leads',channel:'whatsapp',status:'active',reach:18400,leads:246,cpa:31,roas:4.2,budget:3300,spent:2970},
+  {name:'Retargeting Caruaru',meta:'Instagram Ads · Caruaru',channel:'instagram',status:'paused',reach:22600,leads:87,cpa:74,roas:1.9,budget:4000,spent:2600},
+  {name:'Olinda — Lançamento',meta:'Google Ads · Olinda',channel:'google',status:'draft',reach:0,leads:0,cpa:0,roas:0,budget:5000,spent:0},
+];
+
+const chIcons = {
+  instagram:{bg:'#FFF0F5',color:'#E4405F',svg:'<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>'},
+  facebook:{bg:'#F0F7FF',color:'#1877F2',svg:'<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>'},
+  google:{bg:'#F0FFF4',color:'#059669',svg:'<path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>'},
+  whatsapp:{bg:'#F0FFF4',color:'#25D366',svg:'<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>'},
+};
+
+const statusMap={active:'s-active',paused:'s-paused',draft:'s-draft'};
+const statusLabel={active:'● Ativa',paused:'⏸ Pausada',draft:'Rascunho'};
+
+function renderCamps(filter='all'){
+  const grid=document.getElementById('campGrid');
+  const filtered=filter==='all'?campaigns:campaigns.filter(c=>c.status===filter);
+  grid.innerHTML=filtered.map(c=>{
+    const ic=chIcons[c.channel];
+    const pct=c.budget?Math.round(c.spent/c.budget*100):0;
+    const cpaColor=c.cpa<50?'color:var(--green)':c.cpa<70?'color:var(--amber)':'color:var(--red)';
+    return `<div class="camp-card">
+      <div class="camp-header">
+        <div class="camp-ch-icon" style="background:${ic.bg};color:${ic.color};"><svg viewBox="0 0 24 24" fill="currentColor">${ic.svg}</svg></div>
+        <div><div class="camp-name">${c.name}</div><div class="camp-meta">${c.meta}</div></div>
+        <span class="camp-status ${statusMap[c.status]}">${statusLabel[c.status]}</span>
+      </div>
+      <div class="camp-metrics">
+        <div class="metric"><div class="metric-val">${c.reach?c.reach.toLocaleString('pt-BR'):'—'}</div><div class="metric-label">Alcance</div></div>
+        <div class="metric"><div class="metric-val">${c.leads||'—'}</div><div class="metric-label">Leads</div></div>
+        <div class="metric"><div class="metric-val" style="${cpaColor}">${c.cpa?'R$'+c.cpa:'—'}</div><div class="metric-label">CPA</div></div>
+        <div class="metric"><div class="metric-val">${c.roas?c.roas+'×':'—'}</div><div class="metric-label">ROAS</div></div>
+        <div class="metric"><div class="metric-val">R$${(c.spent/1000).toFixed(1)}k</div><div class="metric-label">Gasto</div></div>
+        <div class="metric"><div class="metric-val">R$${(c.budget/1000).toFixed(1)}k</div><div class="metric-label">Budget</div></div>
+      </div>
+      <div class="budget-row">
+        <div class="budget-label">Orçamento: ${pct}% usado</div>
+        <div class="budget-bar"><div class="budget-fill" style="width:${pct}%;background:${pct>90?'var(--red)':pct>70?'var(--amber)':'var(--orange)'}"></div></div>
+        <div class="budget-pct">R$${(c.spent/1000).toFixed(1)}k / R$${(c.budget/1000).toFixed(1)}k</div>
+        <div class="camp-actions">
+          <button class="act-btn">${c.status==='active'?'Pausar':'Ativar'}</button>
+          <button class="act-btn orange">Ver detalhes</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterCamps(el,filter){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderCamps(filter);
+}
+
+renderCamps();
+</script>
+</body>
+</html>

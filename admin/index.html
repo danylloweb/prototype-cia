@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Dashboard Administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --font:'Inter',sans-serif;
+      --orange:#F97316;
+      --orange-2:#EA6C00;
+      --orange-l:#FFF7ED;
+      --orange-m:rgba(249,115,22,.12);
+      --orange-b:rgba(249,115,22,.2);
+      --bg:#F8FAFC;
+      --bg2:#FFFFFF;
+      --bg3:#F1F5F9;
+      --bg4:#E2E8F0;
+      --surf:#FFFFFF;
+      --surf-h:#F8FAFC;
+      --border:#E2E8F0;
+      --border-h:#CBD5E1;
+      --t1:#0F172A;
+      --t2:#334155;
+      --t3:#64748B;
+      --t4:#94A3B8;
+      --green:#059669;--green-l:#ECFDF5;--green-b:#BBF7D0;
+      --amber:#D97706;--amber-l:#FFFBEB;--amber-b:#FDE68A;
+      --red:#DC2626;--red-l:#FEF2F2;--red-b:#FECACA;
+      --blue:#2563EB;--blue-l:#EFF6FF;
+      --sidebar:256px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
+      --shadow-lg:0 8px 32px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.06);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+
+    /* SIDEBAR */
+    .sidebar{
+      width:var(--sidebar);min-width:var(--sidebar);
+      background:var(--bg2);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;
+      position:fixed;top:0;left:0;bottom:0;z-index:60;
+    }
+    .sdb-top{padding:20px 16px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:16px;}
+    .logo-img{height:36px;width:auto;object-fit:contain;}
+    .platform-tag{
+      display:inline-flex;align-items:center;gap:4px;
+      background:var(--orange-m);border:1px solid var(--orange-b);
+      border-radius:6px;padding:3px 8px;
+      font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.5px;text-transform:uppercase;
+    }
+    .client-info{
+      background:var(--orange-l);border:1px solid var(--orange-b);
+      border-radius:10px;padding:10px 12px;margin-top:10px;
+    }
+    .client-info-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .client-info-sub{font-size:11px;color:var(--orange);font-weight:600;}
+
+    .nav-items{flex:1;padding:10px 10px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{
+      display:flex;align-items:center;gap:9px;
+      padding:9px 10px;border-radius:8px;
+      text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;
+      transition:all .15s;margin-bottom:1px;cursor:pointer;
+    }
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:16px;height:16px;fill:currentColor;flex-shrink:0;}
+    .nav-item .nav-badge{
+      margin-left:auto;background:var(--orange);color:white;
+      font-size:10px;font-weight:700;border-radius:100px;
+      padding:1px 6px;min-width:18px;text-align:center;
+    }
+
+    .sdb-footer{padding:12px 10px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;}
+    .user-row:hover{background:var(--bg3);}
+    .user-av{width:36px;height:36px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+    .user-info .name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-info .role{font-size:10px;color:var(--t3);}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar);flex:1;position:relative;}
+    .topbar{
+      background:var(--bg2);border-bottom:1px solid var(--border);
+      height:58px;padding:0 28px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);
+    }
+    .topbar-left{display:flex;align-items:center;gap:12px;}
+    .topbar-title{font-family:var(--font);font-size:18px;font-weight:700;color:var(--t1);}
+    .topbar-date{font-size:12px;color:var(--t4);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .tb-btn{
+      padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
+      cursor:pointer;border:none;font-family:var(--font);transition:all .15s;
+    }
+    .tb-primary{background:var(--orange);color:white;}
+    .tb-primary:hover{background:var(--orange-2);}
+    .tb-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .tb-ghost:hover{background:var(--bg4);}
+    .notif-btn{
+      width:34px;height:34px;border-radius:8px;background:var(--bg3);
+      border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+      cursor:pointer;position:relative;
+    }
+    .notif-btn svg{width:16px;height:16px;fill:var(--t3);}
+    .notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--orange);border-radius:50%;border:2px solid white;}
+
+    .content{padding:24px 28px;}
+
+    /* KPI CARDS */
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+    .kpi{
+      background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+      padding:18px 20px;transition:box-shadow .2s;
+      box-shadow:var(--shadow-sm);
+    }
+    .kpi:hover{box-shadow:var(--shadow);}
+    .kpi-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+    .kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .kpi-icon svg{width:18px;height:18px;fill:currentColor;}
+    .kpi-change{font-size:11px;font-weight:700;padding:2px 6px;border-radius:100px;}
+    .kpi-change.up{background:var(--green-l);color:var(--green);}
+    .kpi-change.dn{background:var(--red-l);color:var(--red);}
+    .kpi-val{font-family:var(--font);font-size:24px;font-weight:700;color:var(--t1);line-height:1;margin-bottom:3px;}
+    .kpi-label{font-size:12px;color:var(--t3);}
+
+    /* SECTION */
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .section-title{font-family:var(--font);font-size:15px;font-weight:700;color:var(--t1);}
+    .section-link{font-size:12px;font-weight:600;color:var(--orange);cursor:pointer;}
+
+    /* GRID */
+    .grid-2-1{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-bottom:18px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px;}
+
+    /* CARD */
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+    .card-title{font-family:var(--font);font-size:14px;font-weight:700;color:var(--t1);}
+    .card-body{padding:20px;}
+
+    /* CHARTS */
+    .chart-wrap{position:relative;height:220px;}
+
+    /* FUNNEL */
+    .funnel{display:flex;flex-direction:column;gap:6px;padding:16px 20px;}
+    .funnel-step{display:flex;align-items:center;gap:12px;}
+    .funnel-bar-wrap{flex:1;background:var(--bg3);border-radius:6px;height:28px;overflow:hidden;}
+    .funnel-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:700;color:white;transition:width .6s;}
+    .funnel-label{font-size:12px;color:var(--t2);font-weight:500;white-space:nowrap;width:90px;}
+    .funnel-val{font-family:var(--font);font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;width:60px;text-align:right;}
+
+    /* CAMPAIGNS TABLE */
+    .data-table{width:100%;border-collapse:collapse;}
+    .data-table th{
+      padding:10px 14px;text-align:left;font-size:10px;font-weight:700;
+      color:var(--t4);letter-spacing:1px;text-transform:uppercase;
+      background:var(--bg3);border-bottom:1px solid var(--border);
+    }
+    .data-table th:first-child{border-radius:8px 0 0 0;}
+    .data-table th:last-child{border-radius:0 8px 0 0;}
+    .data-table td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--t2);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--bg3);}
+    .data-table td:first-child{color:var(--t1);font-weight:600;}
+    .ch-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ch-icon svg{width:14px;height:14px;fill:currentColor;}
+    .cell-with-icon{display:flex;align-items:center;gap:8px;}
+    .status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap;}
+    .badge-active{background:var(--green-l);color:var(--green);}
+    .badge-paused{background:var(--amber-l);color:var(--amber);}
+    .badge-draft{background:var(--bg3);color:var(--t3);}
+    .badge-info{background:var(--blue-l);color:var(--blue);}
+
+    /* UNITS TABLE */
+    .occ-bar{height:4px;background:var(--bg4);border-radius:2px;margin-top:4px;overflow:hidden;}
+    .occ-fill{height:100%;border-radius:2px;background:var(--orange);}
+    .mrr-cell{font-family:var(--font);font-size:13px;font-weight:700;color:var(--t1);}
+
+    /* CAMPAIGNS MINI */
+    .camp-list{display:flex;flex-direction:column;gap:8px;padding:16px 20px;}
+    .camp-item{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:10px;background:var(--bg3);
+      border:1px solid var(--border);
+    }
+    .camp-num{font-family:var(--font);font-size:16px;font-weight:700;color:var(--t1);}
+    .camp-unit{font-size:10px;color:var(--t4);}
+    .camp-name{font-size:13px;font-weight:600;color:var(--t1);}
+    .camp-detail{font-size:11px;color:var(--t3);}
+    .camp-pill{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;}
+
+    /* RETENTION */
+    .retention-rings{display:flex;gap:12px;justify-content:center;padding:16px;}
+    .ring-item{text-align:center;}
+    .ring-svg{width:80px;height:80px;}
+    .ring-label{font-size:11px;color:var(--t3);margin-top:4px;}
+    .ring-val{font-family:var(--font);font-size:18px;font-weight:700;color:var(--t1);}
+
+    /* AI INSIGHTS */
+    .insight-list{display:flex;flex-direction:column;gap:10px;padding:16px 20px;}
+    .insight-item{
+      display:flex;gap:10px;padding:10px 12px;
+      background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+    }
+    .insight-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+    .insight-text{font-size:12px;color:var(--t2);line-height:1.5;}
+    .insight-text strong{color:var(--t1);}
+
+    /* LTV/CAC */
+    .ltv-cac{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:16px 20px;}
+    .ltv-cac-item{text-align:center;padding:12px;}
+    .ltv-cac-item+.ltv-cac-item{border-left:1px solid var(--border);}
+    .ltv-cac-val{font-family:var(--font);font-size:22px;font-weight:700;margin-bottom:2px;}
+    .ltv-cac-label{font-size:11px;color:var(--t3);}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+    /* MOBILE MENU */
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+
+    @media(max-width:1200px){.kpi-row{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:1024px){.grid-2-1{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .kpi-row{grid-template-columns:repeat(2,1fr);}
+      .grid-2-1,.grid-2,.grid-3{grid-template-columns:1fr;}
+      .topbar{padding:0 14px;}
+      .content{padding:14px 16px;}
+      .tb-ghost{display:none;}
+      .topbar-date{display:none;}
+      .tb-btn{padding:7px 12px;font-size:11px;}
+    }
+    @media(max-width:520px){
+      .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px;}
+      .kpi-val{font-size:20px;}
+      .topbar-title{font-size:16px;}
+      .funnel-label{font-size:11px;width:70px;}
+      .data-table th,.data-table td{padding:8px 10px;font-size:12px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="client-info"><div class="client-info-name">Academia CIA do Corpo</div><div class="client-info-sub">Painel Admin · 6 Unidades</div></div>
+  </div>
+
+  <nav class="nav-items">
+    <div class="nav-label">Visão Geral</div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-label">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Campanhas
+      <span class="nav-badge">6</span>
+    </a>
+    <a href="admin-analytics.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+      Analytics & BI
+    </a>
+    <a href="admin-funil.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      Funil de Captação
+    </a>
+    <div class="nav-label">Operações</div>
+    <a href="admin-unidades.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      Unidades
+    </a>
+    <a href="admin-alunos.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Alunos
+    </a>
+    <a href="admin-financeiro.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+      Financeiro
+    </a>
+    <div class="nav-label">Produto</div>
+    <a href="../checkout/index.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M19 6H17c0-2.21-1.79-4-4-4S9 3.79 9 6H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-2c1.1 0 2 .9 2 2H10c0-1.1.9-2 2-2zm7 16H7V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>
+      Checkout
+    </a>
+    <a href="../aluno/index.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Área do Aluno
+    </a>
+  </nav>
+
+  <div class="sdb-footer">
+    <div class="user-row">
+      <div class="user-av">RC</div>
+      <div class="user-info">
+        <div class="name">Ticyane Chyarelly</div>
+        <div class="role">Diretora Comercial</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-date">Sexta-feira, 6 de Junho · 2025</div>
+    </div>
+    <div class="topbar-right">
+      <div class="notif-btn"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><div class="notif-dot"></div></div>
+      <button class="tb-btn tb-ghost">Exportar relatório</button>
+      <a href="admin-nova-campanha.html" class="tb-btn tb-primary" style="text-decoration:none;">Nova campanha +</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+          <span class="kpi-change up">+4.2%</span>
+        </div>
+        <div class="kpi-val">2.847</div>
+        <div class="kpi-label">Alunos Ativos</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+          <span class="kpi-change up">+11.8%</span>
+        </div>
+        <div class="kpi-val">R$ 198k</div>
+        <div class="kpi-label">MRR (Mensal)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+          <span class="kpi-change up">+22%</span>
+        </div>
+        <div class="kpi-val">1.243</div>
+        <div class="kpi-label">Leads / mês</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div>
+          <span class="kpi-change up">+1.4pp</span>
+        </div>
+        <div class="kpi-val">18.4%</div>
+        <div class="kpi-label">Conversão</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon" style="background:var(--red-l);color:var(--red);"><svg viewBox="0 0 24 24"><path d="M13 2.05V4.05c3.95.49 7 3.85 7 7.95s-3.05 7.46-7 7.95v2c5.05-.5 9-4.76 9-9.95S18.05 2.55 13 2.05zM11 2.05C5.95 2.55 2 6.81 2 12s3.95 9.45 9 9.95v-2C7.05 19.46 4 16.1 4 12s3.05-7.46 7-7.95v-2zM12 10l-5 5h3v3h4v-3h3l-5-5z"/></svg></div>
+          <span class="kpi-change dn">-0.3pp</span>
+        </div>
+        <div class="kpi-val">4.2%</div>
+        <div class="kpi-label">Churn Mensal</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Receita & Matrículas</div>
+          <div style="display:flex;gap:12px;font-size:12px;">
+            <span style="display:flex;align-items:center;gap:5px;color:var(--t3);"><span style="width:10px;height:10px;border-radius:2px;background:var(--orange);display:inline-block;"></span>MRR</span>
+            <span style="display:flex;align-items:center;gap:5px;color:var(--t3);"><span style="width:10px;height:2px;background:#2563EB;display:inline-block;"></span>Matrículas</span>
+          </div>
+        </div>
+        <div class="card-body"><div class="chart-wrap"><canvas id="revenueChart"></canvas></div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <!-- Channel donut -->
+        <div class="card" style="flex:1;">
+          <div class="card-head"><div class="card-title">Canais de Captação</div></div>
+          <div class="card-body" style="display:flex;align-items:center;gap:16px;padding:12px 16px;">
+            <div style="width:110px;height:110px;flex-shrink:0;"><canvas id="channelChart"></canvas></div>
+            <div style="display:flex;flex-direction:column;gap:7px;flex:1;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="display:flex;gap:5px;align-items:center;color:var(--t2);"><span style="width:8px;height:8px;border-radius:2px;background:#F97316;display:inline-block;"></span>Instagram</span><strong style="color:var(--t1);">38%</strong></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="display:flex;gap:5px;align-items:center;color:var(--t2);"><span style="width:8px;height:8px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>WhatsApp</span><strong style="color:var(--t1);">27%</strong></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="display:flex;gap:5px;align-items:center;color:var(--t2);"><span style="width:8px;height:8px;border-radius:2px;background:#2563EB;display:inline-block;"></span>Google</span><strong style="color:var(--t1);">21%</strong></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="display:flex;gap:5px;align-items:center;color:var(--t2);"><span style="width:8px;height:8px;border-radius:2px;background:#1877F2;display:inline-block;"></span>Facebook</span><strong style="color:var(--t1);">14%</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LTV/CAC -->
+        <div class="card" style="flex:0 0 auto;">
+          <div class="card-head"><div class="card-title">Métricas de Aquisição</div></div>
+          <div class="ltv-cac">
+            <div class="ltv-cac-item"><div class="ltv-cac-val" style="color:var(--green);">R$ 1.847</div><div class="ltv-cac-label">LTV médio</div></div>
+            <div class="ltv-cac-item"><div class="ltv-cac-val" style="color:var(--orange);">R$ 492</div><div class="ltv-cac-label">CAC médio</div></div>
+            <div class="ltv-cac-item"><div class="ltv-cac-val" style="color:#2563EB;">3.75×</div><div class="ltv-cac-label">LTV/CAC</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Funnel + Retention + AI -->
+    <div class="grid-3">
+      <!-- Funnel -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Funil de Conversão</div><span class="section-link">Ver detalhes</span></div>
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-label">Impressões</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:var(--orange);">312k</div></div>
+            <div class="funnel-val">312.000</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Cliques</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:60%;background:#EA6C00;">6%</div></div>
+            <div class="funnel-val">18.720</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Leads</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:40%;background:#2563EB;">6.6%</div></div>
+            <div class="funnel-val">1.243</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Avaliações</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:24%;background:#059669;">36%</div></div>
+            <div class="funnel-val">448</div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">Matrículas</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:var(--green);">51%</div></div>
+            <div class="funnel-val">229</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retention rings -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Retenção de Alunos</div></div>
+        <div class="retention-rings">
+          <div class="ring-item">
+            <svg class="ring-svg" viewBox="0 0 80 80">
+              <circle fill="none" stroke="#F1F5F9" stroke-width="8" cx="40" cy="40" r="30"/>
+              <circle fill="none" stroke="#F97316" stroke-width="8" stroke-linecap="round" cx="40" cy="40" r="30" stroke-dasharray="188" stroke-dashoffset="38" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="ring-val">80%</div>
+            <div class="ring-label">3 meses</div>
+          </div>
+          <div class="ring-item">
+            <svg class="ring-svg" viewBox="0 0 80 80">
+              <circle fill="none" stroke="#F1F5F9" stroke-width="8" cx="40" cy="40" r="30"/>
+              <circle fill="none" stroke="#EA6C00" stroke-width="8" stroke-linecap="round" cx="40" cy="40" r="30" stroke-dasharray="188" stroke-dashoffset="56" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="ring-val">70%</div>
+            <div class="ring-label">6 meses</div>
+          </div>
+          <div class="ring-item">
+            <svg class="ring-svg" viewBox="0 0 80 80">
+              <circle fill="none" stroke="#F1F5F9" stroke-width="8" cx="40" cy="40" r="30"/>
+              <circle fill="none" stroke="#2563EB" stroke-width="8" stroke-linecap="round" cx="40" cy="40" r="30" stroke-dasharray="188" stroke-dashoffset="94" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="ring-val">50%</div>
+            <div class="ring-label">12 meses</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);margin:0 16px 16px;padding-top:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:10px 12px;">
+              <div style="font-family:var(--font);font-size:16px;font-weight:700;color:var(--orange);">R$ 1.847</div>
+              <div style="font-size:11px;color:var(--t3);">LTV médio</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;">
+              <div style="font-family:var(--font);font-size:16px;font-weight:700;color:var(--t1);">8.2 meses</div>
+              <div style="font-size:11px;color:var(--t3);">Tempo médio</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Inteligência CIA NET</div>
+          <span style="font-size:10px;font-weight:700;background:var(--orange-m);color:var(--orange);border:1px solid var(--orange-b);padding:2px 8px;border-radius:100px;">IA Ativo</span>
+        </div>
+        <div class="insight-list">
+          <div class="insight-item">
+            <div class="insight-dot" style="background:#F97316;"></div>
+            <div class="insight-text"><strong>Instagram Boa Viagem</strong> tem CTR 2.4× acima da média. Aumento de verba recomendado.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-dot" style="background:#2563EB;"></div>
+            <div class="insight-text"><strong>Queda de retenção</strong> detectada na unidade Caruaru após 3 meses. Ação de engajamento sugerida.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-dot" style="background:#059669;"></div>
+            <div class="insight-text"><strong>Pico de conversão</strong> entre 18h–20h via WhatsApp. Agende campanhas neste horário.</div>
+          </div>
+          <div class="insight-item">
+            <div class="insight-dot" style="background:#D97706;"></div>
+            <div class="insight-text"><strong>282 leads inativos</strong> há +7 dias. Ative régua de nutrição automática agora.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaigns Table -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-head">
+        <div class="card-title">Campanhas Ativas</div>
+        <div style="display:flex;gap:8px;">
+          <span class="section-link">Ver todas</span>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Campanha</th>
+              <th>Canal</th>
+              <th>Alcance</th>
+              <th>Leads</th>
+              <th>CPA</th>
+              <th>ROAS</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Verão Boa Viagem</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#FFF0F5;color:#E4405F;"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>Instagram</div></td>
+              <td>84.200</td><td>312</td>
+              <td style="color:var(--green);font-weight:700;">R$ 48</td>
+              <td><span style="font-weight:700;">3.8×</span></td>
+              <td><span class="status-badge badge-active">● Ativa</span></td>
+            </tr>
+            <tr>
+              <td>Matrícula Recife</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#F0F7FF;color:#1877F2;"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>Facebook</div></td>
+              <td>61.800</td><td>198</td>
+              <td style="color:var(--green);font-weight:700;">R$ 52</td>
+              <td><span style="font-weight:700;">2.9×</span></td>
+              <td><span class="status-badge badge-active">● Ativa</span></td>
+            </tr>
+            <tr>
+              <td>Google Search PE</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#F0FFF4;color:#059669;"><svg viewBox="0 0 24 24"><path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg></div>Google</div></td>
+              <td>45.100</td><td>287</td>
+              <td style="color:var(--orange);font-weight:700;">R$ 61</td>
+              <td><span style="font-weight:700;">2.4×</span></td>
+              <td><span class="status-badge badge-active">● Ativa</span></td>
+            </tr>
+            <tr>
+              <td>WhatsApp Fidelização</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#F0FFF4;color:#25D366;"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>WhatsApp</div></td>
+              <td>18.400</td><td>246</td>
+              <td style="color:var(--green);font-weight:700;">R$ 31</td>
+              <td><span style="font-weight:700;">4.2×</span></td>
+              <td><span class="status-badge badge-active">● Ativa</span></td>
+            </tr>
+            <tr>
+              <td>Retargeting Caruaru</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#FFF0F5;color:#E4405F;"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>Instagram</div></td>
+              <td>22.600</td><td>87</td>
+              <td style="color:var(--amber);font-weight:700;">R$ 74</td>
+              <td><span style="font-weight:700;">1.9×</span></td>
+              <td><span class="status-badge badge-paused">⏸ Pausada</span></td>
+            </tr>
+            <tr>
+              <td>Olinda — Lançamento</td>
+              <td><div class="cell-with-icon"><div class="ch-icon" style="background:#F0FFF4;color:#059669;"><svg viewBox="0 0 24 24"><path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg></div>Google</div></td>
+              <td>—</td><td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td><span class="status-badge badge-draft">Rascunho</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Units Table -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Performance por Unidade</div>
+        <span class="section-link">Gerenciar unidades →</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Unidade</th><th>Alunos</th><th>Ocupação</th><th>MRR</th><th>Conversão</th><th>Churn</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Boa Viagem, Recife</td>
+              <td>612</td>
+              <td><div>82%</div><div class="occ-bar"><div class="occ-fill" style="width:82%;"></div></div></td>
+              <td class="mrr-cell">R$ 42.800</td>
+              <td style="color:var(--green);font-weight:700;">21.3%</td>
+              <td style="color:var(--green);">3.1%</td>
+              <td><span class="status-badge badge-active">● Ótima</span></td>
+            </tr>
+            <tr>
+              <td>Boa Viagem II, Recife</td>
+              <td>548</td>
+              <td><div>74%</div><div class="occ-bar"><div class="occ-fill" style="width:74%;"></div></div></td>
+              <td class="mrr-cell">R$ 38.300</td>
+              <td style="color:var(--green);font-weight:700;">19.1%</td>
+              <td style="color:var(--green);">3.6%</td>
+              <td><span class="status-badge badge-active">● Boa</span></td>
+            </tr>
+            <tr>
+              <td>Madalena, Recife</td>
+              <td>487</td>
+              <td><div>68%</div><div class="occ-bar"><div class="occ-fill" style="width:68%;"></div></div></td>
+              <td class="mrr-cell">R$ 34.100</td>
+              <td>17.8%</td>
+              <td>4.2%</td>
+              <td><span class="status-badge badge-info">● Regular</span></td>
+            </tr>
+            <tr>
+              <td>Olinda</td>
+              <td>401</td>
+              <td><div>61%</div><div class="occ-bar"><div class="occ-fill" style="width:61%;background:#D97706;"></div></div></td>
+              <td class="mrr-cell">R$ 28.000</td>
+              <td>15.4%</td>
+              <td style="color:var(--amber);">5.1%</td>
+              <td><span class="status-badge badge-paused">● Atenção</span></td>
+            </tr>
+            <tr>
+              <td>Caruaru</td>
+              <td>476</td>
+              <td><div>71%</div><div class="occ-bar"><div class="occ-fill" style="width:71%;"></div></div></td>
+              <td class="mrr-cell">R$ 33.300</td>
+              <td>18.6%</td>
+              <td>4.4%</td>
+              <td><span class="status-badge badge-info">● Regular</span></td>
+            </tr>
+            <tr>
+              <td>Caruaru II</td>
+              <td>323</td>
+              <td><div>55%</div><div class="occ-bar"><div class="occ-fill" style="width:55%;background:#DC2626;"></div></div></td>
+              <td class="mrr-cell">R$ 22.600</td>
+              <td>14.2%</td>
+              <td style="color:var(--red);">6.3%</td>
+              <td><span class="status-badge" style="background:var(--red-l);color:var(--red);">● Crítica</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = '#64748B';
+
+// Revenue chart
+const ctx1 = document.getElementById('revenueChart').getContext('2d');
+const months = ['Jan','Fev','Mar','Abr','Mai','Jun'];
+const mrr = [148000,159000,164000,172000,188000,198000];
+const mat = [189,201,214,219,224,229];
+
+const gradMRR = ctx1.createLinearGradient(0,0,0,260);
+gradMRR.addColorStop(0,'rgba(249,115,22,.45)');
+gradMRR.addColorStop(0.6,'rgba(249,115,22,.12)');
+gradMRR.addColorStop(1,'rgba(249,115,22,0)');
+
+const gradMat = ctx1.createLinearGradient(0,0,0,260);
+gradMat.addColorStop(0,'rgba(37,99,235,.3)');
+gradMat.addColorStop(0.6,'rgba(37,99,235,.08)');
+gradMat.addColorStop(1,'rgba(37,99,235,0)');
+
+new Chart(ctx1, {
+  type:'bar',
+  data:{
+    labels:months,
+    datasets:[{
+      label:'MRR (R$)',
+      data:mrr,
+      backgroundColor:gradMRR,
+      borderColor:'#F97316',
+      borderWidth:2,
+      borderRadius:8,
+      yAxisID:'y',
+    },{
+      label:'Matrículas',
+      data:mat,
+      type:'line',
+      borderColor:'#2563EB',
+      backgroundColor:gradMat,
+      borderWidth:2.5,
+      pointBackgroundColor:'#2563EB',
+      pointBorderColor:'white',
+      pointBorderWidth:2,
+      pointRadius:5,
+      fill:true,
+      tension:.4,
+      yAxisID:'y1',
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+    scales:{
+      y:{position:'left',grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>'R$'+Math.round(v/1000)+'k'}},
+      y1:{position:'right',grid:{display:false},ticks:{stepSize:20}},
+      x:{grid:{display:false}}
+    }
+  }
+});
+
+// Donut chart
+const ctx2 = document.getElementById('channelChart').getContext('2d');
+new Chart(ctx2, {
+  type:'doughnut',
+  data:{
+    labels:['Instagram','WhatsApp','Google','Facebook'],
+    datasets:[{
+      data:[38,27,21,14],
+      backgroundColor:['#F97316','#F59E0B','#2563EB','#1877F2'],
+      borderWidth:0,
+      hoverOffset:6,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    cutout:'72%',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed}%`}}}
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Minha Área</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:240px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:36px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .student-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .student-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .student-plan{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .sdb-footer-links{display:flex;gap:8px;padding:4px 10px;}
+    .sdb-footer-link{font-size:11px;color:var(--t4);text-decoration:none;font-weight:500;}
+    .sdb-footer-link:hover{color:var(--orange);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .notif-btn{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+    .notif-btn svg{width:16px;height:16px;fill:var(--t3);}
+    .notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--orange);border-radius:50%;border:1.5px solid white;}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .content{padding:22px 26px;}
+
+    /* Welcome banner */
+    .welcome-banner{background:linear-gradient(135deg,#F97316 0%,#EA6C00 100%);border-radius:16px;padding:22px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+    .welcome-banner::after{content:'';position:absolute;right:-20px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.07);border-radius:50%;}
+    .wb-left{}
+    .wb-hi{font-size:22px;font-weight:800;color:white;margin-bottom:3px;}
+    .wb-sub{font-size:13px;color:rgba(255,255,255,.78);}
+    .wb-streak{display:flex;align-items:center;gap:6px;margin-top:12px;background:rgba(255,255,255,.15);border-radius:8px;padding:6px 12px;width:fit-content;}
+    .wb-streak svg{width:14px;height:14px;fill:white;}
+    .wb-streak-text{font-size:12px;font-weight:700;color:white;}
+    .wb-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;position:relative;z-index:1;}
+    .wb-ring{width:74px;height:74px;position:relative;}
+    .wb-ring svg{width:74px;height:74px;transform:rotate(-90deg);}
+    .wb-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+    .wb-ring-val{font-size:19px;font-weight:800;color:white;line-height:1;}
+    .wb-ring-sub{font-size:9px;color:rgba(255,255,255,.85);font-weight:700;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;}
+
+    /* KPI row */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+    .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;box-shadow:var(--sh-sm);}
+    .kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+    .kpi-icon svg{width:16px;height:16px;fill:currentColor;}
+    .kpi-val{font-size:22px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px;}
+    .kpi-label{font-size:12px;color:var(--t3);}
+    .kpi-sub{font-size:11px;font-weight:600;margin-top:4px;}
+
+    /* Cards grid */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .grid-3-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:13px;font-weight:700;color:var(--t1);}
+    .card-link{font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;}
+    .card-body{padding:14px 16px;}
+
+    /* Workout card */
+    .workout-day{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+    .workout-day:last-child{border-bottom:none;}
+    .wd-letter{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+    .wd-info{flex:1;}
+    .wd-name{font-size:13px;font-weight:600;color:var(--t1);}
+    .wd-ex{font-size:11px;color:var(--t3);}
+    .wd-today{font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;background:var(--orange-m);color:var(--orange);border:1px solid var(--orange-b);}
+
+    /* Activity feed */
+    .act-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+    .act-item:last-child{border-bottom:none;}
+    .act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+    .act-text{font-size:13px;color:var(--t2);}
+    .act-time{font-size:11px;color:var(--t4);margin-top:2px;}
+
+    /* Quick actions */
+    .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .qa-btn{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-decoration:none;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:.15s;}
+    .qa-btn:hover{background:var(--orange-m);border-color:var(--orange-b);}
+    .qa-btn:hover .qa-icon{color:var(--orange);}
+    .qa-btn:hover .qa-label{color:var(--orange);}
+    .qa-icon{fill:var(--t3);width:20px;height:20px;}
+    .qa-label{font-size:12px;font-weight:600;color:var(--t2);}
+
+    /* Next class */
+    .next-class{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:10px;padding:12px 14px;}
+    .nc-time{font-size:20px;font-weight:800;color:var(--orange);}
+    .nc-name{font-size:14px;font-weight:700;color:var(--t1);margin:2px 0;}
+    .nc-detail{font-size:12px;color:var(--t3);}
+    .nc-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+    .nc-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;background:rgba(249,115,22,.15);color:var(--orange);}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.kpi-row{grid-template-columns:1fr 1fr;}.grid-3-1{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="platform-tag">Área do Aluno</div>
+    <div class="student-info"><div class="student-name">João Silva</div><div class="student-plan">Plano Semestral · Boa Viagem</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Menu</div>
+    <a href="index.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Minha Área</a>
+    <a href="aluno-treinos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>Meus Treinos</a>
+    <a href="aluno-agenda.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agenda</a>
+    <div class="nav-label">Financeiro</div>
+    <a href="aluno-carteira.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Minha Carteira</a>
+    <a href="aluno-planos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Meus Planos</a>
+    <a href="aluno-pagamentos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Pagamentos</a>
+    <a href="aluno-pendencias.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Pendências</a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">JS</div><div><div class="user-name">João Silva</div><div class="user-role">Aluno ativo</div></div></div>
+    <div class="sdb-footer-links"><a href="aluno-login.html" class="sdb-footer-link">Sair</a></div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Minha Área</div>
+    <div class="topbar-right">
+      <div class="notif-btn"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><div class="notif-dot"></div></div>
+      <button class="btn btn-primary" onclick="location.href='aluno-agenda.html'">+ Agendar aula</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Welcome banner -->
+    <div class="welcome-banner">
+      <div class="wb-left">
+        <div class="wb-hi">Bom dia, João! 👋</div>
+        <div class="wb-sub">Você está na sua 3ª semana consecutiva de treinos.</div>
+        <div class="wb-streak"><svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg><div class="wb-streak-text">18 dias seguidos!</div></div>
+      </div>
+      <div class="wb-ring-wrap">
+        <div class="wb-ring">
+          <svg viewBox="0 0 74 74"><circle cx="37" cy="37" r="30" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/><circle cx="37" cy="37" r="30" fill="none" stroke="white" stroke-width="7" stroke-dasharray="188.5" stroke-dashoffset="47" stroke-linecap="round"/></svg>
+          <div class="wb-ring-label"><div class="wb-ring-val">75%</div></div>
+        </div>
+        <div class="wb-ring-sub">meta mensal</div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-icon" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="kpi-val">18</div><div class="kpi-label">Treinos / mês</div><div class="kpi-sub" style="color:var(--green);">↑ +3 vs mês passado</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div><div class="kpi-val">Hoje</div><div class="kpi-label">Próximo treino</div><div class="kpi-sub" style="color:var(--orange);">Treino B — 17:00</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div><div class="kpi-val">Semestral</div><div class="kpi-label">Plano ativo</div><div class="kpi-sub" style="color:var(--t3);">Vence em 147 dias</div></div>
+      <div class="kpi"><div class="kpi-icon" style="background:var(--green-l);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><div class="kpi-val">Em dia</div><div class="kpi-label">Status financeiro</div><div class="kpi-sub" style="color:var(--green);">R$69,90 pago</div></div>
+    </div>
+
+    <div class="grid-3-1">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Próxima aula -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Próxima Aula</div><a href="aluno-agenda.html" class="card-link">Ver agenda →</a></div>
+          <div class="card-body">
+            <div class="next-class">
+              <div class="nc-time">17:00</div>
+              <div class="nc-name">Musculação — Treino B</div>
+              <div class="nc-detail">Hoje · Unidade Boa Viagem · Prof. Carlos Mendes</div>
+              <div class="nc-row"><span class="nc-tag">Confirmado</span><span style="font-size:11px;color:var(--t4);">14/20 vagas preenchidas</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Programa de treinos -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Programa Atual</div><a href="aluno-treinos.html" class="card-link">Ver completo →</a></div>
+          <div class="card-body" style="padding:8px 16px;">
+            <div class="workout-day"><div class="wd-letter" style="background:#FFF7ED;color:#F97316;">A</div><div class="wd-info"><div class="wd-name">Peito + Tríceps</div><div class="wd-ex">8 exercícios · 52 min</div></div></div>
+            <div class="workout-day"><div class="wd-letter" style="background:#FFF7ED;color:#F97316;">B</div><div class="wd-info"><div class="wd-name">Costas + Bíceps</div><div class="wd-ex">7 exercícios · 48 min</div></div><span class="wd-today">Hoje</span></div>
+            <div class="workout-day"><div class="wd-letter" style="background:#F1F5F9;color:#64748B;">C</div><div class="wd-info"><div class="wd-name">Pernas + Glúteos</div><div class="wd-ex">9 exercícios · 60 min</div></div></div>
+            <div class="workout-day"><div class="wd-letter" style="background:#F1F5F9;color:#64748B;">D</div><div class="wd-info"><div class="wd-name">Ombros + Abdômen</div><div class="wd-ex">7 exercícios · 45 min</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Quick actions -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Ações rápidas</div></div>
+          <div class="card-body">
+            <div class="qa-grid">
+              <a href="aluno-agenda.html" class="qa-btn"><svg class="qa-icon" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg><span class="qa-label">Agendar aula</span></a>
+              <a href="aluno-treinos.html" class="qa-btn"><svg class="qa-icon" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg><span class="qa-label">Ver treino</span></a>
+              <a href="aluno-financeiro.html" class="qa-btn"><svg class="qa-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg><span class="qa-label">Financeiro</span></a>
+              <a href="#" class="qa-btn" onclick="alert('Avaliação física agendada!')"><svg class="qa-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg><span class="qa-label">Avaliação física</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Atividade recente</div></div>
+          <div class="card-body" style="padding:8px 16px;">
+            <div class="act-item"><div class="act-dot" style="background:var(--green);"></div><div><div class="act-text">Check-in Treino B realizado</div><div class="act-time">Hoje, 07:12</div></div></div>
+            <div class="act-item"><div class="act-dot" style="background:var(--orange);"></div><div><div class="act-text">Aula de Spinning reservada</div><div class="act-time">Ontem, 18:30</div></div></div>
+            <div class="act-item"><div class="act-dot" style="background:var(--green);"></div><div><div class="act-text">Mensalidade paga — R$69,90</div><div class="act-time">01/06/2025</div></div></div>
+            <div class="act-item"><div class="act-dot" style="background:#2563EB;"></div><div><div class="act-text">Treino A concluído (52 min)</div><div class="act-time">30/05/2025</div></div></div>
+            <div class="act-item"><div class="act-dot" style="background:var(--green);"></div><div><div class="act-text">Avaliação física realizada</div><div class="act-time">28/05/2025</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

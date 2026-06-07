@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Unidades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--blue:#2563EB;--blue-l:#EFF6FF;--sidebar:256px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:38px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .client-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .client-info-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .client-info-sub{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--orange);color:white;font-size:10px;font-weight:700;border-radius:100px;padding:1px 6px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .content{padding:22px 26px;}
+
+    /* KPI row */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+    .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 18px;box-shadow:var(--sh-sm);}
+    .kpi-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .kpi-icon svg{width:17px;height:17px;fill:currentColor;}
+    .kpi-badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;}
+    .up{background:var(--green-l);color:var(--green);}
+    .dn{background:var(--red-l);color:var(--red);}
+    .kpi-val{font-size:24px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px;}
+    .kpi-label{font-size:12px;color:var(--t3);}
+
+    /* Unit cards grid */
+    .units-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+    .unit-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow .2s;}
+    .unit-card:hover{box-shadow:var(--sh);}
+    .unit-card-map{height:110px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    .unit-card-map svg{width:32px;height:32px;fill:var(--t4);opacity:.5;}
+    .map-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;}
+    .s-great{background:var(--green-l);color:var(--green);}
+    .s-good{background:#EFF6FF;color:#2563EB;}
+    .s-warn{background:var(--amber-l);color:var(--amber);}
+    .s-crit{background:var(--red-l);color:var(--red);}
+    .unit-body{padding:14px 16px;}
+    .unit-name{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+    .unit-addr{font-size:12px;color:var(--t3);margin-bottom:12px;}
+    .unit-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+    .um{background:var(--bg3);border-radius:7px;padding:7px 8px;text-align:center;}
+    .um-val{font-size:14px;font-weight:700;color:var(--t1);}
+    .um-label{font-size:10px;color:var(--t4);margin-top:1px;}
+    .occ-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+    .occ-label{font-size:11px;color:var(--t3);white-space:nowrap;}
+    .occ-bar{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+    .occ-fill{height:100%;border-radius:3px;}
+    .occ-pct{font-size:11px;font-weight:700;color:var(--t2);white-space:nowrap;}
+    .unit-actions{display:flex;gap:6px;}
+    .u-btn{flex:1;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--t2);text-align:center;transition:.15s;}
+    .u-btn:hover{background:var(--bg4);}
+    .u-btn.orange{background:var(--orange-m);border-color:var(--orange-b);color:var(--orange);}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+    @media(max-width:1100px){.units-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .topbar{padding:0 14px;}
+      .content{padding:14px 16px;}
+      .kpi-row{grid-template-columns:repeat(2,1fr);}
+      .btn-ghost{display:none;}
+    }
+    @media(max-width:600px){
+      .units-grid{grid-template-columns:1fr;}
+      .kpi-val{font-size:20px;}
+      .topbar-title{font-size:15px;}
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+
+    <div class="client-info"><div class="client-info-name">Academia CIA do Corpo</div><div class="client-info-sub">Painel Admin · 6 Unidades</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Visão Geral</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a>
+    <div class="nav-label">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Campanhas<span class="nav-badge">6</span></a>
+    <a href="admin-analytics.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Analytics & BI</a>
+    <a href="admin-funil.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Funil de Captação</a>
+    <div class="nav-label">Operações</div>
+    <a href="admin-unidades.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Unidades</a>
+    <a href="admin-alunos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Alunos</a>
+    <a href="admin-financeiro.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro</a>
+    <div class="nav-label">Produto</div>
+    <a href="../checkout/index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 6H17c0-2.21-1.79-4-4-4S9 3.79 9 6H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>Checkout</a>
+    <a href="../aluno/aluno-login.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+  </nav>
+  <div class="sdb-footer"><div class="user-row"><div class="user-av">RC</div><div><div class="user-name">Marcos Paulo</div><div class="user-role">Diretor Comercial</div></div></div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+      <div class="topbar-title">Unidades</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">Exportar</button>
+      <button class="btn btn-primary">+ Nova unidade</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div><span class="kpi-badge up">+1</span></div><div class="kpi-val">6</div><div class="kpi-label">Unidades ativas</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><span class="kpi-badge up">+4.2%</span></div><div class="kpi-val">2.847</div><div class="kpi-label">Total de alunos</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><span class="kpi-badge up">+11.8%</span></div><div class="kpi-val">R$ 198k</div><div class="kpi-label">MRR total</div></div>
+      <div class="kpi"><div class="kpi-head"><div class="kpi-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div><span class="kpi-badge up">+5.2pp</span></div><div class="kpi-val">68.5%</div><div class="kpi-label">Ocupação média</div></div>
+    </div>
+
+    <div class="units-grid">
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#fed7aa,#fb923c);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-great">● Ótima</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Boa Viagem</div>
+          <div class="unit-addr">Av. Boa Viagem, 3254 · Recife, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">612</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val" style="color:var(--green);">R$42,8k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val">21.3%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:82%;background:var(--orange);"></div></div><div class="occ-pct">82%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#fde68a,#f59e0b);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-good">● Boa</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Boa Viagem II</div>
+          <div class="unit-addr">R. Setúbal, 860 · Recife, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">548</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val" style="color:var(--green);">R$38,3k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val">19.1%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:74%;background:var(--orange);"></div></div><div class="occ-pct">74%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#dbeafe,#3b82f6);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-good">● Regular</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Madalena</div>
+          <div class="unit-addr">R. da Aurora, 1022 · Recife, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">487</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val">R$34,1k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val">17.8%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:68%;background:#2563EB;"></div></div><div class="occ-pct">68%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#fde68a,#d97706);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-warn">● Atenção</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Olinda</div>
+          <div class="unit-addr">R. do Amparo, 187 · Olinda, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">401</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val">R$28,0k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val" style="color:var(--amber);">15.4%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:61%;background:var(--amber);"></div></div><div class="occ-pct" style="color:var(--amber);">61%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#d1fae5,#059669);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-good">● Regular</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Caruaru</div>
+          <div class="unit-addr">R. Vigário Freire, 320 · Caruaru, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">476</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val">R$33,3k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val">18.6%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:71%;background:#2563EB;"></div></div><div class="occ-pct">71%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+      <div class="unit-card">
+        <div class="unit-card-map" style="background:linear-gradient(135deg,#fee2e2,#dc2626);"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="map-badge s-crit">● Crítica</span></div>
+        <div class="unit-body">
+          <div class="unit-name">Caruaru II</div>
+          <div class="unit-addr">Av. Agamenon Magalhães, 1050 · Caruaru, PE</div>
+          <div class="unit-metrics">
+            <div class="um"><div class="um-val">323</div><div class="um-label">Alunos</div></div>
+            <div class="um"><div class="um-val" style="color:var(--red);">R$22,6k</div><div class="um-label">MRR</div></div>
+            <div class="um"><div class="um-val" style="color:var(--red);">14.2%</div><div class="um-label">Conversão</div></div>
+          </div>
+          <div class="occ-row"><div class="occ-label">Ocupação</div><div class="occ-bar"><div class="occ-fill" style="width:55%;background:var(--red);"></div></div><div class="occ-pct" style="color:var(--red);">55%</div></div>
+          <div class="unit-actions"><div class="u-btn">Detalhes</div><div class="u-btn orange">Gerenciar</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+</script>
+</body>
+</html>

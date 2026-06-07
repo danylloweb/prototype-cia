@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Agenda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:240px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:36px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .student-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .student-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .student-plan{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .sdb-footer-links{display:flex;gap:8px;padding:4px 10px;}
+    .sdb-footer-link{font-size:11px;color:var(--t4);text-decoration:none;}
+    .sdb-footer-link:hover{color:var(--orange);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .content{padding:22px 26px;}
+    .week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .week-title{font-size:16px;font-weight:700;color:var(--t1);}
+    .week-btns{display:flex;gap:6px;}
+    .week-btn{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+    .week-btn svg{width:16px;height:16px;fill:var(--t3);}
+    .day-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;}
+    .day-cell{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:.15s;}
+    .day-cell:hover{border-color:var(--orange-b);}
+    .day-cell.active{background:var(--orange);border-color:var(--orange);}
+    .day-cell.active .dc-name,.day-cell.active .dc-num{color:white;}
+    .dc-name{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+    .dc-num{font-size:18px;font-weight:800;color:var(--t1);}
+    .dc-dot{width:4px;height:4px;border-radius:50%;background:var(--orange);margin:3px auto 0;}
+    .day-cell.active .dc-dot{background:rgba(255,255,255,.6);}
+    .two-col{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:13px;font-weight:700;color:var(--t1);}
+    .card-sub{font-size:12px;color:var(--t4);}
+    .time-slot{display:flex;border-bottom:1px solid var(--border);}
+    .time-slot:last-child{border-bottom:none;}
+    .slot-time{width:64px;flex-shrink:0;padding:12px 10px;font-size:12px;font-weight:700;color:var(--t4);border-right:1px solid var(--border);}
+    .slot-classes{flex:1;padding:8px 12px;display:flex;flex-direction:column;gap:6px;}
+    .class-item{border-radius:8px;padding:9px 11px;cursor:pointer;transition:.15s;border:1px solid transparent;}
+    .class-item.booked{border-color:var(--green)!important;background:var(--green-l)!important;}
+    .class-item.booked .ci-name{color:var(--green);}
+    .ci-name{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:1px;}
+    .ci-meta{font-size:11px;color:var(--t3);margin-bottom:5px;}
+    .ci-foot{display:flex;align-items:center;justify-content:space-between;}
+    .ci-cap{font-size:10px;color:var(--t4);}
+    .ci-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .ci-btn-book{background:var(--orange);color:white;}
+    .ci-btn-book:hover{background:var(--orange-2);}
+    .ci-btn-cancel{background:var(--red-l);color:var(--red);}
+    .upcoming-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);}
+    .upcoming-item:last-child{border-bottom:none;}
+    .up-color{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+    .up-info{flex:1;}
+    .up-name{font-size:13px;font-weight:600;color:var(--t1);}
+    .up-meta{font-size:11px;color:var(--t3);margin-top:1px;}
+    .up-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap;}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    @media(max-width:1100px){.two-col{grid-template-columns:1fr;}}
+    @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="platform-tag">Área do Aluno</div>
+    <div class="student-info"><div class="student-name">João Silva</div><div class="student-plan">Plano Semestral · Boa Viagem</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Menu</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Minha Área</a>
+    <a href="aluno-treinos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>Meus Treinos</a>
+    <a href="aluno-agenda.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agenda</a>
+    <div class="nav-label">Financeiro</div>
+    <a href="aluno-carteira.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Minha Carteira</a>
+    <a href="aluno-planos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Meus Planos</a>
+    <a href="aluno-pagamentos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Pagamentos</a>
+    <a href="aluno-pendencias.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Pendências</a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">JS</div><div><div class="user-name">João Silva</div><div class="user-role">Aluno ativo</div></div></div>
+    <div class="sdb-footer-links"><a href="aluno-login.html" class="sdb-footer-link">Sair</a></div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Agenda</div>
+    <span style="font-size:12px;color:var(--t3);">Unidade Boa Viagem</span>
+  </div>
+  <div class="content">
+    <div class="week-nav">
+      <div class="week-title">Semana de 2 a 8 de Junho, 2025</div>
+      <div class="week-btns">
+        <div class="week-btn"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></div>
+        <div class="week-btn"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+      </div>
+    </div>
+    <div class="day-strip">
+      <div class="day-cell"><div class="dc-name">SEG</div><div class="dc-num">2</div><div class="dc-dot"></div></div>
+      <div class="day-cell"><div class="dc-name">TER</div><div class="dc-num">3</div><div class="dc-dot"></div></div>
+      <div class="day-cell"><div class="dc-name">QUA</div><div class="dc-num">4</div><div class="dc-dot"></div></div>
+      <div class="day-cell"><div class="dc-name">QUI</div><div class="dc-num">5</div></div>
+      <div class="day-cell active"><div class="dc-name">SEX</div><div class="dc-num">6</div><div class="dc-dot"></div></div>
+      <div class="day-cell"><div class="dc-name">SÁB</div><div class="dc-num">7</div></div>
+      <div class="day-cell"><div class="dc-name">DOM</div><div class="dc-num">8</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Aulas — Sexta, 6 de Junho</div><div class="card-sub">Boa Viagem</div></div>
+        <div>
+          <div class="time-slot"><div class="slot-time">06:00</div><div class="slot-classes"><div class="class-item" style="background:#FFF7ED;"><div class="ci-name">Musculação</div><div class="ci-meta">Prof. Carlos Mendes · 60 min</div><div class="ci-foot"><span class="ci-cap">18/25 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div></div></div>
+          <div class="time-slot"><div class="slot-time">07:00</div><div class="slot-classes"><div class="class-item" style="background:#EFF6FF;"><div class="ci-name">Spinning</div><div class="ci-meta">Prof. Ana Beatriz · 45 min</div><div class="ci-foot"><span class="ci-cap">12/15 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div><div class="class-item" style="background:#ECFDF5;"><div class="ci-name">Pilates</div><div class="ci-meta">Prof. Fernanda Lima · 60 min</div><div class="ci-foot"><span class="ci-cap">8/10 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div></div></div>
+          <div class="time-slot"><div class="slot-time">09:00</div><div class="slot-classes"><div class="class-item booked"><div class="ci-name">Musculação ✓</div><div class="ci-meta">Prof. Carlos Mendes · 60 min · Reservado</div><div class="ci-foot"><span class="ci-cap" style="color:var(--green);">20/25 vagas</span><button class="ci-btn ci-btn-cancel" onclick="cancel(this)">Cancelar</button></div></div></div></div>
+          <div class="time-slot"><div class="slot-time">11:00</div><div class="slot-classes"><div class="class-item" style="background:#FFFBEB;"><div class="ci-name">Funcional</div><div class="ci-meta">Prof. Ricardo Neves · 50 min</div><div class="ci-foot"><span class="ci-cap">10/20 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div></div></div>
+          <div class="time-slot"><div class="slot-time">17:00</div><div class="slot-classes"><div class="class-item" style="background:#FFF7ED;"><div class="ci-name">Musculação</div><div class="ci-meta">Prof. Carlos Mendes · 60 min</div><div class="ci-foot"><span class="ci-cap">14/25 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div><div class="class-item" style="background:#EFF6FF;"><div class="ci-name">Spinning</div><div class="ci-meta">Prof. Ana Beatriz · 45 min</div><div class="ci-foot"><span class="ci-cap">11/15 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div></div></div>
+          <div class="time-slot"><div class="slot-time">19:00</div><div class="slot-classes"><div class="class-item" style="background:#ECFDF5;"><div class="ci-name">Pilates</div><div class="ci-meta">Prof. Fernanda Lima · 60 min</div><div class="ci-foot"><span class="ci-cap">6/10 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div><div class="class-item" style="background:#FFFBEB;"><div class="ci-name">Funcional</div><div class="ci-meta">Prof. Ricardo Neves · 50 min</div><div class="ci-foot"><span class="ci-cap">15/20 vagas</span><button class="ci-btn ci-btn-book" onclick="book(this)">Reservar</button></div></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Próximas reservas</div></div>
+        <div>
+          <div class="upcoming-item"><div class="up-color" style="background:var(--orange);"></div><div class="up-info"><div class="up-name">Musculação</div><div class="up-meta">Hoje, 09:00 · Boa Viagem</div></div><span class="up-badge" style="background:var(--green-l);color:var(--green);">Confirmado</span></div>
+          <div class="upcoming-item"><div class="up-color" style="background:#2563EB;"></div><div class="up-info"><div class="up-name">Spinning</div><div class="up-meta">Sáb, 07:00 · Boa Viagem</div></div><span class="up-badge" style="background:var(--green-l);color:var(--green);">Confirmado</span></div>
+          <div class="upcoming-item"><div class="up-color" style="background:#059669;"></div><div class="up-info"><div class="up-name">Pilates</div><div class="up-meta">Seg, 07:00 · Boa Viagem</div></div><span class="up-badge" style="background:var(--green-l);color:var(--green);">Confirmado</span></div>
+          <div class="upcoming-item"><div class="up-color" style="background:var(--amber);"></div><div class="up-info"><div class="up-name">Funcional</div><div class="up-meta">Ter, 19:00 · Boa Viagem</div></div><span class="up-badge" style="background:var(--amber-l);color:var(--amber);">Espera</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function book(btn){const card=btn.closest('.class-item');card.classList.add('booked');card.querySelector('.ci-name').textContent+=' ✓';card.querySelector('.ci-meta').textContent+=' · Reservado';btn.textContent='Cancelar';btn.className='ci-btn ci-btn-cancel';btn.setAttribute('onclick','cancel(this)');}
+function cancel(btn){if(!confirm('Cancelar esta reserva?'))return;const card=btn.closest('.class-item');card.classList.remove('booked');card.querySelector('.ci-name').textContent=card.querySelector('.ci-name').textContent.replace(' ✓','');card.querySelector('.ci-meta').textContent=card.querySelector('.ci-meta').textContent.replace(' · Reservado','');btn.textContent='Reservar';btn.className='ci-btn ci-btn-book';btn.setAttribute('onclick','book(this)');}
+</script>
+</body>
+</html>

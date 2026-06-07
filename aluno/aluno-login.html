@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Entrar na Área do Aluno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --font:'Inter',sans-serif;
+      --orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;
+      --orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);
+      --bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;
+      --border:#E2E8F0;--border-h:#CBD5E1;
+      --t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;
+      --green:#059669;--green-l:#ECFDF5;
+      --sh:0 4px 24px rgba(0,0,0,.08),0 1px 6px rgba(0,0,0,.05);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;}
+
+    /* Topbar */
+    .nav{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;justify-content:space-between;}
+    .nav-logo img{height:36px;width:auto;object-fit:contain;}
+    .nav-link{font-size:13px;color:var(--t3);text-decoration:none;font-weight:500;}
+    .nav-link:hover{color:var(--orange);}
+
+    /* Main */
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px;}
+    .login-wrap{width:100%;max-width:420px;}
+
+    /* Logo area */
+    .logo-section{text-align:center;margin-bottom:32px;}
+    .logo-img{height:64px;width:auto;object-fit:contain;margin-bottom:16px;}
+    .login-title{font-size:26px;font-weight:800;color:var(--t1);margin-bottom:4px;}
+    .login-sub{font-size:14px;color:var(--t3);}
+
+    /* Card */
+    .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:32px;box-shadow:var(--sh);}
+
+    /* Form */
+    .field{margin-bottom:18px;}
+    .field label{display:block;font-size:13px;font-weight:600;color:var(--t2);margin-bottom:6px;}
+    .field-wrap{position:relative;}
+    .field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:var(--t4);}
+    .field input{width:100%;padding:11px 12px 11px 38px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;color:var(--t1);background:var(--bg2);outline:none;transition:border-color .15s;}
+    .field input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.1);}
+    .field input::placeholder{color:var(--t4);}
+
+    .forgot{display:block;text-align:right;font-size:12px;color:var(--orange);font-weight:600;text-decoration:none;margin-top:4px;}
+    .forgot:hover{text-decoration:underline;}
+
+    .btn-login{width:100%;padding:13px;background:var(--orange);color:white;border:none;border-radius:10px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:.15s;margin-top:8px;}
+    .btn-login:hover{background:var(--orange-2);}
+    .btn-login:active{transform:scale(.98);}
+
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+    .divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+    .divider span{font-size:12px;color:var(--t4);font-weight:500;}
+
+    .btn-qr{width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);color:var(--t2);border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-qr:hover{background:var(--bg4);}
+    .btn-qr svg{width:18px;height:18px;fill:currentColor;}
+
+    /* Trust badges */
+    .trust-row{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:24px;}
+    .trust-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t4);}
+    .trust-item svg{width:13px;height:13px;fill:var(--green);}
+
+    /* Footer */
+    .signup-link{text-align:center;margin-top:20px;font-size:13px;color:var(--t3);}
+    .signup-link a{color:var(--orange);font-weight:600;text-decoration:none;}
+    .signup-link a:hover{text-decoration:underline;}
+
+    /* Error */
+    .error-msg{background:var(--red-l,#FEF2F2);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:10px 12px;font-size:13px;color:#DC2626;margin-bottom:16px;display:none;}
+    .error-msg.show{display:block;}
+
+    footer{padding:20px;text-align:center;font-size:12px;color:var(--t4);}
+    footer a{color:var(--orange);text-decoration:none;}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo" style="display:flex;align-items:center;gap:8px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:32px;height:32px;object-fit:contain;"><div><div style="font-size:12px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:8px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <a href="../checkout/" class="nav-link">Não é aluno? Matricule-se →</a>
+  </nav>
+
+  <main>
+    <div class="login-wrap">
+      <div class="logo-section">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px;">
+          <img src="../logo-cia.png" alt="CIA do Corpo" style="width:70px;height:70px;object-fit:contain;">
+          <div style="text-align:left;">
+            <div style="font-size:24px;font-weight:800;letter-spacing:1px;color:#0F172A;line-height:1.1;">CIA DO CORPO</div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:3px;color:#94A3B8;margin-top:3px;">GYM</div>
+          </div>
+        </div>
+        <div class="login-title">Área do Aluno</div>
+        <div class="login-sub">Acesse seus treinos, agenda e financeiro</div>
+      </div>
+
+      <div class="login-card">
+        <div class="error-msg" id="errorMsg">E-mail ou senha incorretos. Tente novamente.</div>
+
+        <form onsubmit="doLogin(event)">
+          <div class="field">
+            <label>E-mail</label>
+            <div class="field-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <input type="email" placeholder="seu@email.com" id="emailInput" value="joao.silva@email.com" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Senha</label>
+            <div class="field-wrap">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <input type="password" placeholder="••••••••" id="passwordInput" value="123456" required>
+            </div>
+            <a href="#" class="forgot" onclick="alert('Enviaremos um link de redefinição para seu e-mail.')">Esqueci minha senha</a>
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">Entrar</button>
+        </form>
+
+        <div class="divider"><hr><span>ou</span><hr></div>
+
+        <button class="btn-qr" onclick="alert('Abra o app CIA NET no celular e escaneie o QR')">
+          <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm8 0h2v2h-2v-2zm0-2h2v2h-2v-2zm4 4h-2v2h2v-2zm-4 4h2v-2h-2v2zm4 0h-2v-2h2v2zm0-6h-2v2h2v-2z"/></svg>
+          Entrar com QR Code
+        </button>
+
+        <div class="trust-row">
+          <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Dados seguros</div>
+          <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>SSL 256-bit</div>
+          <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>LGPD</div>
+        </div>
+      </div>
+
+      <div class="signup-link">Não tem conta? <a href="../checkout/">Faça sua matrícula →</a></div>
+    </div>
+  </main>
+
+  <footer>© 2025 Academia CIA do Corpo · Powered by <a href="index.html">CIA NET</a></footer>
+
+  <script>
+  function doLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+    setTimeout(() => {
+      window.location.href = 'aluno-dashboard.html';
+    }, 900);
+  }
+  </script>
+</body>
+</html>

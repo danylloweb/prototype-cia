@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Pendências</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:240px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .platform-tag{display:inline-flex;align-items:center;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .student-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .student-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .student-plan{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--amber);color:white;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:100px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .sdb-footer-links{display:flex;gap:8px;padding:4px 10px;}
+    .sdb-footer-link{font-size:11px;color:var(--t4);text-decoration:none;font-weight:500;}
+    .sdb-footer-link:hover{color:var(--orange);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-badge{display:inline-flex;align-items:center;gap:5px;background:var(--amber-l);border:1px solid rgba(217,119,6,.25);border-radius:100px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--amber);margin-left:10px;}
+    .content{padding:22px 26px;}
+    .btn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--orange);color:white;}
+    .btn-primary:hover{background:var(--orange-2);}
+    .btn-amber{background:var(--amber-l);color:var(--amber);border:1px solid rgba(217,119,6,.2);}
+    .btn-amber:hover{background:#fde68a;}
+    .btn-ghost{background:var(--bg3);color:var(--t2);border:1px solid var(--border);}
+    .btn-ghost:hover{background:var(--bg4);}
+    .btn svg{width:14px;height:14px;fill:currentColor;}
+
+    /* Summary row */
+    .summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+    .summary-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px 18px;box-shadow:var(--sh-sm);display:flex;align-items:center;gap:14px;}
+    .sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sc-icon svg{width:20px;height:20px;fill:currentColor;}
+    .sc-val{font-size:22px;font-weight:800;color:var(--t1);}
+    .sc-label{font-size:12px;color:var(--t3);}
+
+    /* Pending items */
+    .section-label{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .section-count{background:var(--amber-l);color:var(--amber);font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;}
+    .pend-item{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:18px;margin-bottom:10px;box-shadow:var(--sh-sm);display:flex;align-items:flex-start;gap:14px;transition:.15s;}
+    .pend-item:hover{border-color:var(--border-h,#CBD5E1);}
+    .pend-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .pend-icon svg{width:20px;height:20px;fill:currentColor;}
+    .pend-body{flex:1;}
+    .pend-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+    .pend-desc{font-size:13px;color:var(--t3);margin-bottom:10px;line-height:1.5;}
+    .pend-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .pend-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px;}
+    .tag-amber{background:var(--amber-l);color:var(--amber);}
+    .tag-blue{background:#EFF6FF;color:#2563EB;}
+    .tag-red{background:var(--red-l);color:var(--red);}
+    .pend-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
+
+    /* Financial OK banner */
+    .ok-banner{background:var(--green-l);border:1px solid rgba(5,150,105,.2);border-radius:13px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+    .ok-icon{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ok-icon svg{width:20px;height:20px;fill:white;}
+    .ok-title{font-size:14px;font-weight:700;color:#065f46;margin-bottom:2px;}
+    .ok-sub{font-size:13px;color:#047857;}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.summary-row{grid-template-columns:1fr;}.pend-item{flex-direction:column;}.pend-actions{margin-left:0;}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" style="display:flex;align-items:center;gap:9px;text-decoration:none;margin-bottom:14px;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="platform-tag">Área do Aluno</div>
+    <div class="student-info"><div class="student-name">João Silva</div><div class="student-plan">Plano Semestral · Boa Viagem</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Menu</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Minha Área</a>
+    <a href="aluno-treinos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>Meus Treinos</a>
+    <a href="aluno-agenda.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agenda</a>
+    <div class="nav-label">Financeiro</div>
+    <a href="aluno-carteira.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Minha Carteira</a>
+    <a href="aluno-planos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Meus Planos</a>
+    <a href="aluno-pagamentos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Pagamentos</a>
+    <a href="aluno-pendencias.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Pendências<span class="nav-badge">2</span></a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">JS</div><div><div class="user-name">João Silva</div><div class="user-role">Aluno ativo</div></div></div>
+    <div class="sdb-footer-links"><a href="aluno-login.html" class="sdb-footer-link">Sair</a></div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;">
+      <div class="topbar-title">Pendências</div>
+      <div class="topbar-badge"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>2 pendentes</div>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- Resumo -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="sc-icon" style="background:var(--amber-l);color:var(--amber);"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+        <div><div class="sc-val">2</div><div class="sc-label">Pendências abertas</div></div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-icon" style="background:var(--green-l);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+        <div><div class="sc-val">R$0,00</div><div class="sc-label">Débito financeiro</div></div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-icon" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <div><div class="sc-val">Em dia</div><div class="sc-label">Status do plano</div></div>
+      </div>
+    </div>
+
+    <!-- Financeiro OK -->
+    <div class="ok-banner">
+      <div class="ok-icon"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+      <div>
+        <div class="ok-title">Financeiro em dia</div>
+        <div class="ok-sub">Você não possui débitos pendentes. Próximo vencimento: 15/07/2025 · R$69,90</div>
+      </div>
+    </div>
+
+    <!-- Pendências cadastrais/documentais -->
+    <div style="margin-top:20px;">
+      <div class="section-label">Pendências cadastrais <span class="section-count">2</span></div>
+
+      <!-- Item 1: Termo de responsabilidade -->
+      <div class="pend-item" id="pend1">
+        <div class="pend-icon" style="background:var(--amber-l);color:var(--amber);">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </div>
+        <div class="pend-body">
+          <div class="pend-title">Termo de Responsabilidade</div>
+          <div class="pend-desc">É necessário assinar o Termo de Uso e Responsabilidade da Academia CIA do Corpo para continuar usufruindo de todos os serviços sem interrupções.</div>
+          <div class="pend-meta">
+            <span class="pend-tag tag-amber"><svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Vence em 14 dias · 20/06/2025</span>
+            <span class="pend-tag tag-amber">Importante</span>
+          </div>
+        </div>
+        <div class="pend-actions">
+          <button class="btn btn-amber" onclick="resolverItem('pend1','Termo de Responsabilidade')"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Assinar agora</button>
+        </div>
+      </div>
+
+      <!-- Item 2: Avaliação física -->
+      <div class="pend-item" id="pend2">
+        <div class="pend-icon" style="background:#EFF6FF;color:#2563EB;">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div class="pend-body">
+          <div class="pend-title">Avaliação Física Semestral</div>
+          <div class="pend-desc">Seu plano Semestral inclui uma avaliação física gratuita. Agende com seu professor para acompanhar sua evolução e ajustar os treinos conforme seus objetivos.</div>
+          <div class="pend-meta">
+            <span class="pend-tag tag-blue">Benefício incluso no plano</span>
+            <span class="pend-tag tag-blue">Sem prazo definido</span>
+          </div>
+        </div>
+        <div class="pend-actions">
+          <button class="btn btn-ghost" onclick="resolverItem('pend2','Avaliação Física')"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agendar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico de resolvidas -->
+    <div style="margin-top:28px;">
+      <div class="section-label" style="color:var(--t3);">Resolvidas recentemente</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--green);flex-shrink:0;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t2);">Atualização de dados cadastrais</div><div style="font-size:11px;color:var(--t4);margin-top:1px;">Resolvido em 02/05/2025</div></div>
+          <span style="font-size:11px;font-weight:700;background:var(--green-l);color:var(--green);padding:2px 8px;border-radius:100px;">Concluído</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--green);flex-shrink:0;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--t2);">Foto de perfil atualizada</div><div style="font-size:11px;color:var(--t4);margin-top:1px;">Resolvido em 18/04/2025</div></div>
+          <span style="font-size:11px;font-weight:700;background:var(--green-l);color:var(--green);padding:2px 8px;border-radius:100px;">Concluído</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function resolverItem(id, nome) {
+  const msg = id==='pend1'
+    ? `Abrindo documento para assinatura digital de "${nome}"...`
+    : `Redirecionando para agendamento de "${nome}"...`;
+  if(confirm(msg + '\n\nConfirmar ação?')) {
+    const el = document.getElementById(id);
+    el.style.opacity = '0.4';
+    el.style.pointerEvents = 'none';
+    const btn = el.querySelector('button');
+    btn.textContent = '✓ Solicitado';
+    alert(`${nome} solicitado! Nossa equipe entrará em contato em breve.`);
+  }
+}
+</script>
+</body>
+</html>

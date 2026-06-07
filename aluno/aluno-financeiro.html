@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Financeiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--sidebar:240px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:36px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .student-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .student-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .student-plan{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .sdb-footer-links{display:flex;gap:8px;padding:4px 10px;}
+    .sdb-footer-link{font-size:11px;color:var(--t4);text-decoration:none;}
+    .sdb-footer-link:hover{color:var(--orange);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .content{padding:22px 26px;}
+    .btn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .btn-ghost:hover{background:var(--bg4);}
+    .plan-card{background:linear-gradient(135deg,#F97316,#EA6C00);border-radius:16px;padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden;}
+    .plan-card::after{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:rgba(255,255,255,.07);border-radius:50%;}
+    .pc-grid{display:grid;grid-template-columns:1fr auto;align-items:start;position:relative;z-index:1;}
+    .pc-plan{font-size:22px;font-weight:800;color:white;}
+    .pc-sub{font-size:13px;color:rgba(255,255,255,.8);margin-top:2px;}
+    .pc-label{font-size:12px;color:rgba(255,255,255,.7);font-weight:500;margin-bottom:3px;}
+    .pc-valor{font-size:32px;font-weight:800;color:white;line-height:1;text-align:right;}
+    .pc-recorr{font-size:12px;color:rgba(255,255,255,.7);text-align:right;}
+    .pc-bottom{display:flex;gap:20px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.15);position:relative;z-index:1;}
+    .pc-stat-label{font-size:11px;color:rgba(255,255,255,.6);}
+    .pc-stat-val{font-size:14px;font-weight:700;color:white;}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:13px;font-weight:700;color:var(--t1);}
+    .card-body{padding:16px;}
+    .balance-ok{background:var(--green-l);border:1px solid rgba(5,150,105,.2);border-radius:11px;padding:16px;text-align:center;margin-bottom:12px;}
+    .balance-ok .big{font-size:26px;font-weight:800;color:var(--green);}
+    .balance-ok .lbl{font-size:12px;color:var(--green);margin-top:2px;}
+    .balance-ok .sub{font-size:12px;color:var(--t3);margin-top:6px;}
+    .pix-section{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:14px;display:flex;align-items:center;justify-content:space-between;}
+    .pix-label{font-size:13px;font-weight:600;color:var(--t1);}
+    .pix-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+    .upgrade-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .upgrade-card{border:2px solid var(--border);border-radius:11px;padding:14px;cursor:pointer;transition:.15s;position:relative;}
+    .upgrade-card:hover{border-color:var(--orange-b);background:var(--orange-l);}
+    .upgrade-card.current{border-color:var(--orange);background:var(--orange-l);}
+    .uc-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--orange);color:white;font-size:9px;font-weight:800;padding:2px 8px;border-radius:100px;white-space:nowrap;}
+    .uc-name{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+    .uc-price{font-size:18px;font-weight:800;color:var(--orange);}
+    .uc-period{font-size:11px;color:var(--t4);}
+    .uc-save{font-size:11px;font-weight:600;color:var(--green);margin-top:3px;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:var(--bg3);}
+    th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;}
+    td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--t2);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;display:inline-block;}
+    .b-paid{background:var(--green-l);color:var(--green);}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.two-col{grid-template-columns:1fr;}.upgrade-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="platform-tag">Área do Aluno</div>
+    <div class="student-info"><div class="student-name">João Silva</div><div class="student-plan">Plano Semestral · Boa Viagem</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Menu</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Minha Área</a>
+    <a href="aluno-treinos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>Meus Treinos</a>
+    <a href="aluno-agenda.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agenda</a>
+    <div class="nav-label">Financeiro</div>
+    <a href="aluno-carteira.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Minha Carteira</a>
+    <a href="aluno-planos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Meus Planos</a>
+    <a href="aluno-pagamentos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Pagamentos</a>
+    <a href="aluno-pendencias.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Pendências</a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">JS</div><div><div class="user-name">João Silva</div><div class="user-role">Aluno ativo</div></div></div>
+    <div class="sdb-footer-links"><a href="aluno-login.html" class="sdb-footer-link">Sair</a></div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar"><div class="topbar-title">Financeiro</div></div>
+  <div class="content">
+    <div class="plan-card">
+      <div class="pc-grid">
+        <div><div class="pc-label">Seu plano atual</div><div class="pc-plan">Plano Semestral</div><div class="pc-sub">Academia CIA do Corpo · Boa Viagem</div></div>
+        <div><div class="pc-valor">R$69,90</div><div class="pc-recorr">/mês</div></div>
+      </div>
+      <div class="pc-bottom">
+        <div><div class="pc-stat-label">Início</div><div class="pc-stat-val">01/01/2025</div></div>
+        <div><div class="pc-stat-label">Vencimento</div><div class="pc-stat-val">01/07/2025</div></div>
+        <div><div class="pc-stat-label">Dias restantes</div><div class="pc-stat-val">147 dias</div></div>
+        <div><div class="pc-stat-label">Status</div><div class="pc-stat-val">✓ Em dia</div></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Situação atual</div></div>
+        <div class="card-body">
+          <div class="balance-ok"><div class="big">R$0,00</div><div class="lbl">Sem pendências</div><div class="sub">Próximo vencimento: 01/07/2025 · R$69,90</div></div>
+          <div class="pix-section"><div><div class="pix-label">Próxima cobrança</div><div class="pix-sub">01/07/2025 — R$69,90 via PIX</div></div><button class="btn btn-ghost" onclick="alert('Cobrança agendada. Você receberá um aviso com antecedência.')">Ver detalhes</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Mudar plano</div></div>
+        <div class="card-body">
+          <div class="upgrade-grid">
+            <div class="upgrade-card"><div class="uc-name">Mensal</div><div class="uc-price">R$89,90</div><div class="uc-period">/mês</div></div>
+            <div class="upgrade-card current"><span class="uc-tag">Atual</span><div class="uc-name">Semestral</div><div class="uc-price">R$69,90</div><div class="uc-period">/mês</div><div class="uc-save">✓ 22% off</div></div>
+            <div class="upgrade-card" onclick="alert('Solicitação de upgrade enviada!')"><div class="uc-name">Anual</div><div class="uc-price">R$54,90</div><div class="uc-period">/mês</div><div class="uc-save">↑ 39% off</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--t4);text-align:center;">Clique em Anual para economizar mais</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Histórico de pagamentos</div><button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="window.print()">Exportar PDF</button></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Descrição</th><th>Vencimento</th><th>Pagamento</th><th>Valor</th><th>Método</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidade Junho/2025</td><td>01/06/2025</td><td>01/06/2025</td><td style="font-weight:700;">R$69,90</td><td>PIX</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidade Maio/2025</td><td>01/05/2025</td><td>01/05/2025</td><td style="font-weight:700;">R$69,90</td><td>PIX</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidade Abril/2025</td><td>01/04/2025</td><td>01/04/2025</td><td style="font-weight:700;">R$69,90</td><td>Cartão</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidade Março/2025</td><td>01/03/2025</td><td>01/03/2025</td><td style="font-weight:700;">R$69,90</td><td>Cartão</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Mensalidade Fevereiro/2025</td><td>01/02/2025</td><td>01/02/2025</td><td style="font-weight:700;">R$69,90</td><td>PIX</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+            <tr><td style="font-weight:600;color:var(--t1);">Matrícula — Plano Semestral</td><td>01/01/2025</td><td>01/01/2025</td><td style="font-weight:700;">R$419,40</td><td>Cartão</td><td><span class="badge b-paid">✓ Pago</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

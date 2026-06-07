@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Meus Treinos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--sidebar:240px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:36px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .student-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .student-name{font-size:12px;font-weight:700;color:var(--t1);}
+    .student-plan{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .sdb-footer-links{display:flex;gap:8px;padding:4px 10px;}
+    .sdb-footer-link{font-size:11px;color:var(--t4);text-decoration:none;font-weight:500;}
+    .sdb-footer-link:hover{color:var(--orange);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:.15s;}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .content{padding:22px 26px;}
+    .prog-head{background:linear-gradient(135deg,#F97316,#EA6C00);border-radius:14px;padding:20px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+    .prog-name{font-size:18px;font-weight:800;color:white;}
+    .prog-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px;}
+    .prog-badge{background:rgba(255,255,255,.18);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:white;}
+    .day-tabs{display:flex;gap:8px;margin-bottom:20px;}
+    .day-tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--t3);transition:.15s;}
+    .day-tab:hover{background:var(--bg3);}
+    .day-tab.active{background:var(--orange);color:white;border-color:var(--orange);}
+    .day-tab.today{border-color:var(--orange);color:var(--orange);}
+    .day-tab.active.today{color:white;}
+    .ex-list{display:flex;flex-direction:column;gap:10px;}
+    .ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:14px;padding:14px 16px;box-shadow:var(--sh-sm);transition:.2s;}
+    .ex-card:hover{box-shadow:var(--sh);border-color:var(--orange-b);}
+    .ex-num{width:26px;height:26px;border-radius:6px;background:var(--orange-m);color:var(--orange);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ex-thumb{width:54px;height:54px;border-radius:9px;background:linear-gradient(135deg,#F1F5F9,#E2E8F0);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+    .ex-thumb svg{width:22px;height:22px;fill:var(--t4);}
+    .ex-info{flex:1;}
+    .ex-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+    .ex-muscle{font-size:11px;color:var(--orange);font-weight:600;background:var(--orange-m);border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px;}
+    .ex-detail{font-size:12px;color:var(--t3);}
+    .ex-meta{display:flex;gap:16px;flex-shrink:0;}
+    .ex-stat{text-align:center;}
+    .ex-stat-val{font-size:16px;font-weight:800;color:var(--t1);line-height:1;}
+    .ex-stat-label{font-size:10px;color:var(--t4);margin-top:1px;}
+    .ex-done{width:28px;height:28px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .ex-done:hover{border-color:var(--green);background:var(--green-l);}
+    .ex-done.done{border-color:var(--green);background:var(--green-l);}
+    .ex-done svg{width:14px;height:14px;fill:var(--green);}
+    .prog-bar-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;box-shadow:var(--sh-sm);}
+    .pb-head{display:flex;justify-content:space-between;margin-bottom:8px;}
+    .pb-label{font-size:13px;font-weight:600;color:var(--t1);}
+    .pb-count{font-size:13px;font-weight:700;color:var(--orange);}
+    .pb-track{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+    .pb-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .4s;}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+    <div class="platform-tag">Área do Aluno</div>
+    <div class="student-info"><div class="student-name">João Silva</div><div class="student-plan">Plano Semestral · Boa Viagem</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Menu</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Minha Área</a>
+    <a href="aluno-treinos.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>Meus Treinos</a>
+    <a href="aluno-agenda.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Agenda</a>
+    <div class="nav-label">Financeiro</div>
+    <a href="aluno-carteira.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>Minha Carteira</a>
+    <a href="aluno-planos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Meus Planos</a>
+    <a href="aluno-pagamentos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Pagamentos</a>
+    <a href="aluno-pendencias.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Pendências</a>
+  </nav>
+  <div class="sdb-footer">
+    <div class="user-row"><div class="user-av">JS</div><div><div class="user-name">João Silva</div><div class="user-role">Aluno ativo</div></div></div>
+    <div class="sdb-footer-links"><a href="aluno-login.html" class="sdb-footer-link">Sair</a></div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Meus Treinos</div>
+    <button class="btn btn-ghost" onclick="window.print()">Imprimir treino</button>
+  </div>
+  <div class="content">
+    <div class="prog-head">
+      <div><div class="prog-name">Programa Hipertrofia — Nível Intermediário</div><div class="prog-sub">Prof. Carlos Mendes · Atualizado em 01/05/2025</div></div>
+      <div class="prog-badge">ABCD × 4 dias</div>
+    </div>
+    <div class="day-tabs" id="dayTabs">
+      <div class="day-tab" data-day="A" onclick="switchDay('A')">Treino A</div>
+      <div class="day-tab active today" data-day="B" onclick="switchDay('B')">Treino B ← Hoje</div>
+      <div class="day-tab" data-day="C" onclick="switchDay('C')">Treino C</div>
+      <div class="day-tab" data-day="D" onclick="switchDay('D')">Treino D</div>
+    </div>
+    <div class="prog-bar-wrap">
+      <div class="pb-head"><div class="pb-label">Progresso do treino de hoje</div><div class="pb-count" id="progressCount">0 / 7 exercícios</div></div>
+      <div class="pb-track"><div class="pb-fill" id="progressBar" style="width:0%"></div></div>
+    </div>
+    <div class="ex-list" id="exList"></div>
+  </div>
+</div>
+<script>
+const workouts={A:{name:'Treino A — Peito + Tríceps',exercises:[{name:'Supino Reto com Barra',muscle:'Peito',sets:'4',reps:'10-12',rest:'90s',detail:'Pegada pronada, descida controlada (2s)'},{name:'Supino Inclinado com Halteres',muscle:'Peito',sets:'3',reps:'12',rest:'75s',detail:'Cotovelos a 45°'},{name:'Crucifixo Inclinado',muscle:'Peito',sets:'3',reps:'12-15',rest:'60s',detail:'Arco natural, sem bloquear cotovelo'},{name:'Crossover no Cabo',muscle:'Peito',sets:'3',reps:'15',rest:'60s',detail:'Contração máxima no centro'},{name:'Tríceps Pulley com Corda',muscle:'Tríceps',sets:'4',reps:'12',rest:'60s',detail:'Abrir a corda na extensão'},{name:'Tríceps Testa com Haltere',muscle:'Tríceps',sets:'3',reps:'10-12',rest:'60s',detail:'Cotovelos fixos'},{name:'Mergulho nas Paralelas',muscle:'Tríceps',sets:'3',reps:'Até falha',rest:'90s',detail:'Tronco levemente inclinado'},{name:'Prancha Abdominal',muscle:'Core',sets:'3',reps:'45s',rest:'45s',detail:'Quadril alinhado, core ativado'}]},B:{name:'Treino B — Costas + Bíceps',exercises:[{name:'Puxada Frente com Barra Larga',muscle:'Costas',sets:'4',reps:'10-12',rest:'90s',detail:'Puxar até o peito, retorno controlado'},{name:'Remada Curvada com Barra',muscle:'Costas',sets:'4',reps:'10',rest:'90s',detail:'Costas neutras, cotovelo atrás do corpo'},{name:'Remada Unilateral com Haltere',muscle:'Costas',sets:'3',reps:'12/lado',rest:'75s',detail:'Apoio no banco, lombar reta'},{name:'Pull-over com Haltere',muscle:'Costas',sets:'3',reps:'12',rest:'60s',detail:'Braço levemente flexionado'},{name:'Rosca Direta com Barra',muscle:'Bíceps',sets:'4',reps:'10-12',rest:'75s',detail:'Cotovelo fixo, supinação no topo'},{name:'Rosca Alternada com Haltere',muscle:'Bíceps',sets:'3',reps:'12/lado',rest:'60s',detail:'Sem balanço do tronco'},{name:'Rosca Concentrada',muscle:'Bíceps',sets:'3',reps:'12-15',rest:'60s',detail:'Contração total no pico'}]},C:{name:'Treino C — Pernas + Glúteos',exercises:[{name:'Agachamento Livre com Barra',muscle:'Quadríceps',sets:'5',reps:'8-10',rest:'120s',detail:'Profundidade paralela, joelhos alinhados'},{name:'Leg Press 45°',muscle:'Quadríceps',sets:'4',reps:'12',rest:'90s',detail:'Amplitude completa'},{name:'Extensora',muscle:'Quadríceps',sets:'3',reps:'15',rest:'60s',detail:'Contração isométrica no topo (1s)'},{name:'Cadeira Flexora',muscle:'Isquiotibial',sets:'3',reps:'12',rest:'60s',detail:'Sem arquear a lombar'},{name:'Stiff com Halteres',muscle:'Isquiotibial',sets:'4',reps:'12',rest:'75s',detail:'Lombar reta, sentir o alongamento'},{name:'Agachamento Búlgaro',muscle:'Glúteos',sets:'3',reps:'12/lado',rest:'90s',detail:'Joelho da frente não ultrapassa o pé'},{name:'Panturrilha em Pé',muscle:'Panturrilha',sets:'4',reps:'15-20',rest:'45s',detail:'Amplitude total'},{name:'Panturrilha Sentado',muscle:'Panturrilha',sets:'3',reps:'20',rest:'45s',detail:'Pausa de 1s na extensão'}]},D:{name:'Treino D — Ombros + Abdômen',exercises:[{name:'Desenvolvimento com Halteres',muscle:'Ombros',sets:'4',reps:'10-12',rest:'90s',detail:'Cotovelos a 90° na base'},{name:'Elevação Lateral',muscle:'Ombros',sets:'4',reps:'15',rest:'60s',detail:'Leve inclinação para frente'},{name:'Elevação Frontal com Anilha',muscle:'Ombros',sets:'3',reps:'12',rest:'60s',detail:'Controle na descida'},{name:'Crucifixo Invertido',muscle:'Ombros',sets:'3',reps:'15',rest:'60s',detail:'Leve flexão no cotovelo'},{name:'Encolhimento com Halteres',muscle:'Trapézio',sets:'4',reps:'12-15',rest:'60s',detail:'Pausa no topo (1s)'},{name:'Abdominal Supra',muscle:'Abdômen',sets:'4',reps:'20',rest:'45s',detail:'Não travar o pescoço'},{name:'Elevação de Pernas',muscle:'Abdômen',sets:'3',reps:'15',rest:'45s',detail:'Lombar colada no banco'}]}};
+let doneSet=new Set(),currentDay='B';
+function switchDay(day){currentDay=day;doneSet=new Set();document.querySelectorAll('.day-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.day===day)t.classList.add('active');});renderExercises();}
+function renderExercises(){const w=workouts[currentDay];const total=w.exercises.length;document.getElementById('exList').innerHTML=w.exercises.map((ex,i)=>`<div class="ex-card"><div class="ex-num">${i+1}</div><div class="ex-thumb"><svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg></div><div class="ex-info"><div class="ex-name">${ex.name}</div><span class="ex-muscle">${ex.muscle}</span><div class="ex-detail">${ex.detail}</div></div><div class="ex-meta"><div class="ex-stat"><div class="ex-stat-val">${ex.sets}</div><div class="ex-stat-label">Séries</div></div><div class="ex-stat"><div class="ex-stat-val">${ex.reps}</div><div class="ex-stat-label">Reps</div></div><div class="ex-stat"><div class="ex-stat-val">${ex.rest}</div><div class="ex-stat-label">Descanso</div></div></div><div class="ex-done ${doneSet.has(i)?'done':''}" onclick="toggleDone(${i},${total})">${doneSet.has(i)?'<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>':''}</div></div>`).join('');updateProgress(total);}
+function toggleDone(i,total){if(doneSet.has(i))doneSet.delete(i);else doneSet.add(i);renderExercises();}
+function updateProgress(total){const done=doneSet.size;document.getElementById('progressCount').textContent=`${done} / ${total} exercícios`;document.getElementById('progressBar').style.width=`${(done/total)*100}%`;}
+renderExercises();
+</script>
+</body>
+</html>

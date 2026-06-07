@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA do Corpo — Matrícula Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─────────────── TOKENS ─────────────── */
+    :root {
+      --font-h: 'Space Grotesk', sans-serif;
+      --font-b: 'Inter', sans-serif;
+
+      /* Surfaces */
+      --white:    #FFFFFF;
+      --surface:  #F8FAFC;
+      --surface2: #F1F5F9;
+      --border:   #E2E8F0;
+
+      /* Text */
+      --t1: #0F172A;
+      --t2: #334155;
+      --t3: #64748B;
+      --t4: #94A3B8;
+
+      /* Brand — orange */
+      --primary:        #F97316;
+      --primary-h:      #EA580C;
+      --primary-l:      #FFF7ED;
+      --primary-border: #FED7AA;
+
+      /* Green */
+      --green:        #16A34A;
+      --green-l:      #F0FDF4;
+      --green-border: #BBF7D0;
+
+      /* Utils */
+      --red:   #DC2626;
+      --amber: #D97706;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+      --shadow:    0 4px 6px -1px rgba(15,23,42,.07),0 2px 4px -2px rgba(15,23,42,.05);
+      --shadow-md: 0 10px 15px -3px rgba(15,23,42,.07),0 4px 6px -4px rgba(15,23,42,.04);
+      --shadow-brand: 0 4px 14px rgba(249,115,22,.28);
+
+      --radius-sm: 8px;
+      --radius:    12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: var(--font-b);
+      background: var(--surface);
+      color: var(--t1);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─────────────── LEFT PANEL ─────────────── */
+    .left {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .left-accent {
+      height: 4px;
+      background: linear-gradient(90deg, #EA580C 0%, #F97316 40%, #FB923C 70%, #FDBA74 100%);
+      flex-shrink: 0;
+    }
+    .left-inner {
+      padding: 28px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* Logo */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand-logo img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+    .brand-name {
+      font-family: var(--font-h);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: .5px;
+      line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--t4);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Social proof chip */
+    .members-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-l);
+      border: 1px solid var(--green-border);
+      border-radius: 100px;
+      padding: 5px 12px;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+    .members-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .members-chip span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    /* Plan preview card */
+    .preview-card {
+      background: var(--primary-l);
+      border: 1.5px solid var(--primary-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .preview-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .preview-name {
+      font-family: var(--font-h);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 2px;
+    }
+    .preview-price {
+      font-family: var(--font-h);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+    .preview-period {
+      font-size: 12px;
+      color: var(--t3);
+      margin-top: 2px;
+      margin-bottom: 14px;
+    }
+    .feat-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .feat-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--t2);
+    }
+    .feat-check {
+      width: 16px; height: 16px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feat-check svg { width: 9px; height: 9px; fill: white; }
+
+    /* Trust items */
+    .trust-section {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .trust-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .trust-icon svg { width: 15px; height: 15px; fill: var(--t3); }
+    .trust-info strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t2);
+      line-height: 1.3;
+    }
+    .trust-info span { font-size: 11px; color: var(--t4); }
+
+    /* ─────────────── RIGHT PANEL ─────────────── */
+    .right {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--surface);
+    }
+
+    /* Progress header */
+    .progress-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 48px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .steps-track {
+      display: flex;
+      align-items: center;
+      max-width: 500px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .step-bubble {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--white);
+      color: var(--t4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-h);
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+    .step-item.active .step-bubble {
+      border-color: var(--primary);
+      background: var(--primary-l);
+      color: var(--primary);
+    }
+    .step-item.done .step-bubble {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+    }
+    .step-item.done .step-bubble svg { width: 13px; height: 13px; fill: white; }
+    .step-lbl {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t4);
+      white-space: nowrap;
+      transition: color .3s;
+    }
+    .step-item.active .step-lbl { color: var(--t1); }
+    .step-item.done .step-lbl  { color: var(--green); }
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 10px;
+      border-radius: 1px;
+      min-width: 20px;
+      transition: background .3s;
+    }
+    .step-line.done { background: var(--green); }
+
+    /* Content */
+    .content-wrap {
+      flex: 1;
+      padding: 40px 48px 64px;
+      max-width: 680px;
+    }
+    .section-title {
+      font-family: var(--font-h);
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .section-sub {
+      font-size: 14px;
+      color: var(--t3);
+      margin-bottom: 28px;
+    }
+
+    /* Back button */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-b);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--t3);
+      padding: 0;
+      margin-bottom: 20px;
+      transition: color .2s;
+    }
+    .btn-back:hover { color: var(--t1); }
+    .btn-back svg { width: 14px; height: 14px; fill: currentColor; }
+
+    /* ─────────────── STEP 1 — PLANS ─────────────── */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .plan-card {
+      position: relative;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px 18px;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, transform .15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .plan-card:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+    .plan-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-l);
+      box-shadow: var(--shadow-brand);
+    }
+
+    /* checkmark ring */
+    .card-check {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+    }
+    .card-check svg { width: 10px; height: 10px; fill: white; opacity: 0; transition: opacity .2s; }
+    .plan-card.selected .card-check { border-color: var(--primary); background: var(--primary); }
+    .plan-card.selected .card-check svg { opacity: 1; }
+
+    /* badge */
+    .plan-badge {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      white-space: nowrap;
+      letter-spacing: .3px;
+      box-shadow: 0 2px 8px rgba(249,115,22,.4);
+    }
+
+    .plan-period {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 6px;
+    }
+    .plan-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .plan-price {
+      font-family: var(--font-h);
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--t1);
+    }
+    .plan-card.selected .plan-price { color: var(--primary); }
+    .plan-cents {
+      font-family: var(--font-h);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t3);
+    }
+    .plan-per {
+      font-size: 11.5px;
+      color: var(--t3);
+      margin-bottom: 8px;
+    }
+    .plan-save-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--green-l);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .plan-save-tag svg { width: 10px; height: 10px; fill: var(--green); }
+    .plan-std { font-size: 11px; color: var(--t4); font-weight: 500; }
+
+    .plan-note {
+      font-size: 12px;
+      color: var(--t4);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ─────────────── STEP 2 — LOCATION ─────────────── */
+    .selects-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t2);
+    }
+    select, input {
+      width: 100%;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--t1);
+      font-family: var(--font-b);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394A3B8'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+    }
+    select:focus, input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249,115,22,.12);
+    }
+    select:disabled { opacity: .45; cursor: not-allowed; }
+    input::placeholder { color: var(--t4); }
+
+    .units-label { font-size: 13px; font-weight: 600; color: var(--t2); margin-bottom: 12px; }
+    .units-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .unit-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .unit-card:hover { border-color: var(--primary-border); box-shadow: var(--shadow); }
+    .unit-card.selected { border-color: var(--primary); background: var(--primary-l); }
+    .unit-avail {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      padding: 2px 7px;
+      border-radius: 100px;
+      margin-bottom: 6px;
+    }
+    .avail-open { background: var(--green-l); color: var(--green); border: 1px solid var(--green-border); }
+    .avail-busy { background: #FFFBEB; color: var(--amber); border: 1px solid #FDE68A; }
+    .unit-name { font-family: var(--font-h); font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+    .unit-addr { font-size: 11px; color: var(--t3); margin-bottom: 6px; line-height: 1.4; }
+    .unit-hours { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--t3); }
+    .unit-hours svg { width: 11px; height: 11px; fill: var(--t4); flex-shrink: 0; }
+
+    /* ─────────────── STEP 3 — FORM + PAYMENT ─────────────── */
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+    .form-full { grid-column: span 2; }
+
+    /* Order summary */
+    .order-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .order-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--t4);
+      margin-bottom: 14px;
+    }
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--t3);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--surface2);
+    }
+    .order-row:last-child { border-bottom: none; }
+    .order-row.total {
+      border-top: 1.5px solid var(--border);
+      border-bottom: none;
+      padding-top: 14px;
+      margin-top: 2px;
+      font-family: var(--font-h);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--t1);
+    }
+    .order-row.total span:last-child { color: var(--primary); font-size: 18px; }
+    .order-green { color: var(--green) !important; font-weight: 600; }
+
+    /* Payment tabs */
+    .pay-label { font-size: 13px; font-weight: 600; color: var(--t2); margin-bottom: 10px; }
+    .payment-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .pay-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 10px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .pay-tab:hover { border-color: var(--primary-border); }
+    .pay-tab.active { border-color: var(--primary); background: var(--primary-l); }
+    .pay-tab svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .pay-tab-lbl { font-size: 12.5px; font-weight: 600; color: var(--t2); }
+    .pay-tab.active .pay-tab-lbl { color: var(--primary); }
+
+    /* PIX block */
+    .pix-block {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
+    .pix-discount-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-l);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-sm);
+      padding: 7px 14px;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+    }
+    .pix-discount-tag svg { width: 14px; height: 14px; fill: var(--green); }
+    .pix-hint { font-size: 13px; color: var(--t3); }
+    .pix-qr {
+      width: 136px; height: 136px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pix-qr svg { width: 116px; height: 116px; }
+    .pix-code {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-size: 10.5px;
+      color: var(--t3);
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      word-break: break-all;
+      max-width: 380px;
+      transition: border-color .2s;
+      text-align: left;
+    }
+    .pix-code:hover { border-color: var(--primary); }
+    .pix-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t2);
+      cursor: pointer;
+      font-family: var(--font-b);
+      transition: all .2s;
+    }
+    .pix-copy-btn:hover { background: var(--primary-l); border-color: var(--primary); color: var(--primary); }
+    .pix-copy-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .pix-note { font-size: 11px; color: var(--t4); }
+
+    /* Card block */
+    .card-block {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Boleto block */
+    .boleto-block {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .boleto-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .boleto-icon svg { width: 24px; height: 24px; fill: var(--t3); }
+
+    /* ─────────────── BUTTONS ─────────────── */
+    .btn-primary {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-h);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-brand);
+      letter-spacing: .2px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--primary-h); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,.38); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary svg { width: 17px; height: 17px; fill: white; flex-shrink: 0; }
+
+    /* ─────────────── SUCCESS ─────────────── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 56px 20px;
+    }
+    .success-icon {
+      width: 70px; height: 70px;
+      background: var(--green-l);
+      border: 2px solid var(--green-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .success-icon svg { width: 30px; height: 30px; fill: var(--green); }
+    .success-title { font-family: var(--font-h); font-size: 26px; font-weight: 700; color: var(--t1); margin-bottom: 8px; }
+    .success-sub { font-size: 15px; color: var(--t3); max-width: 380px; margin-bottom: 28px; line-height: 1.65; }
+    .success-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .success-card-title { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--t4); margin-bottom: 14px; }
+    .success-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--surface2); }
+    .success-row:last-child { border-bottom: none; }
+    .success-row span:first-child { color: var(--t3); }
+    .success-row span:last-child { font-weight: 600; color: var(--t1); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--t1);
+      color: white;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      z-index: 999;
+      box-shadow: 0 4px 20px rgba(0,0,0,.18);
+      white-space: nowrap;
+      animation: slideDown .25s ease;
+    }
+    @keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    /* ─────────────── RESPONSIVE ─────────────── */
+    @media (max-width: 960px) {
+      body { grid-template-columns: 1fr; }
+      .left { display: none; }
+      .progress-header { padding: 16px 20px; }
+      .content-wrap { padding: 24px 20px 56px; max-width: 100%; }
+      .selects-row { grid-template-columns: 1fr; }
+      .units-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .plans-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-full { grid-column: span 1; }
+      .payment-tabs { flex-direction: column; }
+    }
+    @media (max-width: 400px) {
+      .step-lbl { display: none; }
+      .step-line { min-width: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ LEFT PANEL ══════════════ -->
+<aside class="left">
+  <div class="left-accent"></div>
+  <div class="left-inner">
+
+    <!-- Logo -->
+    <div class="brand-logo">
+      <img src="../logo-cia.png" alt="CIA do Corpo">
+      <div>
+        <div class="brand-name">CIA DO CORPO</div>
+        <div class="brand-sub">Academia</div>
+      </div>
+    </div>
+
+    <!-- Social proof -->
+    <div class="members-chip">
+      <div class="members-dot"></div>
+      <span>+1.847 alunos ativos</span>
+    </div>
+
+    <!-- Plan preview -->
+    <div class="preview-card" id="planPreview">
+      <div class="preview-label">Plano selecionado</div>
+      <div class="preview-name" id="previewName">Nenhum selecionado</div>
+      <div class="preview-price" id="previewPrice">—</div>
+      <div class="preview-period" id="previewPeriod">Escolha um plano ao lado</div>
+      <ul class="feat-list">
+        <li>
+          <div class="feat-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+          Acesso a todas as unidades
+        </li>
+        <li>
+          <div class="feat-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+          App CIA NET incluso
+        </li>
+        <li>
+          <div class="feat-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+          Aulas coletivas ilimitadas
+        </li>
+        <li>
+          <div class="feat-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+          Treino personalizado incluso
+        </li>
+        <li>
+          <div class="feat-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+          Sem taxa de matrícula
+        </li>
+      </ul>
+    </div>
+
+    <!-- Trust signals -->
+    <div class="trust-section">
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <div class="trust-info">
+          <strong>Ambiente 100% seguro</strong>
+          <span>Dados criptografados com SSL</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="trust-info">
+          <strong>PIX e cartão aceitos</strong>
+          <span>Parcelamento em até 12x</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+        </div>
+        <div class="trust-info">
+          <strong>Cancele quando quiser</strong>
+          <span>Sem multa ou burocracia</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">
+          <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </div>
+        <div class="trust-info">
+          <strong>Acesso em até 24 horas</strong>
+          <span>Liberado após confirmação</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- ══════════════ RIGHT PANEL ══════════════ -->
+<main class="right">
+
+  <!-- Progress steps -->
+  <header class="progress-header">
+    <div class="steps-track">
+      <div class="step-item active" id="step1">
+        <div class="step-bubble">1</div>
+        <div class="step-lbl">Plano</div>
+      </div>
+      <div class="step-line" id="conn1"></div>
+      <div class="step-item" id="step2">
+        <div class="step-bubble">2</div>
+        <div class="step-lbl">Unidade</div>
+      </div>
+      <div class="step-line" id="conn2"></div>
+      <div class="step-item" id="step3">
+        <div class="step-bubble">3</div>
+        <div class="step-lbl">Dados &amp; Pagamento</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-wrap">
+
+    <!-- ══ STEP 1 ══ -->
+    <div id="view1">
+      <div class="section-title">Escolha seu plano</div>
+      <div class="section-sub">Quanto mais tempo, mais você economiza. Cancele quando quiser, sem multa.</div>
+
+      <div class="plans-grid">
+
+        <!-- Mensal -->
+        <div class="plan-card" onclick="selectPlan(this,'Mensal','R$ 89,90','/mês',null,'R$ 89,90')">
+          <div class="card-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div class="plan-period">Mensal</div>
+          <div class="plan-price-row">
+            <span class="plan-price">R$ 89</span>
+            <span class="plan-cents">,90</span>
+          </div>
+          <div class="plan-per">/mês</div>
+          <span class="plan-std">Preço padrão</span>
+        </div>
+
+        <!-- Trimestral -->
+        <div class="plan-card" onclick="selectPlan(this,'Trimestral','R$ 79,90','/mês · 3 meses','Economize R$ 30','R$ 239,70')">
+          <div class="card-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div class="plan-period">Trimestral</div>
+          <div class="plan-price-row">
+            <span class="plan-price">R$ 79</span>
+            <span class="plan-cents">,90</span>
+          </div>
+          <div class="plan-per">/mês</div>
+          <span class="plan-save-tag">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            Economize R$ 30
+          </span>
+        </div>
+
+        <!-- Semestral — DESTAQUE -->
+        <div class="plan-card" onclick="selectPlan(this,'Semestral','R$ 69,90','/mês · 6 meses','Economize R$ 120','R$ 419,40')">
+          <div class="plan-badge">Mais escolhido</div>
+          <div class="card-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div class="plan-period">Semestral</div>
+          <div class="plan-price-row">
+            <span class="plan-price">R$ 69</span>
+            <span class="plan-cents">,90</span>
+          </div>
+          <div class="plan-per">/mês</div>
+          <span class="plan-save-tag">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            Economize R$ 120
+          </span>
+        </div>
+
+        <!-- Anual -->
+        <div class="plan-card" onclick="selectPlan(this,'Anual','R$ 54,90','/mês · anual','Economize R$ 420','R$ 658,80')">
+          <div class="card-check">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div class="plan-period">Anual</div>
+          <div class="plan-price-row">
+            <span class="plan-price">R$ 54</span>
+            <span class="plan-cents">,90</span>
+          </div>
+          <div class="plan-per">/mês</div>
+          <span class="plan-save-tag">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            Economize R$ 420
+          </span>
+        </div>
+
+      </div>
+
+      <p class="plan-note">Todos os planos com acesso completo · Sem taxa de matrícula · Cancele quando quiser</p>
+
+      <button class="btn-primary" onclick="goStep(2)">
+        Continuar
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z"/></svg>
+      </button>
+    </div>
+
+    <!-- ══ STEP 2 ══ -->
+    <div id="view2" style="display:none;">
+      <button class="btn-back" onclick="goStep(1)">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Voltar
+      </button>
+
+      <div class="section-title">Escolha sua unidade</div>
+      <div class="section-sub">Selecione o estado, cidade e a unidade onde você vai treinar.</div>
+
+      <div class="selects-row">
+        <div class="field">
+          <label for="estado">Estado</label>
+          <select id="estado" onchange="updateCidades()">
+            <option value="">Selecione o estado</option>
+            <option value="PE">Pernambuco (PE)</option>
+            <option value="SP">São Paulo (SP)</option>
+            <option value="RJ">Rio de Janeiro (RJ)</option>
+            <option value="MG">Minas Gerais (MG)</option>
+            <option value="CE">Ceará (CE)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cidade">Cidade</label>
+          <select id="cidade" onchange="updateUnidades()" disabled>
+            <option value="">Selecione a cidade</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="unidadesWrap" style="display:none;">
+        <div class="units-label">Unidade</div>
+        <div class="units-grid" id="unidadesGrid"></div>
+      </div>
+
+      <button class="btn-primary" onclick="goStep(3)" style="margin-top:24px;" id="btnStep2" disabled>
+        Continuar
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z"/></svg>
+      </button>
+    </div>
+
+    <!-- ══ STEP 3 ══ -->
+    <div id="view3" style="display:none;">
+      <button class="btn-back" onclick="goStep(2)">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Voltar
+      </button>
+
+      <div class="section-title">Dados &amp; pagamento</div>
+      <div class="section-sub">Preencha seus dados para finalizar a matrícula.</div>
+
+      <!-- Personal data -->
+      <div class="form-section-title">Dados pessoais</div>
+      <div class="form-grid">
+        <div class="field form-full">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="João Silva Santos" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="joao@email.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="cpf">CPF</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)">
+        </div>
+        <div class="field">
+          <label for="tel">Telefone / WhatsApp</label>
+          <input type="tel" id="tel" placeholder="(81) 99999-9999" maxlength="15" oninput="maskPhone(this)" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="nasc">Data de nascimento</label>
+          <input type="date" id="nasc" autocomplete="bday">
+        </div>
+        <div class="field">
+          <label for="sexo">Sexo</label>
+          <select id="sexo">
+            <option value="">Selecione</option>
+            <option>Masculino</option>
+            <option>Feminino</option>
+            <option>Prefiro não informar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="order-card">
+        <div class="order-title">Resumo do pedido</div>
+        <div class="order-row">
+          <span>Plano selecionado</span>
+          <span style="font-weight:600;color:var(--t1);" id="summaryPlan">—</span>
+        </div>
+        <div class="order-row">
+          <span>Unidade</span>
+          <span style="font-weight:600;color:var(--t1);" id="summaryUnit">—</span>
+        </div>
+        <div class="order-row">
+          <span>Desconto</span>
+          <span class="order-green" id="summaryDiscount">R$ 0,00</span>
+        </div>
+        <div class="order-row total">
+          <span>Total mensal</span>
+          <span id="summaryPrice">—</span>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="pay-label">Forma de pagamento</div>
+      <div class="payment-tabs">
+
+        <div class="pay-tab active" onclick="selectPayment('pix',this)">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M9.5 16.5C9.5 16.5 6.5 16.5 4.5 14.5C2.5 12.5 2.5 9.5 4.5 7.5L7.5 4.5C9.5 2.5 12.5 2.5 14.5 4.5C16.5 6.5 16.5 9.5 14.5 11.5L13 13" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14.5 7.5C14.5 7.5 17.5 7.5 19.5 9.5C21.5 11.5 21.5 14.5 19.5 16.5L16.5 19.5C14.5 21.5 11.5 21.5 9.5 19.5C7.5 17.5 7.5 14.5 9.5 12.5L11 11" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="pay-tab-lbl">PIX</span>
+        </div>
+
+        <div class="pay-tab" onclick="selectPayment('card',this)">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="#64748B" stroke-width="1.8"/>
+            <line x1="2" y1="10" x2="22" y2="10" stroke="#64748B" stroke-width="1.8"/>
+            <line x1="6" y1="15" x2="10" y2="15" stroke="#64748B" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="pay-tab-lbl">Cartão de crédito</span>
+        </div>
+
+        <div class="pay-tab" onclick="selectPayment('boleto',this)">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="16" rx="2" stroke="#64748B" stroke-width="1.8"/>
+            <line x1="7" y1="8" x2="7" y2="16" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="9.5" y1="8" x2="9.5" y2="16" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="12" y1="8" x2="12" y2="16" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="14.5" y1="8" x2="14.5" y2="16" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="17" y1="8" x2="17" y2="16" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="pay-tab-lbl">Boleto</span>
+        </div>
+
+      </div>
+
+      <!-- PIX -->
+      <div id="pixBlock" class="pix-block">
+        <div class="pix-discount-tag">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          5% de desconto pagando via PIX
+        </div>
+        <div class="pix-hint">Escaneie o QR Code ou copie o código abaixo</div>
+        <div class="pix-qr">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="white"/>
+            <g fill="black">
+              <rect x="10" y="10" width="30" height="30"/>
+              <rect x="15" y="15" width="20" height="20" fill="white"/>
+              <rect x="20" y="20" width="10" height="10"/>
+              <rect x="60" y="10" width="30" height="30"/>
+              <rect x="65" y="15" width="20" height="20" fill="white"/>
+              <rect x="70" y="20" width="10" height="10"/>
+              <rect x="10" y="60" width="30" height="30"/>
+              <rect x="15" y="65" width="20" height="20" fill="white"/>
+              <rect x="20" y="70" width="10" height="10"/>
+              <rect x="45" y="10" width="5" height="5"/>
+              <rect x="50" y="15" width="5" height="5"/>
+              <rect x="45" y="20" width="5" height="5"/>
+              <rect x="60" y="45" width="5" height="5"/>
+              <rect x="70" y="45" width="10" height="5"/>
+              <rect x="80" y="50" width="5" height="5"/>
+              <rect x="45" y="50" width="10" height="5"/>
+              <rect x="60" y="55" width="5" height="5"/>
+              <rect x="70" y="60" width="5" height="5"/>
+              <rect x="45" y="65" width="5" height="10"/>
+              <rect x="55" y="70" width="10" height="5"/>
+              <rect x="70" y="75" width="5" height="5"/>
+              <rect x="80" y="65" width="5" height="20"/>
+              <rect x="60" y="80" width="10" height="5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pix-code" id="pixCode">00020126360014BR.GOV.BCB.PIX0114+5581999999999520400005303986540589.905802BR5920ACADEMIA CIA DO CORPO6009SAO PAULO62070503***6304ABCD</div>
+        <button class="pix-copy-btn" onclick="copyPix()">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copiar código PIX
+        </button>
+        <div class="pix-note">Confirmação automática em até 30 segundos</div>
+      </div>
+
+      <!-- Card -->
+      <div id="cardBlock" class="card-block" style="display:none;">
+        <div class="field">
+          <label>Número do cartão</label>
+          <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="maskCard(this)">
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;">
+          <div class="field">
+            <label>Nome no cartão</label>
+            <input type="text" placeholder="JOAO S SANTOS" style="text-transform:uppercase;">
+          </div>
+          <div class="field">
+            <label>Validade</label>
+            <input type="text" placeholder="MM/AA" maxlength="5" oninput="maskExpiry(this)">
+          </div>
+          <div class="field">
+            <label>CVV</label>
+            <input type="text" placeholder="000" maxlength="3" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label>Parcelamento</label>
+          <select>
+            <option>1x de R$ 89,90 — sem juros</option>
+            <option>2x de R$ 45,00 — sem juros</option>
+            <option>3x de R$ 30,00 — sem juros</option>
+            <option>6x de R$ 15,34 — sem juros</option>
+            <option>12x de R$ 8,17 — com juros (1,99%)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Boleto -->
+      <div id="boletoBlock" class="boleto-block" style="display:none;">
+        <div class="boleto-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 4v16h18V4H3zm16 14H5V6h14v12zM7 8h2v8H7V8zm3 0h1v8h-1V8zm2 0h2v8h-2V8zm3 0h2v8h-2V8z"/></svg>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:var(--t1);margin-bottom:6px;">Boleto bancário</div>
+        <div style="font-size:13px;color:var(--t3);line-height:1.65;max-width:320px;margin:0 auto;">
+          O boleto será gerado após confirmação. Prazo de vencimento: 3 dias úteis. Acesso liberado após compensação bancária.
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <button class="btn-primary" onclick="finalize()">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Finalizar matrícula
+        </button>
+        <p style="font-size:11px;color:var(--t4);text-align:center;margin-top:12px;">
+          Ao finalizar você concorda com os
+          <a href="#" style="color:var(--primary);text-decoration:none;">Termos de Uso</a> e
+          <a href="#" style="color:var(--primary);text-decoration:none;">Política de Privacidade</a>
+          da Academia CIA do Corpo.
+        </p>
+      </div>
+    </div>
+
+    <!-- ══ SUCCESS ══ -->
+    <div class="success-screen" id="viewSuccess">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </div>
+      <div class="success-title">Matrícula confirmada!</div>
+      <p class="success-sub">Bem-vindo(a) à Academia CIA do Corpo. Você receberá um e-mail com as instruções de acesso.</p>
+
+      <div class="success-card">
+        <div class="success-card-title">Resumo da matrícula</div>
+        <div class="success-row">
+          <span>Plano</span>
+          <span id="finalPlan">—</span>
+        </div>
+        <div class="success-row">
+          <span>Unidade</span>
+          <span id="finalUnit">—</span>
+        </div>
+        <div class="success-row">
+          <span>Próximo passo</span>
+          <span>Verificar e-mail</span>
+        </div>
+      </div>
+
+      <a href="../aluno/" class="btn-primary" style="max-width:400px;">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Acessar minha área
+      </a>
+    </div>
+
+  </div><!-- /content-wrap -->
+</main>
+
+<script>
+/* ─── DATA ─── */
+const DATA = {
+  PE: { cidades: {
+    Recife: [
+      {n:'Boa Viagem',   a:'Av. Boa Viagem, 3420',        h:'Seg–Sex 5h–23h · Sáb 6h–20h',    ok:true},
+      {n:'Casa Forte',   a:'R. Sete de Setembro, 110',     h:'Seg–Sex 5h30–22h · Sáb 7h–19h',  ok:true},
+      {n:'Graças',       a:'Av. Conde da Boa Vista, 800',  h:'Seg–Sex 6h–22h · Sáb 7h–18h',    ok:false},
+      {n:'Recife Centro',a:'Av. Agamenon Magalhães, 55',   h:'Seg–Sex 5h–22h',                  ok:true}
+    ],
+    Caruaru: [{n:'Caruaru Centro',a:'R. 15 de Novembro, 200',h:'Seg–Sex 5h–22h · Sáb 6h–18h',ok:true}],
+    Olinda:  [{n:'Olinda Centro', a:'Av. Getúlio Vargas, 420',h:'Seg–Sex 6h–21h · Sáb 7h–17h',ok:false}]
+  }},
+  SP: { cidades: {
+    'São Paulo': [
+      {n:'Pinheiros',a:'R. dos Pinheiros, 500',   h:'Seg–Sex 5h–23h',       ok:true},
+      {n:'Moema',    a:'Av. Ibirapuera, 1200',     h:'Seg–Sex 5h30–23h',     ok:true}
+    ],
+    Campinas: [{n:'Campinas Centro',a:'Av. Brasil, 300',h:'Seg–Sex 6h–22h',ok:false}]
+  }},
+  RJ: { cidades: {
+    'Rio de Janeiro': [
+      {n:'Barra da Tijuca',a:'Av. das Américas, 700',    h:'Seg–Sex 5h–23h', ok:true},
+      {n:'Ipanema',        a:'R. Visconde de Pirajá, 200',h:'Seg–Sex 6h–22h', ok:true}
+    ]
+  }},
+  MG: { cidades: { 'Belo Horizonte': [{n:'Savassi',a:'Av. do Contorno, 400',h:'Seg–Sex 5h–22h',ok:true}] }},
+  CE: { cidades: { Fortaleza: [{n:'Meireles',a:'Av. Beira Mar, 100',h:'Seg–Sex 5h30–22h',ok:true}] }}
+};
+
+/* ─── STATE ─── */
+let selectedPlan = '', selectedUnit = '', selectedPriceStr = '';
+
+/* ─── PLAN SELECT ─── */
+function selectPlan(el, name, priceStr, period, save, total) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPlan = name;
+  selectedPriceStr = priceStr;
+  document.getElementById('previewName').textContent = name;
+  document.getElementById('previewPrice').textContent = priceStr;
+  document.getElementById('previewPeriod').textContent = period + (save ? ' · ' + save : '');
+}
+
+/* ─── LOCATION ─── */
+function updateCidades() {
+  const est = document.getElementById('estado').value;
+  const cidSel = document.getElementById('cidade');
+  cidSel.disabled = true;
+  cidSel.innerHTML = '<option value="">Selecione a cidade</option>';
+  document.getElementById('unidadesWrap').style.display = 'none';
+  document.getElementById('btnStep2').disabled = true;
+  if (!est) return;
+  Object.keys(DATA[est].cidades).forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    cidSel.appendChild(o);
+  });
+  cidSel.disabled = false;
+}
+
+function updateUnidades() {
+  const est = document.getElementById('estado').value;
+  const cid = document.getElementById('cidade').value;
+  if (!cid) return;
+  const units = DATA[est].cidades[cid];
+  const grid = document.getElementById('unidadesGrid');
+  grid.innerHTML = '';
+  selectedUnit = '';
+  document.getElementById('btnStep2').disabled = true;
+
+  units.forEach(u => {
+    const d = document.createElement('div');
+    d.className = 'unit-card';
+    d.innerHTML = `
+      <div class="unit-avail ${u.ok ? 'avail-open' : 'avail-busy'}">${u.ok ? 'Vagas disponíveis' : 'Poucas vagas'}</div>
+      <div class="unit-name">${u.n}</div>
+      <div class="unit-addr">${u.a}</div>
+      <div class="unit-hours">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        ${u.h}
+      </div>`;
+    d.onclick = function () {
+      document.querySelectorAll('.unit-card').forEach(c => c.classList.remove('selected'));
+      d.classList.add('selected');
+      selectedUnit = u.n;
+      document.getElementById('btnStep2').disabled = false;
+    };
+    grid.appendChild(d);
+  });
+  document.getElementById('unidadesWrap').style.display = 'block';
+}
+
+/* ─── STEP NAVIGATION ─── */
+function goStep(n) {
+  if (n === 2 && !selectedPlan) { toast('Selecione um plano primeiro!'); return; }
+
+  [1, 2, 3].forEach(i => {
+    const view = document.getElementById('view' + i);
+    if (view) view.style.display = 'none';
+
+    const s = document.getElementById('step' + i);
+    s.className = 'step-item';
+    if (i < n) s.className += ' done';
+    else if (i === n) s.className += ' active';
+
+    const bubble = s.querySelector('.step-bubble');
+    if (i < n) {
+      bubble.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    } else {
+      bubble.textContent = i;
+    }
+
+    if (i < 3) {
+      const conn = document.getElementById('conn' + i);
+      if (conn) conn.className = 'step-line' + (i < n ? ' done' : '');
+    }
+  });
+
+  document.getElementById('view' + n).style.display = 'block';
+
+  if (n === 3) {
+    document.getElementById('summaryPlan').textContent = selectedPlan;
+    document.getElementById('summaryUnit').textContent = selectedUnit || '—';
+    document.getElementById('summaryPrice').textContent = selectedPriceStr || '—';
+    const discMap = { Mensal: null, Trimestral: 'R$ 30,00', Semestral: 'R$ 120,00', Anual: 'R$ 420,00' };
+    const disc = discMap[selectedPlan];
+    document.getElementById('summaryDiscount').textContent = disc ? '− ' + disc : 'R$ 0,00';
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── PAYMENT ─── */
+function selectPayment(type, el) {
+  document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pixBlock').style.display    = 'none';
+  document.getElementById('cardBlock').style.display   = 'none';
+  document.getElementById('boletoBlock').style.display = 'none';
+  if (type === 'pix')    document.getElementById('pixBlock').style.display    = 'flex';
+  if (type === 'card')   document.getElementById('cardBlock').style.display   = 'flex';
+  if (type === 'boleto') document.getElementById('boletoBlock').style.display = 'block';
+}
+
+function copyPix() {
+  const code = document.getElementById('pixCode').textContent;
+  const btn = document.querySelector('.pix-copy-btn');
+  const orig = btn.innerHTML;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Copiado!';
+    btn.style.cssText = 'background:var(--green-l);border-color:var(--green);color:var(--green);';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.cssText = ''; }, 2200);
+  }).catch(() => { toast('Código PIX copiado!'); });
+}
+
+/* ─── FINALIZE ─── */
+function finalize() {
+  document.getElementById('view3').style.display = 'none';
+  const s = document.getElementById('viewSuccess');
+  s.style.display = 'flex';
+  document.getElementById('finalPlan').textContent = selectedPlan + ' — ' + selectedPriceStr + '/mês';
+  document.getElementById('finalUnit').textContent = selectedUnit || '—';
+
+  const step3 = document.getElementById('step3');
+  step3.className = 'step-item done';
+  step3.querySelector('.step-bubble').innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+  document.getElementById('conn2').className = 'step-line done';
+}
+
+/* ─── MASKS ─── */
+function maskCPF(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2')
+       .replace(/(\d{3})(\d)/, '$1.$2')
+       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  el.value = v;
+}
+function maskPhone(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  el.value = v.length <= 10
+    ? v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
+    : v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+}
+function maskCard(el) {
+  el.value = el.value.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})/g, '$1 ').trim();
+}
+function maskExpiry(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 4);
+  if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+  el.value = v;
+}
+
+/* ─── TOAST ─── */
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2400);
+}
+</script>
+</body>
+</html>

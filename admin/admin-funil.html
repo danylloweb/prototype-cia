@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIA NET — Funil de Captação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--font:'Inter',sans-serif;--orange:#F97316;--orange-2:#EA6C00;--orange-l:#FFF7ED;--orange-m:rgba(249,115,22,.1);--orange-b:rgba(249,115,22,.22);--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:#E2E8F0;--t1:#0F172A;--t2:#334155;--t3:#64748B;--t4:#94A3B8;--green:#059669;--green-l:#ECFDF5;--amber:#D97706;--amber-l:#FFFBEB;--red:#DC2626;--red-l:#FEF2F2;--blue:#2563EB;--blue-l:#EFF6FF;--sidebar:256px;--sh-sm:0 1px 2px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.04);--sh:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+    .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;}
+    .sdb-top{padding:18px 14px;border-bottom:1px solid var(--border);}
+    .sdb-logo{display:block;text-decoration:none;margin-bottom:14px;}
+    .sdb-logo img{height:38px;width:auto;object-fit:contain;}
+    .platform-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange-m);border:1px solid var(--orange-b);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px;}
+    .client-info{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:9px;padding:9px 11px;}
+    .client-info-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .client-info-sub{font-size:11px;color:var(--orange);font-weight:500;margin-top:1px;}
+    .nav-items{flex:1;padding:8px;overflow-y:auto;}
+    .nav-label{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1.2px;text-transform:uppercase;padding:12px 8px 5px;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--t3);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+    .nav-item:hover{background:var(--bg3);color:var(--t2);}
+    .nav-item.active{background:var(--orange-m);color:var(--orange);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;fill:currentColor;flex-shrink:0;}
+    .nav-badge{margin-left:auto;background:var(--orange);color:white;font-size:10px;font-weight:700;border-radius:100px;padding:1px 6px;}
+    .sdb-footer{padding:10px 8px;border-top:1px solid var(--border);}
+    .user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;}
+    .user-av{width:34px;height:34px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:12px;font-weight:600;color:var(--t1);}
+    .user-role{font-size:10px;color:var(--t3);}
+    .main{margin-left:var(--sidebar);flex:1;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);height:56px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm);}
+    .topbar-title{font-size:17px;font-weight:700;color:var(--t1);}
+    .topbar-right{display:flex;gap:8px;align-items:center;}
+    .btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t2);}
+    .content{padding:22px 26px;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:14px;font-weight:700;color:var(--t1);}
+    .card-body{padding:18px;}
+
+    /* Stages row */
+    .stages-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+    .stage-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:16px;box-shadow:var(--sh-sm);text-align:center;position:relative;}
+    .stage-card::after{content:'→';position:absolute;right:-18px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--t4);font-weight:300;}
+    .stage-card:last-child::after{display:none;}
+    .stage-dot{width:36px;height:36px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;}
+    .stage-dot svg{width:18px;height:18px;fill:currentColor;}
+    .stage-val{font-size:22px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:2px;}
+    .stage-label{font-size:11px;color:var(--t3);margin-bottom:6px;}
+    .stage-conv{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;display:inline-block;}
+
+    /* Big funnel bars */
+    .funnel-wrap{display:flex;flex-direction:column;gap:8px;padding:8px 0;}
+    .funnel-row{display:flex;align-items:center;gap:14px;}
+    .funnel-label{font-size:12px;font-weight:600;color:var(--t2);width:100px;flex-shrink:0;text-align:right;}
+    .funnel-bar-outer{flex:1;background:var(--bg3);border-radius:8px;height:42px;overflow:hidden;}
+    .funnel-bar-inner{height:100%;border-radius:8px;display:flex;align-items:center;padding:0 14px;transition:width .8s ease;}
+    .funnel-bar-inner span{font-size:13px;font-weight:700;color:white;white-space:nowrap;}
+    .funnel-right{width:120px;flex-shrink:0;}
+    .funnel-num{font-size:15px;font-weight:800;color:var(--t1);}
+    .funnel-pct{font-size:11px;color:var(--t3);}
+    .drop-badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;background:var(--red-l);color:var(--red);}
+
+    /* By channel table */
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .data-table th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;background:var(--bg3);}
+    .data-table td{padding:11px 14px;border-bottom:1px solid var(--border);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:rgba(0,0,0,.01);}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+    .menu-toggle{display:none;width:36px;height:36px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+    .menu-toggle:hover{background:var(--bg4);}
+    .menu-toggle svg{width:18px;height:18px;fill:var(--t2);}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55;backdrop-filter:blur(2px);}
+    .sidebar-overlay.open{display:block;}
+    @media(max-width:1024px){.stages-row{grid-template-columns:repeat(3,1fr);}.grid-2{grid-template-columns:1fr;}}
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-260px);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex!important;}
+      .sidebar.open{transform:translateX(0);box-shadow:0 8px 32px rgba(0,0,0,.15);}
+      .main{margin-left:0;}
+      .menu-toggle{display:flex;}
+      .topbar{padding:0 14px;}
+      .content{padding:14px 16px;}
+      .btn-ghost{display:none;}
+      .stages-row{grid-template-columns:repeat(2,1fr);}
+      .stage-card::after{display:none;}
+      .funnel-label{width:70px;font-size:11px;}
+      .funnel-right{width:80px;}
+      .funnel-num{font-size:13px;}
+    }
+    @media(max-width:520px){
+      .stages-row{grid-template-columns:1fr 1fr;}
+      .topbar-title{font-size:15px;}
+      .stage-val{font-size:18px;}
+      .funnel-bar-inner span{font-size:11px;}
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar">
+  <div class="sdb-top">
+    <a href="index.html" class="sdb-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;"><img src="../logo-cia.png" alt="CIA do Corpo" style="width:38px;height:38px;object-fit:contain;"><div><div style="font-size:13px;font-weight:800;letter-spacing:.8px;color:#0F172A;line-height:1.2;">CIA DO CORPO</div><div style="font-size:9px;font-weight:700;letter-spacing:2.5px;color:#94A3B8;margin-top:1px;">GYM</div></div></a>
+
+    <div class="client-info"><div class="client-info-name">Academia CIA do Corpo</div><div class="client-info-sub">Painel Admin · 6 Unidades</div></div>
+  </div>
+  <nav class="nav-items">
+    <div class="nav-label">Visão Geral</div>
+    <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a>
+    <div class="nav-label">Marketing</div>
+    <a href="admin-campanhas.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Campanhas<span class="nav-badge">6</span></a>
+    <a href="admin-analytics.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Analytics & BI</a>
+    <a href="admin-funil.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Funil de Captação</a>
+    <div class="nav-label">Operações</div>
+    <a href="admin-unidades.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Unidades</a>
+    <a href="admin-alunos.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Alunos</a>
+    <a href="admin-financeiro.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro</a>
+    <div class="nav-label">Produto</div>
+    <a href="../checkout/index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 6H17c0-2.21-1.79-4-4-4S9 3.79 9 6H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>Checkout</a>
+    <a href="../aluno/aluno-login.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Área do Aluno</a>
+  </nav>
+  <div class="sdb-footer"><div class="user-row"><div class="user-av">RC</div><div><div class="user-name">Ticyane Chyarelly</div><div class="user-role">Diretora Comercial</div></div></div></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+      <div class="topbar-title">Funil de Captação</div>
+    </div>
+    <div class="topbar-right">
+      <select style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--t2);background:var(--bg2);outline:none;"><option>Todas as unidades</option><option>Boa Viagem</option><option>Caruaru</option><option>Olinda</option></select>
+      <button class="btn btn-ghost">Exportar</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Stage cards -->
+    <div class="stages-row">
+      <div class="stage-card">
+        <div class="stage-dot" style="background:#FFF7ED;color:#F97316;"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
+        <div class="stage-val">312k</div>
+        <div class="stage-label">Impressões</div>
+        <span class="stage-conv" style="background:var(--bg3);color:var(--t3);">Topo</span>
+      </div>
+      <div class="stage-card">
+        <div class="stage-dot" style="background:#EFF6FF;color:#2563EB;"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+        <div class="stage-val">18.7k</div>
+        <div class="stage-label">Cliques</div>
+        <span class="stage-conv" style="background:var(--green-l);color:var(--green);">6.0% CTR</span>
+      </div>
+      <div class="stage-card">
+        <div class="stage-dot" style="background:#FFF7ED;color:#D97706;"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+        <div class="stage-val">1.243</div>
+        <div class="stage-label">Leads</div>
+        <span class="stage-conv" style="background:var(--amber-l);color:var(--amber);">6.6% conv.</span>
+      </div>
+      <div class="stage-card">
+        <div class="stage-dot" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+        <div class="stage-val">448</div>
+        <div class="stage-label">Avaliações</div>
+        <span class="stage-conv" style="background:var(--green-l);color:var(--green);">36.1% conv.</span>
+      </div>
+      <div class="stage-card">
+        <div class="stage-dot" style="background:#ECFDF5;color:#059669;"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <div class="stage-val">229</div>
+        <div class="stage-label">Matrículas</div>
+        <span class="stage-conv" style="background:var(--green-l);color:var(--green);">51.1% conv.</span>
+      </div>
+    </div>
+
+    <!-- Big funnel -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head"><div class="card-title">Visualização do Funil</div><div style="font-size:12px;color:var(--t3);">Total: 0.073% impressões → matrícula</div></div>
+      <div class="card-body">
+        <div class="funnel-wrap">
+          <div class="funnel-row">
+            <div class="funnel-label">Impressões</div>
+            <div class="funnel-bar-outer"><div class="funnel-bar-inner" style="width:100%;background:linear-gradient(90deg,#F97316,#EA6C00);"><span>312.000</span></div></div>
+            <div class="funnel-right"><div class="funnel-num">312.000</div><div class="funnel-pct">100%</div></div>
+          </div>
+          <div style="display:flex;justify-content:center;"><span class="drop-badge">-94% perdidos (293.280)</span></div>
+          <div class="funnel-row">
+            <div class="funnel-label">Cliques</div>
+            <div class="funnel-bar-outer"><div class="funnel-bar-inner" style="width:60%;background:linear-gradient(90deg,#2563EB,#1d4ed8);"><span>18.720</span></div></div>
+            <div class="funnel-right"><div class="funnel-num">18.720</div><div class="funnel-pct">6.0%</div></div>
+          </div>
+          <div style="display:flex;justify-content:center;"><span class="drop-badge">-93.4% perdidos (17.477)</span></div>
+          <div class="funnel-row">
+            <div class="funnel-label">Leads</div>
+            <div class="funnel-bar-outer"><div class="funnel-bar-inner" style="width:40%;background:linear-gradient(90deg,#D97706,#B45309);"><span>1.243</span></div></div>
+            <div class="funnel-right"><div class="funnel-num">1.243</div><div class="funnel-pct">0.40%</div></div>
+          </div>
+          <div style="display:flex;justify-content:center;"><span class="drop-badge">-64% perdidos (795)</span></div>
+          <div class="funnel-row">
+            <div class="funnel-label">Avaliações</div>
+            <div class="funnel-bar-outer"><div class="funnel-bar-inner" style="width:20%;background:linear-gradient(90deg,#059669,#047857);"><span>448</span></div></div>
+            <div class="funnel-right"><div class="funnel-num">448</div><div class="funnel-pct">0.14%</div></div>
+          </div>
+          <div style="display:flex;justify-content:center;"><span class="drop-badge">-49% perdidos (219)</span></div>
+          <div class="funnel-row">
+            <div class="funnel-label">Matrículas</div>
+            <div class="funnel-bar-outer"><div class="funnel-bar-inner" style="width:8%;background:linear-gradient(90deg,#059669,#047857);"><span>229 ✓</span></div></div>
+            <div class="funnel-right"><div class="funnel-num" style="color:var(--green);">229</div><div class="funnel-pct">0.073%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- By channel + By unit -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Funil por Canal</div></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Canal</th><th>Leads</th><th>Avaliações</th><th>Matrículas</th><th>Taxa final</th></tr></thead>
+            <tbody>
+              <tr><td>Instagram</td><td>472</td><td>178</td><td>91</td><td style="color:var(--green);font-weight:700;">19.3%</td></tr>
+              <tr><td>Google</td><td>287</td><td>112</td><td>62</td><td style="color:var(--green);font-weight:700;">21.6%</td></tr>
+              <tr><td>WhatsApp</td><td>246</td><td>98</td><td>51</td><td style="color:var(--green);font-weight:700;">20.7%</td></tr>
+              <tr><td>Facebook</td><td>198</td><td>52</td><td>21</td><td style="color:var(--amber);font-weight:700;">10.6%</td></tr>
+              <tr><td>Orgânico</td><td>40</td><td>8</td><td>4</td><td style="color:var(--amber);font-weight:700;">10.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Funil por Unidade</div></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Unidade</th><th>Leads</th><th>Matrículas</th><th>Conversão</th></tr></thead>
+            <tbody>
+              <tr><td>Boa Viagem</td><td>389</td><td>83</td><td style="color:var(--green);font-weight:700;">21.3%</td></tr>
+              <tr><td>Boa Viagem II</td><td>314</td><td>60</td><td style="color:var(--green);font-weight:700;">19.1%</td></tr>
+              <tr><td>Madalena</td><td>248</td><td>44</td><td>17.7%</td></tr>
+              <tr><td>Olinda</td><td>127</td><td>20</td><td style="color:var(--amber);font-weight:700;">15.7%</td></tr>
+              <tr><td>Caruaru</td><td>165</td><td>22</td><td style="color:var(--red);font-weight:700;">13.3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimization tips -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">Oportunidades de Otimização</div><span style="font-size:10px;font-weight:700;background:var(--orange-m);color:var(--orange);border:1px solid var(--orange-b);padding:2px 8px;border-radius:100px;">IA Ativo</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 18px;">
+        <div style="background:var(--red-l);border:1px solid rgba(220,38,38,.15);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">Maior drop-off</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;">Clique → Lead: <strong>93.4% perdidos</strong>. Landing page com formulário mais simples pode aumentar 15–20%.</div>
+        </div>
+        <div style="background:var(--amber-l);border:1px solid rgba(217,119,6,.15);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;">Atenção — Facebook</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;">Taxa final de 10.6% vs. 19–21% dos outros canais. Revisar criativo e segmentação.</div>
+        </div>
+        <div style="background:var(--green-l);border:1px solid rgba(5,150,105,.15);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">Oportunidade — Google</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;">Melhor taxa de conversão (21.6%). Aumentar budget pode gerar +30 matrículas/mês.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+</script>
+</body>
+</html>
