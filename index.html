@@ -26,15 +26,20 @@
     /* SLIDE BASE */
     .slide{
       position:absolute;inset:0;
-      display:flex;flex-direction:column;justify-content:center;
+      display:flex;flex-direction:column;justify-content:safe center;
       padding:80px 96px 100px;
       background:var(--bg);
       opacity:0;
       transform:translateX(60px);
       transition:opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
       pointer-events:none;
-      overflow:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
     }
+    .slide::-webkit-scrollbar{width:6px;}
+    .slide::-webkit-scrollbar-track{background:transparent;}
+    .slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+    .slide::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25);}
     .slide.active{
       opacity:1;transform:translateX(0);
       pointer-events:auto;
@@ -216,8 +221,8 @@
     .tl-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--orange),rgba(249,115,22,.2));width:33%;}
     .tl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative;}
     .tl-item{display:flex;flex-direction:column;align-items:center;text-align:center;}
-    .tl-dot{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;z-index:1;flex-shrink:0;}
-    .tl-dot.done{border-color:var(--orange);background:rgba(249,115,22,.14);}
+    .tl-dot{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;z-index:1;flex-shrink:0;}
+    .tl-dot.done{border-color:var(--orange);background:var(--bg);}
     .tl-dot svg{width:16px;height:16px;fill:var(--t4);}
     .tl-dot.done svg{fill:var(--orange);}
     .tl-week{font-size:8px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
@@ -522,14 +527,14 @@
     <div class="benefits-grid">
       <div class="benefit-card anim anim-2" style="--clr:var(--orange);">
         <div class="benefit-icon" style="background:rgba(249,115,22,.12);color:var(--orange);"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
-        <div class="benefit-num" style="color:var(--orange);" data-target="40">+0%</div>
+        <div class="benefit-num" style="color:var(--orange);" data-target="40" data-prefix="Até " data-suffix="%+">Até 0%+</div>
         <div class="benefit-label">Mais leads qualificados</div>
         <div class="benefit-desc">Aumento na geração de leads através de marketing digital e funil otimizado.</div>
       </div>
       <div class="benefit-card anim anim-3" style="--clr:var(--green);">
         <div class="benefit-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
-        <div class="benefit-num" style="color:var(--green);" data-target="25">+0%</div>
-        <div class="benefit-label">Melhoria na conversão</div>
+        <div class="benefit-num" style="color:var(--green);" data-target="25" data-prefix="Cerca de " data-suffix="%">Cerca de 0%</div>
+        <div class="benefit-label">Melhoria na conversão do lead</div>
         <div class="benefit-desc">Landing pages + checkout + IA no WhatsApp aumentam a taxa de matrícula.</div>
       </div>
       <div class="benefit-card anim anim-4" style="--clr:var(--purple);">
@@ -540,7 +545,7 @@
       </div>
       <div class="benefit-card anim anim-2" style="--clr:#FBBF24;">
         <div class="benefit-icon" style="background:rgba(251,191,36,.1);color:#FBBF24;"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
-        <div class="benefit-num" style="color:#FBBF24;" data-target="30">+0%</div>
+        <div class="benefit-num" style="color:#FBBF24;" data-target="30" data-prefix="Até " data-suffix="%">Até 0%</div>
         <div class="benefit-label">Redução de custos operacionais</div>
         <div class="benefit-desc">Automação de processos, cobranças e gestão centralizada reduzem despesas.</div>
       </div>
@@ -552,7 +557,7 @@
       </div>
       <div class="benefit-card anim anim-4" style="--clr:var(--green);">
         <div class="benefit-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
-        <div class="benefit-num" style="color:var(--green);" data-target="15">+0%</div>
+        <div class="benefit-num" style="color:var(--green);" data-target="15" data-prefix="Até " data-suffix="%+">Até 0%+</div>
         <div class="benefit-label">Crescimento do MRR</div>
         <div class="benefit-desc">Receita recorrente ampliada com mais matrículas, retenção e upsell inteligente.</div>
       </div>
@@ -569,10 +574,10 @@
       <div class="tl-line"><div class="tl-fill"></div></div>
       <div class="tl-grid">
         <div class="tl-item"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div><div class="tl-week">Sem. 1–2</div><div class="tl-name">Planejamento</div><div class="tl-dur">2 semanas</div></div>
-        <div class="tl-item"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2z"/></svg></div><div class="tl-week">Sem. 3–4</div><div class="tl-name">Landing Pages</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M5.5 2v15.5l4.5-4.5 4 8 3.5-1.75-4-8 6.5-.75L5.5 2z"/></svg></div><div class="tl-week">Sem. 3–4</div><div class="tl-name">Landing Pages</div><div class="tl-dur">2 semanas</div></div>
         <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10z"/></svg></div><div class="tl-week">Sem. 5–6</div><div class="tl-name">Marketing & Rastreamento</div><div class="tl-dur">2 semanas</div></div>
         <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg></div><div class="tl-week">Sem. 7–18</div><div class="tl-name">CIA NET Plataforma</div><div class="tl-dur">8–12 semanas</div></div>
-        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606z"/></svg></div><div class="tl-week">Sem. 19–20</div><div class="tl-name">IA WhatsApp</div><div class="tl-dur">2 semanas</div></div>
+        <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5 5.5-2.5-5.5-2.5zm7.5 7l-1.25 2.75L15 20l2.75 1.25L19 23l1.25-2.75L23 20l-2.75-1.25L19 16.5z"/></svg></div><div class="tl-week">Sem. 19–20</div><div class="tl-name">IA WhatsApp</div><div class="tl-dur">2 semanas</div></div>
         <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="tl-week">Sem. 21–22</div><div class="tl-name">Testes & Go Live</div><div class="tl-dur">2 semanas</div></div>
       </div>
     </div>
@@ -610,7 +615,7 @@
     <div class="cta-divider anim anim-5"></div>
 
     <div class="cta-contacts anim anim-5">
-      <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.148-.2.47-.248.644-.15l.16.087m0 0a15.9 15.9 0 003.461 1.4c.263.06.535.09.81.09.47 0 .93-.1 1.37-.3l.16-.08"/></svg>(81) 99999-0000</div>
+      <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 0C5.373 0 0 5.373 0 12c0 2.072.527 4.02 1.453 5.726L0 24l6.436-1.425A11.936 11.936 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.847 0-3.575-.5-5.063-1.37L3.5 21.5l.9-3.345A9.956 9.956 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>+55 81 99901-2706</div>
       <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>contato@cianet.com.br</div>
       <div class="cta-contact"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Recife, Pernambuco</div>
     </div>
@@ -658,6 +663,9 @@ function goToSlide(n){
   const toEl   = document.getElementById('s'+n);
   const forward = n > cur;
 
+  // Reset scroll position of the incoming slide to the top
+  toEl.scrollTop = 0;
+
   // 1. Snap incoming slide to its start position (no transition)
   toEl.style.transition = 'none';
   toEl.style.transform  = forward ? 'translateX(60px)' : 'translateX(-60px)';
@@ -693,7 +701,13 @@ function goToSlide(n){
   if(cur === 7) setTimeout(triggerCountUp, 300);
 }
 
-function nextSlide(){ goToSlide(cur + 1); }
+function nextSlide(){
+  if(cur === TOTAL){
+    goToSlide(1);
+  } else {
+    goToSlide(cur + 1);
+  }
+}
 function prevSlide(){ goToSlide(cur - 1); }
 
 function updateUI(){
@@ -722,9 +736,11 @@ document.addEventListener('keydown', e => {
 function countUp(el, target){
   let v = 0;
   const step = target / 45;
+  const prefix = el.hasAttribute('data-prefix') ? el.getAttribute('data-prefix') : '+';
+  const suffix = el.hasAttribute('data-suffix') ? el.getAttribute('data-suffix') : '%';
   const t = setInterval(()=>{
     v = Math.min(v+step, target);
-    el.textContent = '+' + Math.round(v) + '%';
+    el.textContent = prefix + Math.round(v) + suffix;
     if(v>=target) clearInterval(t);
   }, 22);
 }

@@ -252,6 +252,10 @@
       position: sticky;
       top: 0;
       z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
     .steps-track {
       display: flex;
@@ -828,9 +832,280 @@
       .step-lbl { display: none; }
       .step-line { min-width: 14px; }
     }
+
+    /* ─────────────── TIMELINE & LIVE PROTOTYPE ADDONS ─────────────── */
+    
+    /* 💳 CARD 3D MOCKUP */
+    .credit-card-wrap {
+      perspective: 1000px;
+      width: 100%;
+      max-width: 320px;
+      height: 190px;
+      margin: 10px auto 20px;
+    }
+    .credit-card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .credit-card.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .card-front::before, .card-back::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.16) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+      padding: 20px 0;
+      justify-content: flex-start;
+      gap: 18px;
+    }
+    .card-brand-logo {
+      height: 24px;
+      width: auto;
+      object-fit: contain;
+      align-self: flex-end;
+    }
+    .card-chip {
+      width: 38px;
+      height: 28px;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .card-chip::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 3px;
+    }
+    .card-number-val {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 19px;
+      letter-spacing: 2px;
+      word-spacing: 4px;
+      margin: 16px 0 8px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .card-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .card-info-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .card-info-lbl {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--t4);
+      margin-bottom: 2px;
+    }
+    .card-info-val {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .card-black-line {
+      width: 100%;
+      height: 40px;
+      background: #000;
+      margin-top: 10px;
+    }
+    .card-signature-area {
+      margin: 0 24px;
+      background: rgba(255,255,255,0.84);
+      height: 36px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 12px;
+      color: #1e293b;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .card-signature-lbl {
+      font-size: 8px;
+      text-transform: uppercase;
+      color: var(--t4);
+      margin: 0 24px 4px;
+      text-align: right;
+    }
+
+    /* 🎉 CONFETTI CANVAS */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* 🪄 FLOATING SIMULATOR BUTTON */
+    .sim-btn-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 50px;
+      font-family: var(--font-h);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+      z-index: 500;
+      transition: all 0.2s ease;
+    }
+    .sim-btn-float:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+    }
+    .sim-btn-float:active {
+      transform: scale(0.98);
+    }
+    .sim-btn-float svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+
+    /* ⏱️ PIX TIMER & STATUS */
+    .pix-timer-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--t2);
+      margin: 8px 0 4px;
+    }
+    .pix-timer-val {
+      color: var(--red);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .pix-pulse-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .pix-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      position: relative;
+    }
+    .pix-pulse-dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite ease-in-out;
+      opacity: 0;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* 🌙 DARK THEME & INTERACTIVE BG */
+    #darkBgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      display: none;
+      background: #0f172a;
+    }
+    body.dark-theme #darkBgCanvas {
+      display: block;
+    }
+    body.dark-theme {
+      --white:    #1e293b;
+      --surface:  #0f172a;
+      --surface2: #1e293b;
+      --border:   #334155;
+      --t1:       #f8fafc;
+      --t2:       #e2e8f0;
+      --t3:       #94a3b8;
+      --t4:       #64748b;
+      --primary-l:      rgba(249, 115, 22, 0.08);
+      --primary-border: rgba(249, 115, 22, 0.25);
+      --green-l:        rgba(22, 163, 74, 0.08);
+      --green-border:   rgba(22, 163, 74, 0.25);
+      background: var(--surface);
+    }
+    body.dark-theme .left {
+      background: var(--white);
+    }
+    body.dark-theme select, body.dark-theme input {
+      background: #0f172a;
+    }
+    body.dark-theme .plan-card, body.dark-theme .unit-card, body.dark-theme .pix-block, body.dark-theme .card-block, body.dark-theme .boleto-block, body.dark-theme .order-card, body.dark-theme .success-card {
+      background: var(--white);
+    }
+    body.dark-theme .plan-card.selected, body.dark-theme .unit-card.selected {
+      background: var(--primary-l);
+    }
   </style>
 </head>
 <body>
+  <canvas id="darkBgCanvas"></canvas>
+  <canvas id="confettiCanvas"></canvas>
 
 <!-- ══════════════ LEFT PANEL ══════════════ -->
 <aside class="left">
@@ -844,12 +1119,6 @@
         <div class="brand-name">CIA DO CORPO</div>
         <div class="brand-sub">Academia</div>
       </div>
-    </div>
-
-    <!-- Social proof -->
-    <div class="members-chip">
-      <div class="members-dot"></div>
-      <span>+1.847 alunos ativos</span>
     </div>
 
     <!-- Plan preview -->
@@ -931,20 +1200,30 @@
   <!-- Progress steps -->
   <header class="progress-header">
     <div class="steps-track">
-      <div class="step-item active" id="step1">
+      <div class="step-item active" id="step1" onclick="goToStepFromHeader(1)" style="cursor:pointer;">
         <div class="step-bubble">1</div>
         <div class="step-lbl">Plano</div>
       </div>
       <div class="step-line" id="conn1"></div>
-      <div class="step-item" id="step2">
+      <div class="step-item" id="step2" onclick="goToStepFromHeader(2)" style="cursor:pointer;">
         <div class="step-bubble">2</div>
         <div class="step-lbl">Unidade</div>
       </div>
       <div class="step-line" id="conn2"></div>
-      <div class="step-item" id="step3">
+      <div class="step-item" id="step3" onclick="goToStepFromHeader(3)" style="cursor:pointer;">
         <div class="step-bubble">3</div>
         <div class="step-lbl">Dados &amp; Pagamento</div>
       </div>
+    </div>
+
+    <!-- Theme Switcher Toggle -->
+    <div style="display: flex; align-items: center;">
+      <button id="themeToggleBtn" onclick="toggleTheme()" style="background:var(--bg3); border:1px solid var(--border); border-radius:100px; padding:6px 12px; font-size:12px; font-weight:600; color:var(--t2); cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s; outline:none; margin-right:8px; font-family:var(--font);" onmouseover="this.style.borderColor='var(--orange)'; this.style.color='var(--orange)';" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--t2)';">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;" id="themeIcon">
+          <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
+        <span id="themeBtnText">Escuro</span>
+      </button>
     </div>
   </header>
 
@@ -1139,6 +1418,20 @@
         </div>
       </div>
 
+      <!-- 🏷️ Coupon / Voucher Section -->
+      <div style="margin: 16px 0; padding: 14px; background: var(--white); border: 1.5px dashed var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+        <div class="field" style="gap:4px;">
+          <label style="font-size:12.5px; font-weight:600; color:var(--t2);">Possui cupom de desconto ou voucher?</label>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <input type="text" id="couponCode" placeholder="Ex: CIANET10" style="padding:8px 14px; font-size:13px; text-transform:uppercase; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 60%; outline: none; transition: border-color 0.15s;">
+            <button type="button" class="btn btn-primary" style="padding:8px 16px; font-size:12px; font-weight:700; width: 40%; border-radius: var(--radius-sm); background: var(--t1); color: var(--surface); display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: none;" onclick="applyCoupon()" id="couponApplyBtn">
+              Aplicar
+            </button>
+          </div>
+          <div id="couponMessage" style="font-size:11px; margin-top:6px; font-weight:700; display:none;"></div>
+        </div>
+      </div>
+
       <!-- Payment -->
       <div class="pay-label">Forma de pagamento</div>
       <div class="payment-tabs">
@@ -1180,6 +1473,14 @@
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           5% de desconto pagando via PIX
         </div>
+        <div class="pix-timer-row">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--red);"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+          O código expira em <span class="pix-timer-val" id="pixTimer">05:00</span>
+        </div>
+        <div class="pix-pulse-indicator">
+          <div class="pix-pulse-dot"></div>
+          Aguardando confirmação do pagamento...
+        </div>
         <div class="pix-hint">Escaneie o QR Code ou copie o código abaixo</div>
         <div class="pix-qr">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -1211,7 +1512,7 @@
             </g>
           </svg>
         </div>
-        <div class="pix-code" id="pixCode">00020126360014BR.GOV.BCB.PIX0114+5581999999999520400005303986540589.905802BR5920ACADEMIA CIA DO CORPO6009SAO PAULO62070503***6304ABCD</div>
+        <div class="pix-code" id="pixCode" onclick="copyPix()">00020126360014BR.GOV.BCB.PIX0114+5581999999999520400005303986540589.905802BR5920ACADEMIA CIA DO CORPO6009SAO PAULO62070503***6304ABCD</div>
         <button class="pix-copy-btn" onclick="copyPix()">
           <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
           Copiar código PIX
@@ -1221,22 +1522,100 @@
 
       <!-- Card -->
       <div id="cardBlock" class="card-block" style="display:none;">
-        <div class="field">
-          <label>Número do cartão</label>
-          <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="maskCard(this)">
+        
+        <!-- Toggle Multi Cards Option -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; padding: 4px 0;">
+          <input type="checkbox" id="splitCardsCheck" style="width:16px; height:16px; cursor:pointer;" onchange="handleSplitCardsChange(event)">
+          <label for="splitCardsCheck" style="font-size:13px; font-weight:600; color:var(--t2); cursor:pointer; user-select:none;">Pagar usando 2 cartões de crédito</label>
         </div>
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;">
+
+        <!-- Split Values (Card 1 and Card 2 portion values) -->
+        <div id="splitValuesBlock" style="display:none; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:10px;">
           <div class="field">
-            <label>Nome no cartão</label>
-            <input type="text" placeholder="JOAO S SANTOS" style="text-transform:uppercase;">
+            <label style="font-size:12px;" id="splitVal1Label">Valor no Cartão 1</label>
+            <input type="text" id="splitVal1" placeholder="R$ 0,00" oninput="maskMoney(this); updateSplitValues(1)">
           </div>
           <div class="field">
-            <label>Validade</label>
-            <input type="text" placeholder="MM/AA" maxlength="5" oninput="maskExpiry(this)">
+            <label style="font-size:12px;" id="splitVal2Label">Valor no Cartão 2</label>
+            <input type="text" id="splitVal2" placeholder="R$ 0,00" oninput="maskMoney(this); updateSplitValues(2)">
           </div>
+        </div>
+
+        <!-- 💳 Card 3D Mockup -->
+        <div class="credit-card-wrap">
+          <div class="credit-card" id="virtualCard">
+            <!-- Front -->
+            <div class="card-front">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="card-chip"></div>
+                <div class="card-brand-logo" id="vCardBrand" style="font-family: var(--font-h); font-weight: 800; font-size: 15px; letter-spacing: 0.5px;">VISA</div>
+              </div>
+              <div class="card-number-val" id="vCardNumber">•••• •••• •••• ••••</div>
+              <div class="card-info-row">
+                <div class="card-info-col">
+                  <div class="card-info-lbl" id="vCardNameLabel">Nome do Titular</div>
+                  <div class="card-info-val" id="vCardName">NOME NO CARTÃO</div>
+                </div>
+                <div class="card-info-col" style="align-items:flex-end;">
+                  <div class="card-info-lbl">Validade</div>
+                  <div class="card-info-val" id="vCardExpiry">MM/AA</div>
+                </div>
+              </div>
+            </div>
+            <!-- Back -->
+            <div class="card-back">
+              <div class="card-black-line"></div>
+              <div class="card-signature-lbl">Assinatura Autorizada</div>
+              <div class="card-signature-area">
+                <span id="vCardCvv">•••</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 1 Form Block -->
+        <div id="card1Form">
+          <div style="font-weight:700; font-size:11px; text-transform:uppercase; color:var(--primary); margin-bottom:8px; display:none;" id="card1Title">Cartão 1</div>
           <div class="field">
-            <label>CVV</label>
-            <input type="text" placeholder="000" maxlength="3" inputmode="numeric">
+            <label>Número do cartão</label>
+            <input type="text" id="cardNumberInput" placeholder="0000 0000 0000 0000" maxlength="19" oninput="maskCard(this)">
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px; margin-bottom:14px;">
+            <div class="field">
+              <label>Nome no cartão</label>
+              <input type="text" id="cardNameInput" placeholder="JOAO S SANTOS" style="text-transform:uppercase;">
+            </div>
+            <div class="field">
+              <label>Validade</label>
+              <input type="text" id="cardExpiryInput" placeholder="MM/AA" maxlength="5" oninput="maskExpiry(this)">
+            </div>
+            <div class="field">
+              <label>CVV</label>
+              <input type="text" id="cardCvvInput" placeholder="000" maxlength="3" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 Form Block -->
+        <div id="card2Form" style="display:none; border-top: 1.5px dashed var(--border); padding-top:16px; margin-top:6px;">
+          <div style="font-weight:700; font-size:11px; text-transform:uppercase; color:var(--primary); margin-bottom:10px;">Cartão 2</div>
+          <div class="field">
+            <label>Número do cartão 2</label>
+            <input type="text" id="cardNumberInput2" placeholder="0000 0000 0000 0000" maxlength="19" oninput="maskCard(this)">
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;">
+            <div class="field">
+              <label>Nome no cartão 2</label>
+              <input type="text" id="cardNameInput2" placeholder="JOAO S SANTOS" style="text-transform:uppercase;">
+            </div>
+            <div class="field">
+              <label>Validade 2</label>
+              <input type="text" id="cardExpiryInput2" placeholder="MM/AA" maxlength="5" oninput="maskExpiry(this)">
+            </div>
+            <div class="field">
+              <label>CVV 2</label>
+              <input type="text" id="cardCvvInput2" placeholder="000" maxlength="3" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
           </div>
         </div>
         <div class="field">
@@ -1263,14 +1642,14 @@
       </div>
 
       <div style="margin-top:24px;">
-        <button class="btn-primary" onclick="finalize()">
+        <button id="btnFinalize" class="btn-primary" onclick="finalize()">
           <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           Finalizar matrícula
         </button>
         <p style="font-size:11px;color:var(--t4);text-align:center;margin-top:12px;">
           Ao finalizar você concorda com os
-          <a href="#" style="color:var(--primary);text-decoration:none;">Termos de Uso</a> e
-          <a href="#" style="color:var(--primary);text-decoration:none;">Política de Privacidade</a>
+          <a href="javascript:void(0)" style="color:var(--primary);text-decoration:none;" title="Página a ser desenvolvida">Termos de Uso</a> e
+          <a href="javascript:void(0)" style="color:var(--primary);text-decoration:none;" title="Página a ser desenvolvida">Política de Privacidade</a>
           da Academia CIA do Corpo.
         </p>
       </div>
@@ -1300,7 +1679,7 @@
         </div>
       </div>
 
-      <a href="../aluno/" class="btn-primary" style="max-width:400px;">
+      <a href="../aluno/index.html" class="btn-primary" style="max-width:400px;">
         <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         Acessar minha área
       </a>
@@ -1340,7 +1719,9 @@ const DATA = {
 };
 
 /* ─── STATE ─── */
-let selectedPlan = '', selectedUnit = '', selectedPriceStr = '';
+let selectedPlan = '', selectedUnit = '', selectedPriceStr = '', selectedBasePrice = 0;
+let activeCoupon = '';
+let currentPaymentType = 'pix'; // default active tab is pix
 
 /* ─── PLAN SELECT ─── */
 function selectPlan(el, name, priceStr, period, save, total) {
@@ -1348,6 +1729,7 @@ function selectPlan(el, name, priceStr, period, save, total) {
   el.classList.add('selected');
   selectedPlan = name;
   selectedPriceStr = priceStr;
+  selectedBasePrice = parseFloat(priceStr.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0;
   document.getElementById('previewName').textContent = name;
   document.getElementById('previewPrice').textContent = priceStr;
   document.getElementById('previewPeriod').textContent = period + (save ? ' · ' + save : '');
@@ -1403,6 +1785,15 @@ function updateUnidades() {
 }
 
 /* ─── STEP NAVIGATION ─── */
+function goToStepFromHeader(n) {
+  const currentActive = document.querySelector('.step-item.active');
+  if (!currentActive) return;
+  const currentIndex = parseInt(currentActive.id.replace('step', ''));
+  if (n < currentIndex) {
+    goStep(n);
+  }
+}
+
 function goStep(n) {
   if (n === 2 && !selectedPlan) { toast('Selecione um plano primeiro!'); return; }
 
@@ -1433,10 +1824,8 @@ function goStep(n) {
   if (n === 3) {
     document.getElementById('summaryPlan').textContent = selectedPlan;
     document.getElementById('summaryUnit').textContent = selectedUnit || '—';
-    document.getElementById('summaryPrice').textContent = selectedPriceStr || '—';
-    const discMap = { Mensal: null, Trimestral: 'R$ 30,00', Semestral: 'R$ 120,00', Anual: 'R$ 420,00' };
-    const disc = discMap[selectedPlan];
-    document.getElementById('summaryDiscount').textContent = disc ? '− ' + disc : 'R$ 0,00';
+    updateSummaryPrices();
+    startPixTimer();
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1449,9 +1838,14 @@ function selectPayment(type, el) {
   document.getElementById('pixBlock').style.display    = 'none';
   document.getElementById('cardBlock').style.display   = 'none';
   document.getElementById('boletoBlock').style.display = 'none';
+  
+  currentPaymentType = type;
+  
   if (type === 'pix')    document.getElementById('pixBlock').style.display    = 'flex';
   if (type === 'card')   document.getElementById('cardBlock').style.display   = 'flex';
   if (type === 'boleto') document.getElementById('boletoBlock').style.display = 'block';
+
+  updateSummaryPrices();
 }
 
 function copyPix() {
@@ -1470,13 +1864,18 @@ function finalize() {
   document.getElementById('view3').style.display = 'none';
   const s = document.getElementById('viewSuccess');
   s.style.display = 'flex';
-  document.getElementById('finalPlan').textContent = selectedPlan + ' — ' + selectedPriceStr + '/mês';
+  
+  const finalPriceText = document.getElementById('summaryPrice').textContent;
+  document.getElementById('finalPlan').textContent = selectedPlan + ' — ' + finalPriceText + '/mês';
   document.getElementById('finalUnit').textContent = selectedUnit || '—';
 
   const step3 = document.getElementById('step3');
   step3.className = 'step-item done';
   step3.querySelector('.step-bubble').innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
   document.getElementById('conn2').className = 'step-line done';
+  
+  // Launch confetti on successful registration!
+  launchConfetti();
 }
 
 /* ─── MASKS ─── */
@@ -1501,6 +1900,15 @@ function maskExpiry(el) {
   if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
   el.value = v;
 }
+function maskMoney(el) {
+  let val = el.value.replace(/\D/g, '');
+  if (!val) {
+    el.value = '';
+    return;
+  }
+  let num = parseFloat(val) / 100;
+  el.value = formatMoneyValue(num);
+}
 
 /* ─── TOAST ─── */
 function toast(msg) {
@@ -1510,6 +1918,594 @@ function toast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2400);
 }
+
+/* ─── PIX TIMER ─── */
+let pixInterval;
+function startPixTimer() {
+  if (pixInterval) clearInterval(pixInterval);
+  let duration = 5 * 60; // 5 minutes
+  const timerEl = document.getElementById('pixTimer');
+  if (!timerEl) return;
+  pixInterval = setInterval(() => {
+    let mins = Math.floor(duration / 60);
+    let secs = duration % 60;
+    timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    if (--duration < 0) {
+      clearInterval(pixInterval);
+      timerEl.textContent = "Expirado";
+    }
+  }, 1000);
+}
+
+/* ─── 🎉 CONFETTI ─── */
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const colors = ['#f97316', '#ea580c', '#fb923c', '#10b981', '#059669', '#3b82f6', '#818cf8'];
+  const confettis = [];
+  
+  for (let i = 0; i < 150; i++) {
+    confettis.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * canvas.height,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 5,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+      tiltAngle: 0
+    });
+  }
+  
+  let animationFrameId;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let active = false;
+    confettis.forEach((p, index) => {
+      p.tiltAngle += p.tiltAngleIncremental;
+      p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+      p.x += Math.sin(p.tiltAngle);
+      p.tilt = Math.sin(p.tiltAngle - (index / 3)) * 15;
+      
+      if (p.y <= canvas.height) {
+        active = true;
+      }
+      
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+      ctx.stroke();
+    });
+    
+    if (active) {
+      animationFrameId = requestAnimationFrame(draw);
+    } else {
+      cancelAnimationFrame(animationFrameId);
+    }
+  }
+  
+  draw();
+  
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }, { passive: true });
+}
+
+/* ─── 🏷️ COUPON SYSTEM ─── */
+function applyCoupon() {
+  const codeInput = document.getElementById('couponCode');
+  const msgEl = document.getElementById('couponMessage');
+  const code = codeInput.value.trim().toUpperCase();
+  
+  if (!selectedPlan) {
+    toast('Selecione um plano primeiro!');
+    return;
+  }
+  
+  if (!code) {
+    msgEl.textContent = 'Por favor, insira um cupom.';
+    msgEl.style.color = 'var(--red)';
+    msgEl.style.display = 'block';
+    return;
+  }
+  
+  // Valid coupons: CIANET10, VERAO10, PROMO10, DESCONTO10
+  if (code === 'CIANET10' || code === 'VERAO10' || code === 'PROMO10' || code === 'DESCONTO10') {
+    activeCoupon = code;
+    msgEl.textContent = `Cupom ${code} aplicado! 10% de desconto.`;
+    msgEl.style.color = 'var(--green)';
+    msgEl.style.display = 'block';
+    toast('Cupom aplicado com sucesso!');
+    updateSummaryPrices();
+  } else {
+    activeCoupon = '';
+    msgEl.textContent = 'Cupom inválido ou expirado.';
+    msgEl.style.color = 'var(--red)';
+    msgEl.style.display = 'block';
+    updateSummaryPrices();
+  }
+}
+
+function getFinalPriceNumber() {
+  let baseVal = selectedBasePrice;
+  let couponDiscount = 0;
+  if (activeCoupon) {
+    couponDiscount = baseVal * 0.10;
+  }
+  let pixDiscount = 0;
+  if (currentPaymentType === 'pix') {
+    pixDiscount = (baseVal - couponDiscount) * 0.05;
+  }
+  return baseVal - couponDiscount - pixDiscount;
+}
+
+function formatMoneyValue(num) {
+  return 'R$ ' + num.toFixed(2).replace('.', ',');
+}
+
+function parseMoneyValue(str) {
+  if (!str) return 0;
+  let clean = str.replace(/[^\d]/g, '');
+  if (!clean) return 0;
+  return parseFloat(clean) / 100;
+}
+
+function updateSummaryPrices() {
+  let baseVal = selectedBasePrice;
+  
+  let couponDiscount = 0;
+  if (activeCoupon) {
+    couponDiscount = baseVal * 0.10; // 10% discount
+  }
+  
+  let pixDiscount = 0;
+  if (currentPaymentType === 'pix') {
+    pixDiscount = (baseVal - couponDiscount) * 0.05; // 5% PIX discount
+  }
+  
+  const finalPrice = baseVal - couponDiscount - pixDiscount;
+  
+  // Update the summary price text
+  document.getElementById('summaryPrice').textContent = formatMoneyValue(finalPrice);
+  
+  // Update discount display
+  const discMap = { Mensal: 0, Trimestral: 30, Semestral: 120, Anual: 420 };
+  const planSavings = discMap[selectedPlan] || 0;
+  
+  let discountText = '';
+  let parts = [];
+  if (planSavings > 0) {
+    parts.push(`R$ ${planSavings.toFixed(2).replace('.', ',')} (Plano)`);
+  }
+  if (couponDiscount > 0) {
+    parts.push(`R$ ${couponDiscount.toFixed(2).replace('.', ',')} (Cupom)`);
+  }
+  if (pixDiscount > 0) {
+    parts.push(`R$ ${pixDiscount.toFixed(2).replace('.', ',')} (PIX)`);
+  }
+  
+  if (parts.length > 0) {
+    discountText = '− ' + parts.join(' + ');
+  } else {
+    discountText = 'R$ 0,00';
+  }
+  document.getElementById('summaryDiscount').textContent = discountText;
+
+  // Sync split fields if multi cards is active
+  updateSplitFieldsVisibility(finalPrice);
+}
+
+/* ─── 💳 SPLIT CARD PAYMENT ─── */
+function handleSplitCardsChange(event) {
+  const isChecked = event.target.checked;
+  const splitBlock = document.getElementById('splitValuesBlock');
+  const card2Form = document.getElementById('card2Form');
+  const card1Title = document.getElementById('card1Title');
+  
+  if (isChecked) {
+    splitBlock.style.display = 'grid';
+    card2Form.style.display = 'block';
+    if (card1Title) card1Title.style.display = 'block';
+    
+    // Auto prefill 50/50 split of the total price
+    const finalPrice = getFinalPriceNumber();
+    const half = finalPrice / 2;
+    document.getElementById('splitVal1').value = formatMoneyValue(half);
+    document.getElementById('splitVal2').value = formatMoneyValue(half);
+  } else {
+    splitBlock.style.display = 'none';
+    card2Form.style.display = 'none';
+    if (card1Title) card1Title.style.display = 'none';
+    // Re-sync virtual card with Card 1 if we uncheck
+    syncVirtualCard(1);
+  }
+}
+
+function updateSplitFieldsVisibility(finalPrice) {
+  const isChecked = document.getElementById('splitCardsCheck').checked;
+  if (isChecked) {
+    const half = finalPrice / 2;
+    document.getElementById('splitVal1').value = formatMoneyValue(half);
+    document.getElementById('splitVal2').value = formatMoneyValue(half);
+  }
+}
+
+function updateSplitValues(focusedInputId) {
+  const finalPrice = getFinalPriceNumber();
+  
+  if (focusedInputId === 1) {
+    const val1 = parseMoneyValue(document.getElementById('splitVal1').value);
+    if (val1 > finalPrice) {
+      document.getElementById('splitVal1').value = formatMoneyValue(finalPrice);
+      document.getElementById('splitVal2').value = formatMoneyValue(0);
+    } else {
+      const val2 = finalPrice - val1;
+      document.getElementById('splitVal2').value = formatMoneyValue(val2);
+    }
+  } else if (focusedInputId === 2) {
+    const val2 = parseMoneyValue(document.getElementById('splitVal2').value);
+    if (val2 > finalPrice) {
+      document.getElementById('splitVal2').value = formatMoneyValue(finalPrice);
+      document.getElementById('splitVal1').value = formatMoneyValue(0);
+    } else {
+      const val1 = finalPrice - val2;
+      document.getElementById('splitVal1').value = formatMoneyValue(val1);
+    }
+  }
+}
+
+/* ─── 🪄 DEMO SIMULATION ─── */
+function typeInput(id, val, cb) {
+  const el = document.getElementById(id);
+  if (!el) { cb && cb(); return; }
+  el.value = '';
+  let i = 0;
+  const t = setInterval(() => {
+    el.value += val[i];
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    i++;
+    if (i >= val.length) {
+      clearInterval(t);
+      cb && cb();
+    }
+  }, 75);
+}
+
+function runSimulation() {
+  const simBtn = document.getElementById('btnSimulate');
+  if (simBtn) {
+    simBtn.disabled = true;
+    simBtn.style.opacity = '0.5';
+    simBtn.style.cursor = 'not-allowed';
+  }
+
+  // Back to step 1 first to start clean
+  goStep(1);
+  
+  setTimeout(() => {
+    // 1. Select semestral plan card
+    const cards = document.querySelectorAll('.plans-grid .plan-card');
+    if (cards.length >= 3) {
+      cards[2].click(); // Semestral card
+    }
+    
+    setTimeout(() => {
+      // Click continue
+      const contBtn = document.querySelector('#view1 .btn-primary');
+      if (contBtn) contBtn.click();
+      
+      setTimeout(() => {
+        // 2. Select Location
+        const est = document.getElementById('estado');
+        if (est) {
+          est.value = 'PE';
+          updateCidades();
+          
+          setTimeout(() => {
+            const cid = document.getElementById('cidade');
+            if (cid) {
+              cid.value = 'Recife';
+              updateUnidades();
+              
+              setTimeout(() => {
+                const units = document.querySelectorAll('#unidadesGrid .unit-card');
+                if (units.length > 0) {
+                  units[0].click(); // Boa Viagem
+                }
+                
+                setTimeout(() => {
+                  // Click continue to step 3
+                  const btn2 = document.getElementById('btnStep2');
+                  if (btn2) btn2.click();
+                  
+                  setTimeout(() => {
+                    // 3. Autofill inputs with typewriter effect
+                    typeInput('nome', 'GIOVANNA PIERONI', () => {
+                      typeInput('email', 'giovanna.pieroni@example.com', () => {
+                        typeInput('cpf', '12345678900', () => {
+                          typeInput('tel', '81999012706', () => {
+                            // Set birth date
+                            const bday = document.getElementById('nasc');
+                            if (bday) bday.value = '1995-10-15';
+                            // Set sex
+                            const sex = document.getElementById('sexo');
+                            if (sex) sex.value = 'Feminino';
+                            
+                            // Scroll down to coupon area
+                            window.scrollBy({ top: 250, behavior: 'smooth' });
+                            
+                            // Apply Coupon
+                            typeInput('couponCode', 'CIANET10', () => {
+                              const couponBtn = document.getElementById('couponApplyBtn');
+                              if (couponBtn) couponBtn.click();
+                              
+                              setTimeout(() => {
+                                // Click credit card tab
+                                const tabs = document.querySelectorAll('.payment-tabs .pay-tab');
+                                if (tabs.length >= 2) {
+                                  tabs[1].click(); // Card tab
+                                }
+                                
+                                setTimeout(() => {
+                                  // Habilitar opção de 2 cartões
+                                  const splitCheck = document.getElementById('splitCardsCheck');
+                                  if (splitCheck) {
+                                    splitCheck.click();
+                                  }
+                                  
+                                  setTimeout(() => {
+                                    // Scroll down to credit card area
+                                    window.scrollBy({ top: 350, behavior: 'smooth' });
+                                    
+                                    // Fill Card Info 1
+                                    typeInput('cardNumberInput', '5522883399440011', () => {
+                                      typeInput('cardNameInput', 'GIOVANNA PIERONI', () => {
+                                        typeInput('cardExpiryInput', '1229', () => {
+                                          
+                                          // Fill Card Info 2
+                                          typeInput('cardNumberInput2', '4000123456789010', () => {
+                                            typeInput('cardNameInput2', 'GIOVANNA PIERONI', () => {
+                                              typeInput('cardExpiryInput2', '0831', () => {
+                                                
+                                                // Scroll down to show the finalize button
+                                                window.scrollBy({ top: 300, behavior: 'smooth' });
+                                                
+                                                // Focus Card 2 CVV to trigger flip
+                                                const cvvInput2 = document.getElementById('cardCvvInput2');
+                                                if (cvvInput2) cvvInput2.focus();
+                                                
+                                                typeInput('cardCvvInput2', '321', () => {
+                                                  setTimeout(() => {
+                                                    if (cvvInput2) cvvInput2.blur(); // Flip back
+                                                    
+                                                    setTimeout(() => {
+                                                      // Finalize checkout!
+                                                      const submitBtn = document.getElementById('btnFinalize');
+                                                      if (submitBtn) submitBtn.click();
+                                                      
+                                                      if (simBtn) {
+                                                        simBtn.disabled = false;
+                                                        simBtn.style.opacity = '';
+                                                        simBtn.style.cursor = '';
+                                                      }
+                                                    }, 2000);
+                                                  }, 2000);
+                                                });
+                                              });
+                                            });
+                                          });
+                                          
+                                        });
+                                      });
+                                    });
+                                  }, 1500);
+                                }, 1500);
+                              }, 1500);
+                            });
+                          });
+                        });
+                      });
+                    });
+                  }, 1500);
+                }, 1500);
+              }, 1200);
+            }
+          }, 1200);
+        }
+      }, 1500);
+    }, 1500);
+  }, 1000);
+}
+
+/* ─── CARD REALTIME SYNC ─── */
+function syncVirtualCard(cardNum) {
+  const vCard = document.getElementById('virtualCard');
+  const vCardNum = document.getElementById('vCardNumber');
+  const vCardName = document.getElementById('vCardName');
+  const vCardExpiry = document.getElementById('vCardExpiry');
+  const vCardCvv = document.getElementById('vCardCvv');
+  const vCardBrand = document.getElementById('vCardBrand');
+  const vCardNameLabel = document.getElementById('vCardNameLabel');
+
+  if (cardNum === 2) {
+    vCardNameLabel.textContent = 'Titular (Cartão 2)';
+    const val = document.getElementById('cardNumberInput2').value;
+    vCardNum.textContent = val || '•••• •••• •••• ••••';
+    vCardName.textContent = document.getElementById('cardNameInput2').value.toUpperCase() || 'NOME NO CARTÃO';
+    vCardExpiry.textContent = document.getElementById('cardExpiryInput2').value || 'MM/AA';
+    vCardCvv.textContent = document.getElementById('cardCvvInput2').value || '•••';
+
+    let plain = val.replace(/\D/g, '');
+    if (plain.startsWith('4')) vCardBrand.textContent = 'VISA';
+    else if (plain.startsWith('5')) vCardBrand.textContent = 'MASTERCARD';
+    else if (plain.startsWith('3')) vCardBrand.textContent = 'AMEX';
+    else if (plain.startsWith('6')) vCardBrand.textContent = 'ELO';
+    else vCardBrand.textContent = 'CARD';
+  } else {
+    vCardNameLabel.textContent = 'Titular (Cartão 1)';
+    const val = document.getElementById('cardNumberInput').value;
+    vCardNum.textContent = val || '•••• •••• •••• ••••';
+    vCardName.textContent = document.getElementById('cardNameInput').value.toUpperCase() || 'NOME NO CARTÃO';
+    vCardExpiry.textContent = document.getElementById('cardExpiryInput').value || 'MM/AA';
+    vCardCvv.textContent = document.getElementById('cardCvvInput').value || '•••';
+
+    let plain = val.replace(/\D/g, '');
+    if (plain.startsWith('4')) vCardBrand.textContent = 'VISA';
+    else if (plain.startsWith('5')) vCardBrand.textContent = 'MASTERCARD';
+    else if (plain.startsWith('3')) vCardBrand.textContent = 'AMEX';
+    else if (plain.startsWith('6')) vCardBrand.textContent = 'ELO';
+    else vCardBrand.textContent = 'CARD';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const vCard = document.getElementById('virtualCard');
+  
+  // Listeners para o Cartão 1
+  const card1Inputs = ['cardNumberInput', 'cardNameInput', 'cardExpiryInput', 'cardCvvInput'];
+  card1Inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('focus', () => syncVirtualCard(1));
+      el.addEventListener('input', () => syncVirtualCard(1));
+    }
+  });
+
+  // Listeners para o Cartão 2
+  const card2Inputs = ['cardNumberInput2', 'cardNameInput2', 'cardExpiryInput2', 'cardCvvInput2'];
+  card2Inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('focus', () => syncVirtualCard(2));
+      el.addEventListener('input', () => syncVirtualCard(2));
+    }
+  });
+
+  // Efeito de flip para o CVV do Cartão 1
+  const cvv1 = document.getElementById('cardCvvInput');
+  if (cvv1) {
+    cvv1.addEventListener('focus', () => {
+      syncVirtualCard(1);
+      if (vCard) vCard.classList.add('flipped');
+    });
+    cvv1.addEventListener('blur', () => {
+      if (vCard) vCard.classList.remove('flipped');
+    });
+  }
+
+  // Efeito de flip para o CVV do Cartão 2
+  const cvv2 = document.getElementById('cardCvvInput2');
+  if (cvv2) {
+    cvv2.addEventListener('focus', () => {
+      syncVirtualCard(2);
+      if (vCard) vCard.classList.add('flipped');
+    });
+    cvv2.addEventListener('blur', () => {
+      if (vCard) vCard.classList.remove('flipped');
+    });
+  }
+});
+
+/* ─── 🌙 THEME TOGGLE & INTERACTIVE CANVAS BG ─── */
+function toggleTheme() {
+  const body = document.body;
+  const btnText = document.getElementById('themeBtnText');
+  const btnIcon = document.getElementById('themeIcon');
+  
+  body.classList.toggle('dark-theme');
+  const isDark = body.classList.contains('dark-theme');
+  
+  if (isDark) {
+    btnText.textContent = 'Modo Claro';
+    btnIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.01c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>`;
+  } else {
+    btnText.textContent = 'Modo Escuro';
+    btnIcon.innerHTML = `<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const darkCanvas = document.getElementById('darkBgCanvas');
+  if (darkCanvas) {
+    const ctx = darkCanvas.getContext('2d');
+    let width = darkCanvas.width = window.innerWidth;
+    let height = darkCanvas.height = window.innerHeight;
+    
+    let mouse = { x: width / 2, y: height / 2, tx: width / 2, ty: height / 2 };
+    
+    window.addEventListener('mousemove', (e) => {
+      mouse.tx = e.clientX;
+      mouse.ty = e.clientY;
+    }, { passive: true });
+    
+    window.addEventListener('resize', () => {
+      width = darkCanvas.width = window.innerWidth;
+      height = darkCanvas.height = window.innerHeight;
+    }, { passive: true });
+    
+    const blobs = [
+      { x: width * 0.2, y: height * 0.3, tx: width * 0.2, ty: height * 0.3, vx: 0.3, vy: 0.4, radius: 260, color: 'rgba(249, 115, 22, 0.15)' },
+      { x: width * 0.8, y: height * 0.2, tx: width * 0.8, ty: height * 0.2, vx: -0.2, vy: 0.3, radius: 340, color: 'rgba(59, 130, 246, 0.12)' },
+      { x: width * 0.5, y: height * 0.8, tx: width * 0.5, ty: height * 0.8, vx: 0.15, vy: -0.25, radius: 300, color: 'rgba(16, 185, 129, 0.10)' }
+    ];
+    
+    function animate() {
+      if (!document.body.classList.contains('dark-theme')) {
+        requestAnimationFrame(animate);
+        return;
+      }
+      
+      mouse.x += (mouse.tx - mouse.x) * 0.05;
+      mouse.y += (mouse.ty - mouse.y) * 0.05;
+      
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, width, height);
+      
+      blobs.forEach((b, index) => {
+        b.tx += b.vx;
+        b.ty += b.vy;
+        
+        if (b.tx < 0 || b.tx > width) b.vx *= -1;
+        if (b.ty < 0 || b.ty > height) b.vy *= -1;
+        
+        b.x += (b.tx - b.x) * 0.02;
+        b.y += (b.ty - b.y) * 0.02;
+        
+        let dx = mouse.x - b.x;
+        let dy = mouse.y - b.y;
+        b.x += dx * 0.005;
+        b.y += dy * 0.005;
+        
+        const radGrad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius);
+        radGrad.addColorStop(0, b.color);
+        radGrad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fillStyle = radGrad;
+        ctx.fill();
+      });
+      
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+});
 </script>
+<!-- 🪄 Floating Simulator Button -->
+<button class="sim-btn-float" onclick="runSimulation()" id="btnSimulate">
+  <svg viewBox="0 0 24 24"><path d="M7.5 2v15.5l4.5-4.5 4 8 3.5-1.75-4-8 6.5-.75L5.5 2z"/></svg>
+  Simular Matrícula
+</button>
+
 </body>
 </html>
