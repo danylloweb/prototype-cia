@@ -290,5 +290,5 @@ cia-net/checkout/               → Checkout digital
 
 ---
 
-*Proposta exclusiva para Academia CIA do Corpo · CIA NET © 2025*
+*Proposta exclusiva para Academia CIA do Corpo · CIA NET © 2026*
 # prototype-cia
