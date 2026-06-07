@@ -18,5 +18,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            cd /var/www/html/
-            git clone git@github.com:danylloweb/prototype-cia.git
+            cd /var/www/html/prototype-cia
+            git pull origin main
