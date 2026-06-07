@@ -514,6 +514,16 @@
     }
     select:disabled { opacity: .45; cursor: not-allowed; }
     input::placeholder { color: var(--t4); }
+    
+    input[type="checkbox"], input[type="radio"] {
+      -webkit-appearance: auto;
+      -moz-appearance: auto;
+      appearance: auto;
+      width: auto;
+      padding: 0;
+      border: none;
+      accent-color: var(--primary);
+    }
 
     .units-label { font-size: 13px; font-weight: 600; color: var(--t2); margin-bottom: 12px; }
     .units-grid {
