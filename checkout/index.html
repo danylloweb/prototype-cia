@@ -2276,14 +2276,18 @@ function runSimulation() {
                                   }
                                   
                                   setTimeout(() => {
-                                    // Scroll down to credit card area to show both virtual cards
-                                    const cardContainer = document.getElementById('virtualCardContainer');
-                                    if (cardContainer) cardContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    // Scroll down to credit card area to show inputs
+                                    const cardInput = document.getElementById('cardNumberInput');
+                                    if (cardInput) cardInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     
                                     // Fill Card Info 1
                                     typeInput('cardNumberInput', '5522883399440011', () => {
                                       typeInput('cardNameInput', 'GIOVANNA PIERONI', () => {
                                         typeInput('cardExpiryInput', '1229', () => {
+                                          
+                                          // Scroll to second card
+                                          const cardInput2 = document.getElementById('cardNumberInput2');
+                                          if (cardInput2) cardInput2.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                           
                                           // Fill Card Info 2
                                           typeInput('cardNumberInput2', '4000123456789010', () => {
