@@ -224,18 +224,18 @@ window.CDC_DEFAULT_CONFIG = {
        unitIds: ["areias", "afogados", "agua-fria", "bomba-do-hemeterio"],
        items: [
          {
-           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 99,90", total: "R$ 1.198,80",
-           enrollment: "+ R$ 50,00", description: "Plano anual com melhor custo-benefício",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"],
-           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
-           featured: false
-         },
-         {
            id: "basic-plus", name: "Basic+", price: "R$ 109,99", period: "/mês",
            enrollment: "+ R$ 50,00", description: "Flexibilidade com recorrência segura",
            features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades", "Sem comprometer limite do cartão"],
            badges: [{ label: "Não compromete limite", type: "success" }],
            featured: false
+         },
+         {
+           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 99,90", total: "R$ 1.198,80",
+           enrollment: "+ R$ 50,00", description: "Plano anual com melhor custo-benefício",
+           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"],
+           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
+           featured: true
          },
          {
            id: "monthly", name: "Mensal", price: "R$ 150,00", period: "/mês",
@@ -253,17 +253,17 @@ window.CDC_DEFAULT_CONFIG = {
        unitIds: ["avenida-norte", "ouro-preto", "peixinhos"],
        items: [
          {
-           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 109,90", total: "R$ 1.318,80",
-           enrollment: "+ R$ 50,00", description: "Melhor custo-benefício para acesso total",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"],
-           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
-           featured: false
-         },
-         {
            id: "basic-plus", name: "Basic+", price: "R$ 129,99", period: "/mês",
            enrollment: "+ R$ 50,00", description: "Flexibilidade com recorrência segura",
            features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades", "Sem comprometer limite", "30 dias de carência"],
            badges: [{ label: "Não compromete limite", type: "success" }, { label: "Carência 30 dias", type: "info" }],
+           featured: false
+         },
+         {
+           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 109,90", total: "R$ 1.318,80",
+           enrollment: "+ R$ 50,00", description: "Melhor custo-benefício para acesso total",
+           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"],
+           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
            featured: true
          },
          {

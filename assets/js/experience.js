@@ -9,6 +9,7 @@
   var MY_KEY = "cdc_my_unit";
   var PLAN_KEY = "cdc_preselected_plan";
   var UNIT_PLAN_KEY = "cdc_unit_for_plan";
+  var WA_CENTRAL = "558186049894";
   var WA = '<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg>';
 
   function myUnit() {
@@ -21,15 +22,29 @@
     applyUnit(); renderChips();
   }
   function waHref(unit, text) {
-    unit = unit || myUnit();
-    return "https://wa.me/" + (unit ? unit.whatsapp : "") + (text ? "?text=" + encodeURIComponent(text) : "");
+    return "https://wa.me/" + WA_CENTRAL + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+
+  function planLabelFromCta(a) {
+    var explicit = a.getAttribute("data-plan-name");
+    if (explicit) return explicit;
+    var key = (a.getAttribute("data-plan") || "").toLowerCase();
+    if (key === "hexa") return "Hexa";
+    if (key === "plus") return "Plus";
+    if (key === "annual-vip") return "Anual VIP";
+    if (key === "basic-plus") return "Basic+";
+    if (key === "monthly") return "Mensal";
+    return "";
   }
 
   /* Reaponta todos os CTAs padrão para a unidade escolhida */
   function applyUnit() {
     var u = myUnit(); if (!u) return;
-    var msg = "Olá! Vim pelo site da Cia do Corpo e quero fazer minha matrícula na unidade " + u.name + ".";
     d.querySelectorAll('[data-cdc="wa-default"]').forEach(function (a) {
+      var plan = planLabelFromCta(a);
+      var msg = plan
+        ? "Olá! Vim pelo site da Cia do Corpo e tenho interesse no plano " + plan + " da unidade " + u.name + "."
+        : "Olá! Vim pelo site da Cia do Corpo e quero fazer minha matrícula na unidade " + u.name + ".";
       a.href = waHref(u, msg); a.target = "_blank"; a.rel = "noopener";
       a.setAttribute("data-cta", "whatsapp_click"); a.setAttribute("data-unit", u.id); a.setAttribute("data-unit-name", u.name);
     });
@@ -193,7 +208,7 @@
           ].filter(function(l) { return l !== ""; });
           var msg = encodeURIComponent(lines.join("\n"));
           if (T) T.event("trial_request", { unit: un ? un.id : "", plano: plano, objetivo: ans.objetivo, preselected: !!preselectedPlan, location_page: "quiz" });
-          w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
+          w.open("https://wa.me/" + WA_CENTRAL + "?text=" + msg, "_blank");
           close();
         };
       }
@@ -237,7 +252,7 @@
         "*Empresa:* " + data.empresa, "*Responsável:* " + data.nome, "*Categoria:* " + data.categoria,
         "*WhatsApp:* " + data.telefone, (data.instagram ? "*Instagram:* " + data.instagram : ""),
         (data.cidade ? "*Cidade:* " + data.cidade : ""), (data.beneficio ? "*Benefício:* " + data.beneficio : "")].filter(Boolean);
-      if (central) w.open("https://wa.me/" + central + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+      if (central) w.open("https://wa.me/" + WA_CENTRAL + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
       var card = sheet.querySelector(".cdc-sheet-card");
       card.innerHTML = '<button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
         '<div style="text-align:center;padding:14px 0"><div style="font-size:3rem;margin-bottom:6px">✅</div>' +
