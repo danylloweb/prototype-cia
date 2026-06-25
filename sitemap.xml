@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.academiaciadocorpo.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidades</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=avenida-norte</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=ouro-preto</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=peixinhos</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=afogados</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=agua-fria</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=bomba-do-hemeterio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/unidade?u=areias</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/modalidades</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/planos</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/clube-da-parceria</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/sobre</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.academiaciadocorpo.com/contato</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+</urlset>

@@ -1,0 +1,8 @@
+Coloque aqui os arquivos de imagem com EXATAMENTE estes nomes:
+
+  cia-kids.jpg            -> foto da brinquedoteca / Cia Kids
+  personal.jpg           -> foto do personal treinando aluno
+  clube-da-parceria.png  -> logo do Clube da Parceria (fundo laranja)
+
+O site já está apontando para estes caminhos. Enquanto o arquivo
+não existir, é exibida uma imagem de fallback automaticamente.

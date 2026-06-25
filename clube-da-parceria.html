@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clube da Parceria | Cia do Corpo — Benefícios e descontos exclusivos</title>
+<meta name="description" content="O Clube da Parceria da Cia do Corpo dá a você descontos e benefícios exclusivos com 22 parceiros em saúde, beleza, moda, educação e serviços em Recife e Olinda. Filtre por categoria e aproveite.">
+<link rel="canonical" href="https://www.academiaciadocorpo.com/clube-da-parceria">
+<meta name="theme-color" content="#0a0a0b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Clube da Parceria | Cia do Corpo">
+<meta property="og:description" content="Descontos e benefícios exclusivos com dezenas de parceiros. Filtre por categoria e aproveite.">
+<meta property="og:image" content="https://static.wixstatic.com/media/837beb_2f6fd13d39384ccd927dfcf9945716c0~mv2.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://static.wixstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://www.academiaciadocorpo.com/"},{"@type":"ListItem","position":2,"name":"Clube da Parceria","item":"https://www.academiaciadocorpo.com/clube-da-parceria"}]}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand-logo" href="index.html">CIA DO <span class="tag">CORPO</span></a>
+    <nav><ul class="nav-links"><li><a href="index.html">Início</a></li><li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="planos.html">Planos</a></li><li><a href="clube-da-parceria.html" class="active">Clube</a></li><li><a href="contato.html">Contato</a></li></ul></nav>
+    <div class="nav-cta"><a class="btn btn-primary" data-cdc="wa-default" href="#">Faça sua matrícula</a><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="club-hero">
+  <div class="container">
+    <div class="club-logo-badge">
+      <img src="assets/img/clube-da-parceria.png" onerror="this.onerror=null;this.parentNode.style.display='none'" alt="Clube da Parceria">
+    </div>
+    <span class="hero-badge"><span class="pulse"></span> Exclusivo para alunos Cia do Corpo</span>
+    <h1>Treinar aqui<br>vale <span class="grad-word">muito mais.</span></h1>
+    <p>Sua matrícula vira uma rede de vantagens: descontos e benefícios reais com <b style="color:#fff">22 parceiros</b> de Recife e Olinda — saúde, beleza, moda, educação e serviços. Tudo num só lugar, filtrável em segundos.</p>
+    <div class="hero-actions" style="margin-top:32px">
+      <a class="btn btn-whats btn-lg" data-cdc="wa-default" href="#">Quero ser aluno e aproveitar</a>
+      <a class="btn btn-ghost btn-lg invert" href="#diretorio">Explorar benefícios</a>
+    </div>
+    <div class="hero-trust" style="margin-top:40px">
+      <div class="stat"><div class="num"><span data-count="22">22</span></div><div class="lbl">Parceiros</div></div>
+      <div class="stat"><div class="num"><span data-count="7">7</span></div><div class="lbl">Categorias</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">Grátis pra aluno</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section class="section">
+  <div class="container">
+    <div class="section-head center reveal"><span class="eyebrow center">Por que faz diferença</span><h2 class="section-title">Mais economia. Mais saúde. Mais vida.</h2></div>
+    <div class="club-benefits">
+      <div class="pillar reveal"><div class="num">01</div><h3>Descontos reais</h3><p>Condições exclusivas que você só tem por ser aluno da Cia do Corpo — em serviços que você já usa.</p></div>
+      <div class="pillar reveal"><div class="num">02</div><h3>Rede que cresce</h3><p>Novos parceiros entram toda hora. Quanto mais a Cia cresce, mais vantagens chegam pra você.</p></div>
+      <div class="pillar reveal"><div class="num">03</div><h3>Tudo filtrável</h3><p>Ache o benefício que você quer por categoria, busca ou cidade em segundos. Sem complicação.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRETÓRIO DINÂMICO -->
+<div id="diretorio"></div>
+<div class="filter-bar">
+  <div class="container">
+    <div class="filter-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="pSearch" placeholder="Buscar parceiro, benefício ou categoria...">
+    </div>
+    <div class="chips" id="pChips"></div>
+  </div>
+</div>
+
+<section class="club-directory">
+  <div class="container">
+    <div class="partner-count" id="pCount"></div>
+    <div class="partner-grid" id="pGrid"></div>
+  </div>
+</section>
+
+<!-- SEJA PARCEIRO (B2B) -->
+<section class="section">
+  <div class="container">
+    <div class="split">
+      <div class="reveal">
+        <span class="eyebrow">Para empresas</span>
+        <h2 class="section-title" style="font-size:2.4rem">Sua empresa no Clube da Parceria</h2>
+        <p class="section-sub">Coloque sua marca na frente de milhares de alunos engajados em Recife e Olinda. Ofereça um benefício e ganhe visibilidade, fluxo e novos clientes — sem custo de adesão.</p>
+        <ul class="value-list">
+          <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span> Exposição para a comunidade Cia do Corpo</li>
+          <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span> Presença no diretório digital e nas unidades</li>
+          <li><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span> Parceria simples, sem burocracia</li>
+        </ul>
+        <button class="btn btn-primary btn-lg" style="margin-top:26px" data-partner-form>Quero ser parceiro</button>
+      </div>
+      <div class="split-media reveal"><img loading="lazy" src="assets/img/destaque-forca.avif" alt="Comunidade Cia do Corpo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section bg-soft"><div class="container"><div class="cta-band reveal">
+  <h2>Quer aproveitar todos esses benefícios?</h2>
+  <p>Matricule-se na Cia do Corpo e libere o Clube da Parceria. Comece com 3 dias grátis.</p>
+  <a class="btn btn-primary btn-lg" data-cdc="wa-default" href="#">Falar no WhatsApp</a>
+</div></div></section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a class="brand-logo" href="index.html" style="margin-bottom:18px;display:inline-flex">CIA DO <span class="tag">CORPO</span></a><p>Há mais de 13 anos transformando vidas pelo movimento em Recife e Olinda.</p>
+        <div class="foot-social"><a data-cdc="ig" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a><a data-cdc="fb" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a></div></div>
+      <div class="foot-col"><h5>Navegação</h5><ul><li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="planos.html">Planos</a></li><li><a href="sobre.html">Sobre</a></li><li><a href="contato.html">Contato</a></li><li><a href="clube-da-parceria.html">Clube da Parceria</a></li></ul></div>
+      <div class="foot-col"><h5>Horários</h5><ul class="foot-hours" data-cdc="hours"></ul></div>
+      <div class="foot-col"><h5>Institucional</h5><ul><li><a href="https://www.academiaciadocorpo.com/_files/ugd/837beb_aa8fd1283a7a4c4ea0bd1fd390db0e48.pdf" target="_blank" rel="noopener">Normas Internas de Uso</a></li><li><a href="#" data-cdc="privacy">Preferências de privacidade</a></li><li><a href="admin/index.html">Área administrativa</a></li><li>CNPJ <span data-cdc="cnpj"></span></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© <span data-year>2026</span> Cia do Corpo Gym.</span><span>Recife &amp; Olinda — PE</span></div>
+  </div>
+</footer>
+
+<a class="fab-whats" data-cdc="wa-default" href="#" aria-label="Falar no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg></a>
+
+<script src="assets/js/config.js"></script><script src="assets/js/data-service.js"></script><script src="assets/js/telemetry.js"></script><script src="assets/js/site.js"></script><script src="assets/js/experience.js"></script><script src="assets/js/main.js"></script>
+<script>
+/* Diretório de parceiros reais — busca + filtro por categoria */
+(function(){
+  var cfg = window.CDC.data.get();
+  var all = (cfg.partnersClub || []).filter(function(p){ return !p.hidden; });
+  var cats = cfg.partnerCategories || [];
+  var state = { cat: "Todos", q: "" };
+
+  var ACCENT = {
+    "Saúde":"linear-gradient(120deg,#1fbf75,#37d29a)",
+    "Beleza":"linear-gradient(120deg,#e0457b,#ff7eb0)",
+    "Moda":"linear-gradient(120deg,#8b5cf6,#b794f6)",
+    "Serviços":"linear-gradient(120deg,#3b82f6,#60a5fa)",
+    "Educação":"linear-gradient(120deg,#f5a524,#ffd24d)",
+    "Viagem":"linear-gradient(120deg,#06b6d4,#4dd9ec)",
+    "Pet":"linear-gradient(120deg,#ff7a00,#ff9e00)"
+  };
+  function accent(c){ return ACCENT[c] || "linear-gradient(120deg,#ff5a00,#ff9e00)"; }
+  function esc(s){ return (s||"").replace(/[&<>"]/g,function(c){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c];}); }
+  function initials(n){ return n.replace(/[—-].*$/,"").trim().split(" ").filter(Boolean).slice(0,2).map(function(w){return w[0];}).join("").toUpperCase(); }
+  function waNum(phone){ var d=(phone||"").replace(/\D/g,""); return d?("55"+d):""; }
+
+  var chips = document.getElementById("pChips");
+  chips.innerHTML = ["Todos"].concat(cats).map(function(c){
+    return '<button class="chip'+(c==="Todos"?" active":"")+'" data-c="'+c.replace(/"/g,'')+'">'+c+'</button>';
+  }).join("");
+  chips.addEventListener("click", function(e){
+    var b=e.target.closest(".chip"); if(!b) return;
+    state.cat=b.getAttribute("data-c");
+    chips.querySelectorAll(".chip").forEach(function(x){ x.classList.toggle("active", x===b); });
+    render();
+    if(window.CDC.track) window.CDC.track.event("club_filter", { category: state.cat });
+  });
+  var search=document.getElementById("pSearch"), deb;
+  search.addEventListener("input", function(){ clearTimeout(deb); deb=setTimeout(function(){ state.q=search.value.toLowerCase().trim(); render(); },150); });
+
+  var ig='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg>';
+  var ph='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>';
+  var pin='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+  var tag='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/></svg>';
+  var waI='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg>';
+
+  function card(p){
+    var num=waNum(p.phone);
+    var msg=encodeURIComponent("Olá! Sou aluno(a) da Cia do Corpo e quero garantir o benefício do Clube da Parceria com vocês ("+p.name+").");
+    var grantHref = num ? "https://wa.me/"+num+"?text="+msg : "#";
+    var handle=(p.instagram||"").replace(/^@/,"");
+    return '<article class="partner-card'+(p.featured?" feat":"")+'" style="--accent:'+accent(p.category)+'">'+
+      (p.featured?'<span class="feat-tag">Destaque</span>':'')+
+      '<div class="top"><div class="logo">'+esc(initials(p.name))+'</div>'+
+        '<div><div class="cat">'+esc(p.category)+'</div><h3>'+esc(p.name)+'</h3></div></div>'+
+      '<span class="ben-pill">'+tag+esc(p.benefit)+'</span>'+
+      '<div class="meta">'+
+        (p.address?'<div class="row">'+pin+'<span>'+esc(p.address)+'</span></div>':'<div class="row">'+pin+'<span>'+esc(p.city||"Recife & Olinda")+'</span></div>')+
+        (handle?'<a class="row" target="_blank" rel="noopener" href="https://instagram.com/'+encodeURIComponent(handle)+'">'+ig+'<span>@'+esc(handle)+'</span></a>':'')+
+        (p.phone?'<a class="row" href="tel:+'+num+'">'+ph+'<span>'+esc(p.phone)+'</span></a>':'')+
+      '</div>'+
+      '<a class="grant" target="_blank" rel="noopener" href="'+grantHref+'" data-partner="'+esc(p.name)+'">'+waI+' Garantir benefício</a>'+
+    '</article>';
+  }
+
+  document.getElementById("pGrid").addEventListener("click", function(e){
+    var g=e.target.closest(".grant"); if(g && window.CDC.track) window.CDC.track.event("club_partner_click",{partner:g.getAttribute("data-partner")});
+  });
+
+  function render(){
+    var list=all.filter(function(p){
+      var okCat=state.cat==="Todos"||p.category===state.cat;
+      var okQ=!state.q||(p.name+" "+p.benefit+" "+p.category+" "+(p.city||"")).toLowerCase().indexOf(state.q)>-1;
+      return okCat&&okQ;
+    });
+    list.sort(function(a,b){ return (b.featured?1:0)-(a.featured?1:0); });
+    document.getElementById("pCount").innerHTML='<b>'+list.length+'</b> parceiro'+(list.length===1?'':'s')+(state.cat!=="Todos"?' em '+esc(state.cat):'')+' · clique em "Garantir benefício" e fale no WhatsApp';
+    var grid=document.getElementById("pGrid");
+    grid.innerHTML=list.length?list.map(card).join(""):'<div class="no-result">Nenhum parceiro encontrado. Tente outra categoria ou busca.</div>';
+  }
+  render();
+})();
+</script>
+</body>
+</html>

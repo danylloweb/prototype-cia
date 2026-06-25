@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unidade | Cia do Corpo</title>
+<meta name="description" content="Conheça esta unidade da Cia do Corpo: endereço, contato, grade de aulas e estrutura. Faça sua matrícula.">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="geo.region" content="BR-PE">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://static.wixstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand-logo" href="index.html">CIA DO <span class="tag">CORPO</span></a>
+    <nav><ul class="nav-links"><li><a href="index.html">Início</a></li><li><a href="unidades.html" class="active">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="planos.html">Planos</a></li><li><a href="clube-da-parceria.html">Clube</a></li><li><a href="contato.html">Contato</a></li></ul></nav>
+    <div class="nav-cta"><a class="btn btn-primary" data-cdc="wa-default" href="#">Faça sua matrícula</a><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+  </div>
+</header>
+
+<!-- HERO da unidade (preenchido via JS) -->
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Início</a> / <a href="unidades.html">Unidades</a> / <span id="u-crumb">Unidade</span></div>
+    <div class="unit-hero-grid">
+      <div>
+        <span class="hero-badge"><span class="pulse"></span> <span id="u-city">Recife &amp; Olinda</span></span>
+        <h1 id="u-name">Unidade Cia do Corpo</h1>
+        <div class="unit-info-row" id="u-info"></div>
+        <div class="hero-actions">
+          <a class="btn btn-whats btn-lg" id="u-wa" href="#" target="_blank" rel="noopener">Faça sua matrícula</a>
+          <a class="btn btn-ghost btn-lg invert" id="u-call" href="#">Ligar</a>
+        </div>
+      </div>
+      <div class="map-wrap"><iframe id="u-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa da unidade"></iframe></div>
+    </div>
+  </div>
+</section>
+
+<!-- GRADE DE AULAS -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow">Programação</span><h2 class="section-title">Grade de aulas</h2><p class="section-sub">Confira os horários das aulas coletivas. Sujeito a alterações — confirme na recepção.</p></div>
+    <div class="grade" id="u-grade"></div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section class="section bg-ink">
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow">Estrutura</span><h2 class="section-title">O que você encontra aqui</h2></div>
+    <div class="feat-grid">
+      <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h4>Atendimento humanizado</h4><p>Equipe que acompanha sua evolução de perto.</p></div>
+      <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 19a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 22 12"/></svg></div><h4>Ambiente climatizado</h4><p>Conforto térmico em todas as salas.</p></div>
+      <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h3l3 3v3a2 2 0 0 1-2 2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div><h4>Estacionamento</h4><p>Mais praticidade na sua rotina.</p></div>
+      <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h4>Vestiários completos</h4><p>Conforto antes e depois do treino.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTRAS UNIDADES -->
+<section class="section bg-soft">
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow">Perto de você</span><h2 class="section-title">Outras unidades</h2></div>
+    <div class="units-grid" data-cdc="units" data-limit="3"></div>
+  </div>
+</section>
+
+<section class="section"><div class="container"><div class="cta-band reveal">
+  <h2>Pronto para começar?</h2>
+  <p>Faça sua matrícula nesta unidade e comece sua transformação hoje.</p>
+  <a class="btn btn-primary btn-lg" id="u-wa2" href="#" target="_blank" rel="noopener">Faça sua matrícula</a>
+</div></div></section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand"><a class="brand-logo" href="index.html" style="margin-bottom:18px;display:inline-flex">CIA DO <span class="tag">CORPO</span></a><p>Há mais de 13 anos transformando vidas pelo movimento em Recife e Olinda.</p>
+        <div class="foot-social"><a data-cdc="ig" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a><a data-cdc="fb" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a></div></div>
+      <div class="foot-col"><h5>Navegação</h5><ul><li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="planos.html">Planos</a></li><li><a href="sobre.html">Sobre</a></li><li><a href="contato.html">Contato</a></li><li><a href="clube-da-parceria.html">Clube da Parceria</a></li></ul></div>
+      <div class="foot-col"><h5>Horários</h5><ul class="foot-hours" data-cdc="hours"></ul></div>
+      <div class="foot-col"><h5>Institucional</h5><ul><li><a href="https://www.academiaciadocorpo.com/_files/ugd/837beb_aa8fd1283a7a4c4ea0bd1fd390db0e48.pdf" target="_blank" rel="noopener">Normas Internas de Uso</a></li><li><a href="#" data-cdc="privacy">Preferências de privacidade</a></li><li><a href="admin/index.html">Área administrativa</a></li><li>CNPJ <span data-cdc="cnpj"></span></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© <span data-year>2026</span> Cia do Corpo Gym.</span><span>Recife &amp; Olinda — PE</span></div>
+  </div>
+</footer>
+
+<a class="fab-whats" data-cdc="wa-default" href="#" aria-label="Falar no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg></a>
+
+<script src="assets/js/config.js"></script><script src="assets/js/data-service.js"></script><script src="assets/js/telemetry.js"></script><script src="assets/js/site.js"></script><script src="assets/js/experience.js"></script><script src="assets/js/main.js"></script>
+<script>
+(function(){
+  var DATA = window.CDC.data;
+  var id = new URLSearchParams(location.search).get("u");
+  var u = DATA.unitById(id);
+  if(!u){ location.replace("unidades.html"); return; }
+  function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c];}); }
+
+  document.title = "Cia do Corpo " + u.name + " | Academia em " + u.city;
+  var md = document.querySelector('meta[name="description"]');
+  if(md) md.setAttribute("content", "Cia do Corpo unidade "+u.name+": "+u.address+". Estrutura moderna, grade de aulas e matrícula pelo WhatsApp.");
+  var can = document.createElement("link"); can.rel="canonical"; can.href="https://www.academiaciadocorpo.com/unidade?u="+u.id; document.head.appendChild(can);
+
+  document.getElementById("u-crumb").textContent = u.name;
+  document.getElementById("u-name").textContent = "Cia do Corpo " + u.name;
+  document.getElementById("u-city").textContent = u.city;
+
+  var pin='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+  var phn='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>';
+  var clk='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  document.getElementById("u-info").innerHTML =
+    '<span class="pillinfo">'+pin+esc(u.address)+'</span>'+
+    '<span class="pillinfo">'+phn+esc(u.phone)+'</span>'+
+    '<span class="pillinfo">'+clk+'Seg-Sex 5h-23h</span>';
+
+  var waMsg = "Olá! Vim pela página da unidade "+u.name+" e quero fazer minha matrícula.";
+  var waHref = "https://wa.me/"+u.whatsapp+"?text="+encodeURIComponent(waMsg);
+  ["u-wa","u-wa2"].forEach(function(idd){ var a=document.getElementById(idd); a.href=waHref; a.setAttribute("data-cta","whatsapp_click"); a.setAttribute("data-unit",u.id); a.setAttribute("data-unit-name",u.name); });
+  var call=document.getElementById("u-call"); call.href="tel:+55"+u.phone.replace(/\\D/g,""); call.setAttribute("data-cta","call_click"); call.setAttribute("data-unit",u.id);
+
+  document.getElementById("u-map").src = "https://www.google.com/maps?q="+encodeURIComponent(u.address)+"&output=embed";
+
+  // Grade de aulas
+  var cfg = DATA.get();
+  var days = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+  var grid = (cfg.classesGrid||[]).filter(function(c){ return c.unit==="all"||c.unit===u.id; });
+  var byDay = {}; days.forEach(function(d){ byDay[d]=[]; });
+  grid.forEach(function(c){ if(byDay[c.day]) byDay[c.day].push(c); });
+  Object.keys(byDay).forEach(function(d){ byDay[d].sort(function(a,b){ return a.time.localeCompare(b.time); }); });
+  document.getElementById("u-grade").innerHTML = days.filter(function(d){return byDay[d].length;}).map(function(d){
+    return '<div class="grade-day"><h4>'+d+'</h4><ul>'+byDay[d].map(function(c){
+      return '<li><b>'+esc(c.time)+'</b><span>'+esc(c.name)+'</span></li>';
+    }).join("")+'</ul></div>';
+  }).join("") || '<p class="section-sub">Grade em atualização. Consulte a recepção da unidade.</p>';
+
+  // JSON-LD da unidade
+  var ld = { "@context":"https://schema.org","@type":"ExerciseGym","name":"Cia do Corpo — "+u.name,
+    "telephone":u.phone,"address":{"@type":"PostalAddress","streetAddress":u.address,"addressLocality":u.city,"addressRegion":"PE","addressCountry":"BR"},
+    "url":"https://www.academiaciadocorpo.com/unidade?u="+u.id,"openingHours":"Mo-Th 05:00-23:00, Fr 05:00-22:00, Sa 07:00-15:00, Su 08:00-12:00" };
+  var s=document.createElement("script"); s.type="application/ld+json"; s.textContent=JSON.stringify(ld); document.head.appendChild(s);
+
+  // re-aplica experiência (CTAs já têm href próprio aqui)
+  if(window.CDC.exp) window.CDC.exp.applyUnit();
+})();
+</script>
+</body>
+</html>

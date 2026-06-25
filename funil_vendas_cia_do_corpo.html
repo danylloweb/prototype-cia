@@ -1,0 +1,219 @@
+
+<style>
+  @keyframes flowDown { from{stroke-dashoffset:24} to{stroke-dashoffset:0} }
+  @keyframes pulseRing { 0%,100%{opacity:.7;r:14} 50%{opacity:1;r:16} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes shimmer { 0%,100%{opacity:.85} 50%{opacity:1} }
+
+  .connector { stroke-dasharray:6 4; animation: flowDown 1.2s linear infinite; }
+  .connector.paused { animation-play-state:paused; opacity:.3; }
+
+  .step-card { cursor:pointer; }
+  .step-card rect { transition: filter .18s, transform .18s; transform-box: fill-box; transform-origin: center; }
+  .step-card:hover rect { filter:brightness(1.07); transform:scaleX(1.025); }
+  .step-card.active rect { filter:brightness(1.12); }
+
+  .icon-circle { transition: r .15s; }
+  .step-card:hover .icon-circle { r:20; }
+
+  #info-panel { animation: fadeIn .22s ease; }
+
+  .meta-badge { animation: shimmer 2s ease-in-out infinite; }
+  .funnel-line { animation: flowDown 1.8s linear infinite; }
+  .funnel-line.paused { animation-play-state:paused; }
+</style>
+
+<svg width="100%" viewBox="0 0 680 700" role="img">
+  <title>Funil de vendas Cia do Corpo</title>
+  <desc>Diagrama do funil de vendas: Meta Ads, WhatsApp, Triagem, Apresentação, Aula Experimental, Adesão.</desc>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ── TOPO: Meta Ads ── -->
+  <g class="step-card" id="s1" onclick="pick(1)">
+    <!-- fundo arredondado grande -->
+    <rect x="140" y="20" width="400" height="68" rx="14" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+    <!-- ícone lateral -->
+    <circle class="icon-circle" cx="178" cy="54" r="18" fill="#534AB7"/>
+    <text x="178" y="59" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">📣</text>
+    <!-- textos -->
+    <text class="th" x="360" y="46" text-anchor="middle" dominant-baseline="central" fill="#3C3489" font-size="15">Campanha Meta Ads</text>
+    <text class="ts" x="360" y="70" text-anchor="middle" fill="#7F77DD" font-size="11">Facebook & Instagram · Alcance de novos leads</text>
+  </g>
+
+  <!-- conector 1→2 -->
+  <line x1="340" y1="88" x2="340" y2="116" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c1"/>
+  <!-- label -->
+  <text class="ts" x="352" y="105" fill="#7F77DD" font-size="10">Lead entra</text>
+
+  <!-- ── STEP 2: WhatsApp ── -->
+  <g class="step-card" id="s2" onclick="pick(2)">
+    <rect x="155" y="116" width="370" height="64" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <circle class="icon-circle" cx="189" cy="148" r="18" fill="#0F6E56"/>
+    <text x="189" y="153" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">💬</text>
+    <text class="th" x="352" y="140" text-anchor="middle" dominant-baseline="central" fill="#085041" font-size="14">WhatsApp da Unidade</text>
+    <text class="ts" x="352" y="162" text-anchor="middle" fill="#1D9E75" font-size="11">Primeiro contato · Resposta rápida ao lead</text>
+  </g>
+
+  <line x1="340" y1="180" x2="340" y2="208" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c2"/>
+  <text class="ts" x="352" y="197" fill="#1D9E75" font-size="10">Qualifica</text>
+
+  <!-- ── STEP 3: Triagem ── -->
+  <g class="step-card" id="s3" onclick="pick(3)">
+    <rect x="170" y="208" width="340" height="64" rx="12" fill="#FAEEDA" stroke="#BA7517" stroke-width="1.5"/>
+    <circle class="icon-circle" cx="202" cy="240" r="18" fill="#BA7517"/>
+    <text x="202" y="245" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">🔎</text>
+    <text class="th" x="350" y="232" text-anchor="middle" dominant-baseline="central" fill="#412402" font-size="14">Triagem</text>
+    <text class="ts" x="350" y="254" text-anchor="middle" fill="#854F0B" font-size="11">Entender objetivo, disponibilidade e perfil</text>
+  </g>
+
+  <line x1="340" y1="272" x2="340" y2="300" stroke="#BA7517" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c3"/>
+  <text class="ts" x="352" y="289" fill="#854F0B" font-size="10">Avança</text>
+
+  <!-- ── STEP 4: Apresentação dos planos ── -->
+  <g class="step-card" id="s4" onclick="pick(4)">
+    <rect x="185" y="300" width="310" height="64" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+    <circle class="icon-circle" cx="215" cy="332" r="18" fill="#185FA5"/>
+    <text x="215" y="337" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">📋</text>
+    <text class="th" x="348" y="324" text-anchor="middle" dominant-baseline="central" fill="#042C53" font-size="14">Apresentação dos Planos</text>
+    <text class="ts" x="348" y="346" text-anchor="middle" fill="#378ADD" font-size="11">Modalidades, preços e benefícios</text>
+  </g>
+
+  <line x1="340" y1="364" x2="340" y2="392" stroke="#185FA5" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c4"/>
+  <text class="ts" x="352" y="381" fill="#378ADD" font-size="10">Desperta interesse</text>
+
+  <!-- ── STEP 5: Agendamento Aula Exp ── -->
+  <g class="step-card" id="s5" onclick="pick(5)">
+    <rect x="200" y="392" width="280" height="64" rx="12" fill="#FBEAF0" stroke="#993556" stroke-width="1.5"/>
+    <circle class="icon-circle" cx="228" cy="424" r="18" fill="#993556"/>
+    <text x="228" y="429" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">📅</text>
+    <text class="th" x="348" y="416" text-anchor="middle" dominant-baseline="central" fill="#4B1528" font-size="14">Agendamento</text>
+    <text class="ts" x="348" y="438" text-anchor="middle" fill="#D4537E" font-size="11">Aula experimental marcada</text>
+  </g>
+
+  <line x1="340" y1="456" x2="340" y2="484" stroke="#993556" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c5"/>
+  <text class="ts" x="352" y="473" fill="#D4537E" font-size="10">Comparece</text>
+
+  <!-- ── STEP 6: Aula Experimental ── -->
+  <g class="step-card" id="s6" onclick="pick(6)">
+    <rect x="215" y="484" width="250" height="64" rx="12" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+    <circle class="icon-circle" cx="242" cy="516" r="18" fill="#3B6D11"/>
+    <text x="242" y="521" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">🏋️</text>
+    <text class="th" x="352" y="508" text-anchor="middle" dominant-baseline="central" fill="#173404" font-size="14">Aula Experimental</text>
+    <text class="ts" x="352" y="530" text-anchor="middle" fill="#639922" font-size="11">Experiência presencial na academia</text>
+  </g>
+
+  <line x1="340" y1="548" x2="340" y2="576" stroke="#3B6D11" stroke-width="1.5" marker-end="url(#arr)" class="connector" id="c6"/>
+  <text class="ts" x="352" y="565" fill="#639922" font-size="10">Converte</text>
+
+  <!-- ── STEP 7: Adesão ── -->
+  <g class="step-card" id="s7" onclick="pick(7)">
+    <rect x="230" y="576" width="220" height="68" rx="14" fill="#EEEDFE" stroke="#3C3489" stroke-width="2"/>
+    <circle class="icon-circle" cx="257" cy="610" r="20" fill="#3C3489"/>
+    <text x="257" y="615" text-anchor="middle" dominant-baseline="central" font-size="17" fill="#fff">🏆</text>
+    <text class="th" x="356" y="602" text-anchor="middle" dominant-baseline="central" fill="#26215C" font-size="15">Adesão ao Plano</text>
+    <text class="ts" x="356" y="626" text-anchor="middle" fill="#534AB7" font-size="11">Aluno matriculado · Meta batida! 🎉</text>
+  </g>
+
+  <!-- Funil visual (left side decorativo) -->
+  <g opacity=".18">
+    <line x1="100" y1="54" x2="100" y2="644" stroke="var(--color-text-secondary)" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="580" y1="54" x2="580" y2="644" stroke="var(--color-text-secondary)" stroke-width="1" stroke-dasharray="3 3"/>
+    <text class="ts" x="94" y="54"  text-anchor="end" fill="var(--color-text-secondary)" font-size="10">Topo</text>
+    <text class="ts" x="94" y="644" text-anchor="end" fill="var(--color-text-secondary)" font-size="10">Fundo</text>
+  </g>
+</svg>
+
+<!-- Info panel -->
+<div id="info-panel" style="margin:10px 0 0;padding:14px 18px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);background:var(--color-background-secondary);min-height:60px;">
+  <p style="margin:0;font-size:13px;color:var(--color-text-secondary);">👆 Clique em qualquer etapa para ver dicas e métricas-chave.</p>
+</div>
+
+<!-- Controles -->
+<div style="display:flex;gap:10px;margin:10px 0 0;flex-wrap:wrap;align-items:center;">
+  <button onclick="toggleAnim()" id="btn-anim" style="font-size:13px;padding:6px 14px;">⏸ Pausar</button>
+  <button onclick="pick(null)" style="font-size:13px;padding:6px 14px;">↺ Resetar</button>
+  <span style="font-size:12px;color:var(--color-text-secondary);margin-left:4px;">Cia do Corpo · Funil de Vendas</span>
+</div>
+
+<script>
+const steps = {
+  1: {
+    color:'#534AB7', title:'📣 Campanha Meta Ads',
+    kpi:'KPI: CPL (Custo por Lead)',
+    desc:'Topo do funil. Os anúncios no Facebook e Instagram geram interesse e direcionam o lead para o WhatsApp da unidade. Aqui mora o volume — quanto mais qualificada a segmentação, menor o custo por lead e maior a taxa de conversão nas etapas seguintes.',
+    tip:'💡 Dica: use criativos com prova social (fotos reais da academia, depoimentos de alunos) e CTA direto para o WhatsApp.'
+  },
+  2: {
+    color:'#0F6E56', title:'💬 WhatsApp da Unidade',
+    kpi:'KPI: Taxa de resposta em até 5 min',
+    desc:'Primeiro contato humano. A velocidade de resposta aqui é crítica — leads que recebem retorno em menos de 5 minutos têm taxa de conversão muito maior. O objetivo é gerar rapport rápido e levar o lead para a triagem.',
+    tip:'💡 Dica: configure uma mensagem automática de boas-vindas e tenha um roteiro de abordagem padronizado para a equipe.'
+  },
+  3: {
+    color:'#BA7517', title:'🔎 Triagem',
+    kpi:'KPI: % de leads qualificados',
+    desc:'Etapa de qualificação. Aqui você entende o objetivo do lead (emagrecimento, saúde, estética), sua disponibilidade de horário e capacidade de investimento. Leads desqualificados devem ser descartados gentilmente aqui — não adiante para as próximas etapas.',
+    tip:'💡 Dica: use perguntas abertas. Ex: "Qual é seu principal objetivo com a academia?" antes de falar de preço.'
+  },
+  4: {
+    color:'#185FA5', title:'📋 Apresentação dos Planos',
+    kpi:'KPI: Taxa de agendamento pós-apresentação',
+    desc:'Momento de apresentar valor antes de preço. Destaque benefícios, diferenciais da Cia do Corpo (equipamentos, instrutores, localização) e modalidades disponíveis. O plano certo deve ser sugerido com base no que foi mapeado na triagem.',
+    tip:'💡 Dica: apresente 3 opções de plano (básico, recomendado, premium). O do meio tende a ter maior adesão — efeito âncora.'
+  },
+  5: {
+    color:'#993556', title:'📅 Agendamento da Aula Experimental',
+    kpi:'KPI: Taxa de show-up (comparecimento)',
+    desc:'A aula experimental é o maior gatilho de conversão do funil. O agendamento precisa ter confirmação em dois momentos: logo após marcar e 1 hora antes da aula. Reduza no-shows com lembretes automáticos.',
+    tip:'💡 Dica: envie um lembrete via WhatsApp 24h antes e outro 1h antes, com o endereço e nome do instrutor que vai receber o lead.'
+  },
+  6: {
+    color:'#3B6D11', title:'🏋️ Aula Experimental',
+    kpi:'KPI: Taxa de conversão pós-aula',
+    desc:'Etapa mais poderosa do funil. A experiência presencial deve ser memorável. O instrutor responsável deve saber que aquele aluno é um lead e ter uma abordagem consultiva ao final da aula, apresentando o plano no momento de maior engajamento emocional.',
+    tip:'💡 Dica: ao final da aula, o instrutor pergunta: "O que você achou? Posso te ajudar a montar um plano de treino já como aluno?"'
+  },
+  7: {
+    color:'#3C3489', title:'🏆 Adesão ao Plano',
+    kpi:'KPI: CAC (Custo de Aquisição de Cliente)',
+    desc:'Fundo do funil — o lead vira aluno! Aqui entram as facilitações de fechamento: parcelamento, descontos de primeira matrícula, bônus (aula extra, avaliação física). Documente o CAC para otimizar o investimento em Meta Ads.',
+    tip:'💡 Dica: crie um ritual de boas-vindas (kit aluno, foto na academia) — isso aumenta o senso de pertencimento e reduz churn nos primeiros 30 dias.'
+  }
+};
+
+let anim = true;
+let sel = null;
+
+function pick(id) {
+  if (sel !== null) document.getElementById('s'+sel)?.classList.remove('active');
+  sel = id;
+  const panel = document.getElementById('info-panel');
+  if (!id) {
+    panel.innerHTML = '<p style="margin:0;font-size:13px;color:var(--color-text-secondary);">👆 Clique em qualquer etapa para ver dicas e métricas-chave.</p>';
+    panel.style.borderColor = 'var(--color-border-secondary)';
+    return;
+  }
+  document.getElementById('s'+id)?.classList.add('active');
+  const s = steps[id];
+  panel.style.borderColor = s.color;
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="font-size:14px;font-weight:500;color:${s.color}">${s.title}</span>
+      <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${s.color}22;color:${s.color};font-weight:500">${s.kpi}</span>
+    </div>
+    <p style="margin:0 0 8px;font-size:13px;color:var(--color-text-secondary);line-height:1.6">${s.desc}</p>
+    <p style="margin:0;font-size:12px;padding:8px 10px;border-radius:8px;background:${s.color}11;color:${s.color};line-height:1.5">${s.tip}</p>
+  `;
+}
+
+function toggleAnim() {
+  anim = !anim;
+  document.querySelectorAll('.connector').forEach(c => c.classList.toggle('paused', !anim));
+  document.getElementById('btn-anim').textContent = anim ? '⏸ Pausar' : '▶ Retomar';
+}
+</script>
