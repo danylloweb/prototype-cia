@@ -71,7 +71,7 @@
   <div class="container hero-inner">
     <span class="hero-badge"><span class="pulse"></span> <span data-cdc="offer-badge">3 dias grátis</span> · Sem fidelidade pra experimentar</span>
     <h1>Sua melhor versão<br>começa <span class="grad-word">aqui.</span></h1>
-    <p class="hero-lead">Há mais de <span >13</span> anos transformando vidas pelo movimento em Recife e Olinda. Estrutura de ponta, climatizada e uma equipe que cuida de você de verdade — em 7 unidades.</p>
+    <p class="hero-lead">Há mais de <span data-cdc="years">11</span> anos transformando vidas pelo movimento em Recife e Olinda. Estrutura de ponta, climatizada e uma equipe que cuida de você de verdade — em 7 unidades.</p>
     <div class="hero-actions">
       <button class="btn btn-primary btn-lg btn-quiz-trigger" data-quiz>Montar meu plano em 30s</button>
       <a class="btn btn-whats btn-lg" data-cdc="wa-default" href="#">Faça sua matrícula</a>
@@ -83,7 +83,7 @@
     </div>
     <div class="hero-trust" style="margin-top:34px">
       <div class="stat"><div class="num"><span data-count="7">7</span></div><div class="lbl">Unidades</div></div>
-      <div class="stat"><div class="num"><span data-count="13">13</span></div><div class="lbl">Anos de história</div></div>
+      <div class="stat"><div class="num"><span data-count="11">11</span></div><div class="lbl">Anos de história</div></div>
       <div class="stat"><div class="num"><span data-count="15" data-suffix="+">15+</span></div><div class="lbl">Modalidades</div></div>
       <div class="stat"><div class="num"><span data-count="5" data-suffix="★">5★</span></div><div class="lbl">Avaliação</div></div>
     </div>
@@ -114,22 +114,6 @@
     <div style="text-align:center;margin-top:38px"><button class="btn btn-primary btn-lg" data-quiz>Montar meu plano agora</button></div>
   </div>
 </section>
-<!-- ===== PLANOS preview ===== -->
-<section id="planos" class="section">
-  <div class="container">
-    <div class="section-head center reveal">
-      <span class="eyebrow center">Comece hoje</span>
-      <h2 class="section-title">Escolha o plano ideal</h2>
-      <p class="section-sub">Valores e planos variam por unidade. Selecione abaixo para ver sua condição especial.</p>
-    </div>
-
-    <!-- Unit selector tabs -->
-    <div class="units-tabs-wrapper reveal" data-units-tabs></div>
-
-    <!-- Dynamic plans grid -->
-    <div style="margin-top:48px" data-plans-host></div>
-  </div>
-</section>
 
 <!-- ===== MODALIDADES ===== -->
 <section class="section">
@@ -153,9 +137,15 @@
       <article class="mod-card reveal"><img loading="lazy" src="assets/img/personal.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/837beb_088c3e4df4cd4c5da2390d10c5e7dbda~mv2.jpg/v1/fill/w_700,h_900,al_c,q_85,enc_auto/m4.jpg'" alt="Personal training na Cia do Corpo">
         <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg></div>
         <h3>Personal</h3><p>Acompanhamento individual para acelerar resultados com segurança.</p></article>
-      <article class="mod-card reveal"><img loading="lazy" src="assets/img/cia-kids.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/837beb_6709c2c14b9f44e89d303c13b949ece6~mv2.jpg/v1/fill/w_700,h_900,al_c,q_85,enc_auto/m5.jpg'" alt="Cia Kids na Cia do Corpo">
-        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6M9 21l3-4 3 4M7 11h10"/></svg></div>
-        <h3>Cia Kids</h3><p>Movimento, saúde e diversão para a criançada em um ambiente seguro.</p></article>
+      <article class="mod-card mod-card--wide reveal"><img loading="lazy" src="assets/img/cia-kids.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/837beb_6709c2c14b9f44e89d303c13b949ece6~mv2.jpg/v1/fill/w_1400,h_500,al_c,q_85,enc_auto/m5.jpg'" alt="Espaço Cia Kids na Cia do Corpo">
+        <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/></svg></div>
+        <div class="mod-card-text">
+          <div class="kids-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Espaço monitorado</div>
+          <h3>Cia Kids</h3>
+          <p>Seu filho fica em boas mãos enquanto você treina. Um espaço seguro, supervisionado e pensado para a criançada se divertir — sem você precisar abrir mão do seu treino.</p>
+          <div class="tags"><span>Supervisionado</span><span>Unidades selecionadas</span><span>Sem custo adicional</span></div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -207,6 +197,24 @@
       <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h3l3 3v3a2 2 0 0 1-2 2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div><h4>Estacionamento gratuito</h4><p>Mais praticidade para encaixar o treino na rotina.</p></div>
       <div class="feat reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><h4>Música ambiente</h4><p>A energia certa para você render mais a cada série.</p></div>
     </div>
+  </div>
+</section>
+
+<!-- ===== PLANOS ===== -->
+<section class="section" id="planos" style="scroll-margin-top:88px">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Comece hoje</span>
+      <h2 class="section-title">Escolha o plano ideal</h2>
+      <p class="section-sub">Condições especiais por unidade. Fale com nosso time e garanta a sua.</p>
+    </div>
+    <div class="plan-unit-select" data-cdc="plan-unit-select"></div>
+    <div class="plan-unit-head">
+      <span class="plan-unit-tier" data-cdc="plan-unit-tier"></span>
+      <h2 class="plan-unit-title" data-cdc="plan-unit-title"></h2>
+      <p class="plan-unit-included" data-cdc="plan-unit-included"></p>
+    </div>
+    <div class="plans-grid" data-cdc="plans-grid"></div>
   </div>
 </section>
 
@@ -317,7 +325,7 @@
         </div>
       </div>
       <div class="foot-col"><h5>Navegação</h5><ul>
-        <li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="planos.html">Planos</a></li><li><a href="sobre.html">Sobre</a></li><li><a href="contato.html">Contato</a></li><li><a href="clube-da-parceria.html">Clube da Parceria</a></li>
+        <li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="#planos">Planos</a></li><li><a href="sobre.html">Sobre</a></li><li><a href="contato.html">Contato</a></li><li><a href="clube-da-parceria.html">Clube da Parceria</a></li>
       </ul></div>
       <div class="foot-col"><h5>Horários</h5><ul class="foot-hours" data-cdc="hours"></ul></div>
       <div class="foot-col"><h5>Institucional</h5><ul>
@@ -339,7 +347,6 @@
 <script src="assets/js/telemetry.js"></script>
 <script src="assets/js/site.js"></script>
 <script src="assets/js/experience.js"></script>
-<script src="assets/js/plans-manager.js"></script>
 <script src="assets/js/reviews.js"></script>
 <script src="assets/js/main.js"></script>
 </body>

@@ -5,7 +5,6 @@
    ============================================================ */
 (function (w, d) {
   var DATA = w.CDC.data;
-  var WA_CENTRAL = "558186049894";
   var ICON = {
     pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
     whats: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>',
@@ -14,7 +13,7 @@
   };
 
   function el(html) { var t = d.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
-  function waLink(text) { return "https://wa.me/" + WA_CENTRAL + (text ? "?text=" + encodeURIComponent(text) : ""); }
+  function waLink(num, text) { return "https://wa.me/" + num + (text ? "?text=" + encodeURIComponent(text) : ""); }
   function telLink(phone) { return "tel:+55" + phone.replace(/\D/g, ""); }
   function currentPage() {
     var p = location.pathname.split("/").pop().replace(".html", "");
@@ -35,7 +34,7 @@
           '<div class="unit-addr">' + ICON.pin + '<span>' + u.address + '</span></div>' +
           '<a href="unidade.html?u=' + u.id + '" class="unit-link">Ver página da unidade →</a>' +
           '<div class="unit-actions">' +
-            '<a class="btn btn-whats" target="_blank" rel="noopener" href="' + waLink(msg) + '" ' +
+            '<a class="btn btn-whats" target="_blank" rel="noopener" href="' + waLink(u.whatsapp, msg) + '" ' +
               'data-cta="whatsapp_click" data-unit="' + u.id + '" data-unit-name="' + u.name + '">' + ICON.whats + ' Agendar aula</a>' +
             '<a class="icon-btn" href="' + telLink(u.phone) + '" aria-label="Ligar para ' + u.name + '" ' +
               'data-cta="call_click" data-unit="' + u.id + '" data-unit-name="' + u.name + '">' + ICON.phone + '</a>' +
@@ -69,7 +68,7 @@
     if (du) {
       var msg = "Olá! Vim pelo site da Cia do Corpo e quero agendar minha aula experimental gratuita.";
       d.querySelectorAll('[data-cdc="wa-default"]').forEach(function (a) {
-        a.setAttribute("href", waLink(msg));
+        a.setAttribute("href", waLink(du.whatsapp, msg));
         a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener");
         a.setAttribute("data-cta", "whatsapp_click"); a.setAttribute("data-unit", du.id);
       });
@@ -118,7 +117,8 @@
     var du = DATA.defaultUnit();
     var href = "#";
     if (p.ctaType === "whatsapp") {
-      href = waLink("Olá! Vim pela campanha do site da Cia do Corpo: " + p.headline);
+      var num = p.ctaTarget || (du && du.whatsapp);
+      href = waLink(num, "Olá! Vim pela campanha do site da Cia do Corpo: " + p.headline);
     } else if (p.ctaType === "link") { href = p.ctaTarget || "#"; }
 
     var overlay = el(
@@ -221,8 +221,71 @@
     });
   }
 
+  /* ---------- Planos por unidade (seletor + cards) ---------- */
+  var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+  function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+  function planCard(item, unit) {
+    var badges = (item.badges || []).map(function (b) { return '<span class="plan-badge pb-' + (b.c || "blue") + '">' + esc(b.t) + '</span>'; }).join("");
+    var feats = (item.features || []).map(function (f) { return '<li>' + CHK + ' ' + esc(f) + '</li>'; }).join("");
+    var priceOld = item.old ? '<span class="old">' + esc(item.old) + '</span>' : '';
+    var priceSmall = item.unit ? '<small>' + esc(item.unit) + '</small>' : '';
+    var msg = "Olá! Vim pelo site da Cia do Corpo e quero o plano " + item.name + " na unidade " + unit.name + ".";
+    return el(
+      '<article class="plan' + (item.featured ? ' featured' : '') + ' reveal">' +
+        (item.featured ? '<span class="ribbon">Mais escolhido</span>' : '') +
+        '<h3>' + esc(item.name) + '</h3><p class="plan-desc">' + esc(item.desc) + '</p>' +
+        '<div class="plan-price">' + esc(item.price) + priceSmall + priceOld + '</div>' +
+        (item.note ? '<div class="plan-note">' + esc(item.note) + '</div>' : '') +
+        (badges ? '<div class="plan-badges">' + badges + '</div>' : '') +
+        '<ul>' + feats + '</ul>' +
+        '<a class="btn ' + (item.featured ? 'btn-primary' : 'btn-ghost') + ' btn-block" target="_blank" rel="noopener" href="' + waLink(unit.whatsapp, msg) + '" ' +
+          'data-cta="whatsapp_click" data-unit="' + unit.id + '" data-unit-name="' + esc(unit.name) + '" data-plan="' + esc(item.key || "") + '">' + esc(item.cta || ("Quero o " + item.name)) + '</a>' +
+      '</article>'
+    );
+  }
+  function renderPlans() {
+    var host = d.querySelector('[data-cdc="plans-grid"]');
+    if (!host) return;
+    var cfg = DATA.get();
+    var plansCfg = cfg.plans || {};
+    var byUnit = plansCfg.byUnit || {};
+    var units = DATA.activeUnits().filter(function (u) { return byUnit[u.id]; });
+    if (!units.length) return;
+    var selWrap = d.querySelector('[data-cdc="plan-unit-select"]');
+    var titleEl = d.querySelector('[data-cdc="plan-unit-title"]');
+    var incEl = d.querySelector('[data-cdc="plan-unit-included"]');
+    var tierEl = d.querySelector('[data-cdc="plan-unit-tier"]');
+    var groups = (plansCfg.groupsOrder || []).slice();
+    units.forEach(function (u) { var t = byUnit[u.id].tierLabel || "Unidades"; if (groups.indexOf(t) < 0) groups.push(t); });
+    if (selWrap) {
+      selWrap.innerHTML = groups.map(function (g) {
+        var us = units.filter(function (u) { return (byUnit[u.id].tierLabel || "Unidades") === g; });
+        if (!us.length) return "";
+        return '<div class="pus-group"><div class="pus-label">' + esc(g) + '</div><div class="pus-btns">' +
+          us.map(function (u) { return '<button class="pus-btn" data-unit-btn="' + u.id + '">' + esc(u.name) + '</button>'; }).join("") +
+          '</div></div>';
+      }).join("");
+    }
+    function select(uid) {
+      var u = units.filter(function (x) { return x.id === uid; })[0] || units[0];
+      var pg = byUnit[u.id];
+      if (tierEl) { var isExcl = /exclus/i.test(pg.tierLabel || ""); tierEl.textContent = pg.tierLabel || ""; tierEl.className = "plan-unit-tier" + (isExcl ? " excl" : ""); tierEl.style.display = pg.tierLabel ? "inline-block" : "none"; }
+      if (titleEl) titleEl.textContent = u.name;
+      if (incEl) incEl.innerHTML = pg.includedText ? ('Unidades incluídas: <b>' + esc(pg.includedText) + '</b>') : '';
+      host.innerHTML = "";
+      (pg.items || []).forEach(function (it) { host.appendChild(planCard(it, u)); });
+      host.querySelectorAll(".reveal").forEach(function (e) { e.classList.add("in"); });
+      if (selWrap) selWrap.querySelectorAll("[data-unit-btn]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-unit-btn") === u.id); });
+    }
+    if (selWrap) selWrap.querySelectorAll("[data-unit-btn]").forEach(function (b) {
+      b.addEventListener("click", function () { select(b.getAttribute("data-unit-btn")); });
+    });
+    var def = DATA.defaultUnit();
+    select(def && byUnit[def.id] ? def.id : units[0].id);
+  }
+
   function init() {
-    renderBrand(); renderUnits(); applyOffer(); renderHours(); injectSchema(); initPopups();
+    renderBrand(); renderUnits(); renderPlans(); applyOffer(); renderHours(); injectSchema(); initPopups();
   }
   d.readyState !== "loading" ? init() : d.addEventListener("DOMContentLoaded", init);
 })(window, document);

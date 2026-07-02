@@ -7,9 +7,6 @@
 (function (w, d) {
   var DATA = w.CDC.data, T = w.CDC.track;
   var MY_KEY = "cdc_my_unit";
-  var PLAN_KEY = "cdc_preselected_plan";
-  var UNIT_PLAN_KEY = "cdc_unit_for_plan";
-  var WA_CENTRAL = "558186049894";
   var WA = '<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg>';
 
   function myUnit() {
@@ -22,29 +19,15 @@
     applyUnit(); renderChips();
   }
   function waHref(unit, text) {
-    return "https://wa.me/" + WA_CENTRAL + (text ? "?text=" + encodeURIComponent(text) : "");
-  }
-
-  function planLabelFromCta(a) {
-    var explicit = a.getAttribute("data-plan-name");
-    if (explicit) return explicit;
-    var key = (a.getAttribute("data-plan") || "").toLowerCase();
-    if (key === "hexa") return "Hexa";
-    if (key === "plus") return "Plus";
-    if (key === "annual-vip") return "Anual VIP";
-    if (key === "basic-plus") return "Basic+";
-    if (key === "monthly") return "Mensal";
-    return "";
+    unit = unit || myUnit();
+    return "https://wa.me/" + (unit ? unit.whatsapp : "") + (text ? "?text=" + encodeURIComponent(text) : "");
   }
 
   /* Reaponta todos os CTAs padrão para a unidade escolhida */
   function applyUnit() {
     var u = myUnit(); if (!u) return;
+    var msg = "Olá! Vim pelo site da Cia do Corpo e quero fazer minha matrícula na unidade " + u.name + ".";
     d.querySelectorAll('[data-cdc="wa-default"]').forEach(function (a) {
-      var plan = planLabelFromCta(a);
-      var msg = plan
-        ? "Olá! Vim pelo site da Cia do Corpo e tenho interesse no plano " + plan + " da unidade " + u.name + "."
-        : "Olá! Vim pelo site da Cia do Corpo e quero fazer minha matrícula na unidade " + u.name + ".";
       a.href = waHref(u, msg); a.target = "_blank"; a.rel = "noopener";
       a.setAttribute("data-cta", "whatsapp_click"); a.setAttribute("data-unit", u.id); a.setAttribute("data-unit-name", u.name);
     });
@@ -138,7 +121,7 @@
         var to = parseFloat(e.target.getAttribute("data-count")), suf = e.target.getAttribute("data-suffix") || "", t0 = 0, dur = 1200, s = performance.now();
         (function step(now) { var p = Math.min((now - s) / dur, 1); var v = (to * (1 - Math.pow(1 - p, 3)));
           e.target.textContent = (to % 1 ? v.toFixed(1) : Math.round(v)) + suf; if (p < 1) requestAnimationFrame(step); })(s);
-       });
+      });
     }, { threshold: .5 });
     els.forEach(function (e) { io.observe(e); });
   }
@@ -147,6 +130,9 @@
   var QUIZ = [
     { k: "objetivo", q: "Qual seu principal objetivo?", o: [["emagrecer", "Emagrecer", "🔥"], ["massa", "Ganhar massa", "💪"], ["saude", "Saúde & bem-estar", "🌿"], ["luta", "Lutas / condicionamento", "🥊"]] },
     { k: "momento", q: "Como está sua rotina de treino hoje?", o: [["iniciante", "Quero começar", "🌱"], ["voltando", "Estou voltando", "🔄"], ["ativo", "Já treino", "⚡"]] },
+    // Só aparece para quem já treina / está voltando — ajuda a receber ex-aluno da Cia (regularização)
+    // ou quem vem de outra academia (aula experimental) sem a atendente precisar perguntar depois.
+    { k: "origem", q: "Só pra te receber do jeito certo:", when: function (a) { return a.momento === "voltando" || a.momento === "ativo"; }, o: [["ciadocorpo", "Já treinei na Cia do Corpo", "🏠"], ["outra", "Já treinei em outra academia", "🏋️"]] },
     { k: "modalidade", q: "O que mais te anima?", o: [["musculacao", "Musculação", "🏋️"], ["coletivas", "Aulas coletivas", "🎵"], ["lutas", "Muay Thai", "🥊"], ["tudo", "Quero tudo", "✨"]] }
   ];
   function openQuiz() {
@@ -154,8 +140,6 @@
     if (T) T.event("quiz_start", {});
     var ans = {}, step = 0;
     var u = myUnit();
-    var preselectedPlan = localStorage.getItem(PLAN_KEY);
-    var preselectedUnit = localStorage.getItem(UNIT_PLAN_KEY);
     var ov = h('<div class="quiz"><div class="quiz-card"><button class="quiz-x" aria-label="Fechar">&times;</button>' +
       '<div class="quiz-progress"><i></i></div><div class="quiz-body"></div></div></div>');
     d.body.appendChild(ov); requestAnimationFrame(function () { ov.classList.add("show"); });
@@ -163,52 +147,82 @@
     ov.querySelector(".quiz-x").onclick = close;
     ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
 
-    function setProg() { ov.querySelector(".quiz-progress i").style.width = (step / (QUIZ.length + 1) * 100) + "%"; }
+    function steps() { return QUIZ.filter(function (q) { return !q.when || q.when(ans); }); }
+    function setProg() { ov.querySelector(".quiz-progress i").style.width = (step / (steps().length + 1) * 100) + "%"; }
     function render() {
       setProg();
+      var list = steps();
       var body = ov.querySelector(".quiz-body");
-      if (step < QUIZ.length) {
-        var s = QUIZ[step];
-        body.innerHTML = '<span class="quiz-step">Passo ' + (step + 1) + ' de ' + (QUIZ.length + 1) + '</span><h3>' + s.q + '</h3><div class="quiz-opts">' +
+      if (step < list.length) {
+        var s = list[step];
+        body.innerHTML = '<span class="quiz-step">Passo ' + (step + 1) + ' de ' + (list.length + 1) + '</span><h3>' + s.q + '</h3><div class="quiz-opts">' +
           s.o.map(function (o) { return '<button class="quiz-opt" data-v="' + o[0] + '"><span class="em">' + o[2] + '</span>' + o[1] + '</button>'; }).join("") + '</div>';
         body.querySelectorAll(".quiz-opt").forEach(function (b) { b.onclick = function () {
           var v = b.getAttribute("data-v"); var opt = s.o.filter(function (o) { return o[0] === v; })[0];
           ans[s.k] = v; ans[s.k + "_label"] = opt ? opt[1] : v; step++; render();
         }; });
       } else {
-        // resultado
-        var unitOpts = DATA.activeUnits().map(function (x) {
-          var selected = (preselectedUnit && x.id === preselectedUnit) || (u && x.id === u.id);
-          return '<option value="' + x.id + '"' + (selected ? " selected" : "") + '>' + x.name + ' — ' + x.city + '</option>';
-        }).join("");
-        var plano = preselectedPlan || (ans.modalidade === "musculacao" ? "Plus" : "Hexa");
+        // resultado PERSONALIZADO — reflete objetivo, momento, modalidade e a unidade escolhida
+        var unitOpts = DATA.activeUnits().map(function (x) { return '<option value="' + x.id + '"' + (u && x.id === u.id ? " selected" : "") + '>' + x.name + ' — ' + x.city + '</option>'; }).join("");
+        // Recomendação de plano pelo momento: quem já treina -> Anual VIP (melhor custo); começando/voltando -> Basic+ (flexível)
+        var recKey = (ans.momento === "ativo") ? "vip" : "basic";
+        var planoNome = recKey === "vip" ? "Anual VIP" : "Basic+";
+        var PLAN_PRICE = {
+          vip:   { 1: "12x de R$ 249,90", 2: "12x de R$ 99,90", 3: "12x de R$ 109,90" },
+          basic: { 1: "R$ 289,99/mês",    2: "R$ 109,99/mês",   3: "R$ 129,99/mês" }
+        };
+        var OBJ = { emagrecer: "emagrecer", massa: "ganhar massa", saude: "cuidar da saúde e do bem-estar", luta: "evoluir no condicionamento e nas lutas" };
+        var MOM = { iniciante: "está começando agora", voltando: "está voltando a treinar", ativo: "já treina" };
+        var MOD = { musculacao: "a musculação com acompanhamento", coletivas: "as aulas coletivas (Zumba, Jump, Funcional e mais)", lutas: "o Muay Thai, que já vem incluso no plano", tudo: "acesso a tudo: musculação, coletivas e Muay Thai" };
+        var reason = recKey === "vip"
+          ? "Como você <b>" + (MOM[ans.momento] || "já treina") + "</b>, o <b>Anual VIP</b> te dá o melhor custo-benefício: acesso completo em 12x, com Muay Thai incluso."
+          : "Como você <b>" + (MOM[ans.momento] || "quer começar") + "</b>, o <b>Basic+</b> é ideal: mensal, flexível, sem fidelidade longa e sem comprometer o limite do cartão.";
+        function priceFor(un) { if (!un) return ""; var g = un.group || 2; return (PLAN_PRICE[recKey][g] || "") + (un.matricula ? (" + matrícula " + un.matricula) : ""); }
         body.innerHTML = '<span class="quiz-step">Seu plano recomendado</span>' +
-          '<div class="quiz-result"><div class="quiz-badge">' + plano + '</div>' +
-          '<h3>Plano ' + plano + ' é a sua cara</h3>' +
-          (preselectedPlan ?
-            '<p>Você selecionou o plano <b>' + plano + '</b> na página de planos — perfeito! Confirme a unidade abaixo.</p>' :
-            '<p>Com base no seu objetivo de <b>' + (ans.objetivo_label || "treinar") + '</b>, recomendamos o plano <b>' + plano + '</b>' + (plano === "Hexa" ? " — acesso total a musculação, aulas coletivas e artes marciais." : " — foco total em musculação com toda a estrutura.") + '</p>'
-          ) + '</div>' +
+          '<div class="quiz-result"><div class="quiz-badge">' + planoNome + '</div>' +
+          '<h3>' + planoNome + ' — feito pra você</h3>' +
+          '<p>Você quer <b>' + (OBJ[ans.objetivo] || "treinar") + '</b> e curte <b>' + (MOD[ans.modalidade] || "treinar") + '</b>. ' + reason + '</p>' +
+          '<div id="quizPrice" style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
           '<div class="quiz-field"><label>Onde quer treinar?</label><select class="quiz-unit">' + unitOpts + '</select></div>' +
+          '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
+            [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+          '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
+            [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 23h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
           '<button class="quiz-restart">Refazer</button>';
+        function refreshPrice() {
+          var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
+          var p = priceFor(un); var el = body.querySelector("#quizPrice");
+          if (el) el.innerHTML = p ? ('Na unidade <b>' + (un ? un.name : "") + '</b>, o ' + planoNome + ' sai por <b>' + p + '</b>.<br><span style="opacity:.65">Condição final confirmada no atendimento — e você ainda testa 3 dias grátis antes.</span>') : "";
+        }
+        refreshPrice();
+        body.querySelector(".quiz-unit").onchange = refreshPrice;
         body.querySelector(".quiz-restart").onclick = function () { step = 0; ans = {}; render(); };
         body.querySelector("#quizGo").onclick = function () {
           var uid = body.querySelector(".quiz-unit").value; var un = DATA.unitById(uid) || u;
+          var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
+          var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
+          var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
           var lines = [
             "Olá! Montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
             "",
-            (preselectedPlan ? "*Plano selecionado:* " + plano : "*Objetivo:* " + (ans.objetivo_label || "-")),
-            (preselectedPlan ? "" : "*Momento:* " + (ans.momento_label || "-")),
-            (preselectedPlan ? "" : "*Interesse:* " + (ans.modalidade_label || "-")),
-            "*Plano ideal:* " + plano,
+            "*Objetivo:* " + (ans.objetivo_label || "-"),
+            "*Momento:* " + (ans.momento_label || "-")
+          ];
+          if (ans.origem_label) lines.push("*Já treinou:* " + ans.origem_label);
+          lines.push(
+            "*Interesse:* " + (ans.modalidade_label || "-"),
+            "*Plano recomendado:* " + planoNome,
+            "*Condição (a partir de):* " + priceFor(un),
             "*Unidade:* " + (un ? un.name : "-"),
+            "*Melhor dia:* " + diaLabel,
+            "*Período:* " + perLabel,
             "",
             "Pode me ajudar a agendar?"
-          ].filter(function(l) { return l !== ""; });
+          );
           var msg = encodeURIComponent(lines.join("\n"));
-          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: plano, objetivo: ans.objetivo, preselected: !!preselectedPlan, location_page: "quiz" });
-          w.open("https://wa.me/" + WA_CENTRAL + "?text=" + msg, "_blank");
+          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz" });
+          w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
           close();
         };
       }
@@ -252,7 +266,7 @@
         "*Empresa:* " + data.empresa, "*Responsável:* " + data.nome, "*Categoria:* " + data.categoria,
         "*WhatsApp:* " + data.telefone, (data.instagram ? "*Instagram:* " + data.instagram : ""),
         (data.cidade ? "*Cidade:* " + data.cidade : ""), (data.beneficio ? "*Benefício:* " + data.beneficio : "")].filter(Boolean);
-      if (central) w.open("https://wa.me/" + WA_CENTRAL + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+      if (central) w.open("https://wa.me/" + central + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
       var card = sheet.querySelector(".cdc-sheet-card");
       card.innerHTML = '<button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
         '<div style="text-align:center;padding:14px 0"><div style="font-size:3rem;margin-bottom:6px">✅</div>' +
@@ -269,14 +283,6 @@
     if (e.target.closest("[data-quiz]")) { e.preventDefault(); openQuiz(); }
     if (e.target.closest("[data-open-units]")) { e.preventDefault(); openUnitPicker(); }
     if (e.target.closest("[data-partner-form]")) { e.preventDefault(); openPartnerForm(); }
-    // Captura clique em planos para pré-selecionar
-    if (e.target.closest("[data-plan-name]")) {
-      var btn = e.target.closest("[data-plan-name]");
-      var planName = btn.getAttribute("data-plan-name");
-      var unitId = btn.getAttribute("data-unit");
-      localStorage.setItem(PLAN_KEY, planName);
-      localStorage.setItem(UNIT_PLAN_KEY, unitId);
-    }
   });
 
   function init() { applyUnit(); renderChips(); buildStickyBar(); counters(); }

@@ -14,10 +14,10 @@ window.CDC_DEFAULT_CONFIG = {
     legalName: "ACADEMIA CIA DO CORPO LTDA",
     cnpj: "19.248.919/0001-27",
     email: "academiaciadocorpo2@gmail.com",
-    partnerCentralWhatsapp: "5581989444888", // central que recebe "Quero ser parceiro"
+    partnerCentralWhatsapp: "558186049894", // central que recebe "Quero ser parceiro"
     instagram: "https://www.instagram.com/academiaciadocorpo/",
     facebook: "https://www.facebook.com/ciadocorpope",
-    yearsActive: 11,
+    yearsActive: 13,
     headOffice: "Av. Antônio da Costa Azevedo, 566 - Peixinhos, Olinda - PE, 53220-130",
     hours: [
       { d: "Segunda a Quinta", h: "5h às 23h" },
@@ -60,13 +60,31 @@ window.CDC_DEFAULT_CONFIG = {
     subtitle: "Sem compromisso. Escolha sua unidade e agende pelo WhatsApp."
   },
 
-  /* Unidades — CRUD pelo admin */
+  /* Unidades — CRUD pelo admin. group/priceFrom/matricula/experimentalDays
+     conforme base oficial (RAG comercial v8). Grupo é interno (não exibir como "Grupo X"). */
   units: [
+    {
+      id: "concept-casa-caiada", name: "Cia Concept Casa Caiada", tier: "concept", active: false, premium: true,
+      city: "Olinda", neighborhood: "Casa Caiada",
+      address: "Rua Caetano Ribeiro, 151 - Casa Caiada, Olinda - PE, 53130-440",
+      phone: "(81) 98604-9761", whatsapp: "558186049894",
+      group: 1, priceFrom: "12x de R$ 249,90", matricula: "R$ 100,00", experimentalDays: 1,
+      hours: [
+        { d: "Segunda a Quinta", h: "5h às 23h" }, { d: "Sexta-feira", h: "5h às 22h" },
+        { d: "Sábado", h: "8h às 16h" }, { d: "Domingo", h: "8h às 13h" }
+      ],
+      neighborhoodsServed: ["Casa Caiada", "Bairro Novo", "Jardim Atlântico", "Rio Doce"],
+      maps: "https://www.google.com/maps/search/?api=1&query=Rua+Caetano+Ribeiro+151+Casa+Caiada+Olinda",
+      lat: -8.0089, lng: -34.8389,
+      image: "https://static.wixstatic.com/media/837beb_e7ad92872603473f9464213607d84fe9~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/kv.png"
+    },
     {
       id: "avenida-norte", name: "Avenida Norte", tier: "standard", active: true,
       city: "Recife", neighborhood: "Casa Amarela",
       address: "Av. Norte Miguel Arraes de Alencar, 6350 - Casa Amarela, Recife - PE, 52071-035",
-      phone: "(81) 98943-1738", whatsapp: "5581989431738",
+      phone: "(81) 98943-1738", whatsapp: "558186049894",
+      group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Casa Amarela", "Tamarineira", "Encruzilhada", "Parnamirim", "Vasco da Gama"],
       maps: "https://g.co/kgs/MDRq364", lat: -8.0186, lng: -34.9176,
       image: "https://static.wixstatic.com/media/837beb_499306147b234bbba67f42b5ece6e17b~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AN.png"
     },
@@ -74,7 +92,9 @@ window.CDC_DEFAULT_CONFIG = {
       id: "ouro-preto", name: "Ouro Preto", tier: "standard", active: true,
       city: "Olinda", neighborhood: "Ouro Preto",
       address: "Av. Argentina Castelo Branco, 175 - Ouro Preto, Olinda - PE, 53370-540",
-      phone: "(81) 98943-8592", whatsapp: "5581989438592",
+      phone: "(81) 98943-8592", whatsapp: "558186049894",
+      group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Ouro Preto", "Alto da Bondade"],
       maps: "https://maps.app.goo.gl/zuVMjNU1khcbtVf59", lat: -8.0050, lng: -34.8550,
       image: "https://static.wixstatic.com/media/837beb_8f209da034064d0ba9628a9fd9d204ca~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/OP.png"
     },
@@ -82,31 +102,39 @@ window.CDC_DEFAULT_CONFIG = {
       id: "peixinhos", name: "Peixinhos", tier: "standard", active: true,
       city: "Olinda", neighborhood: "Peixinhos",
       address: "Av. Antônio da Costa Azevedo, 566 - Peixinhos, Olinda - PE, 53220-130",
-      phone: "(81) 98944-4888", whatsapp: "5581989444888",
+      phone: "(81) 98944-4888", whatsapp: "558186049894",
+      group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Peixinhos", "Sítio Novo", "Salgadinho"],
       maps: "https://maps.app.goo.gl/AtURzTjUgjaZowK16", lat: -8.0186, lng: -34.8839,
       image: "https://static.wixstatic.com/media/837beb_2eb8474fbd2a464eaf0460616efe4ebc~mv2.jpg/v1/fill/w_900,h_560,al_c,q_85,enc_auto/PX.jpg"
     },
     {
-      id: "afogados", name: "Afogados", tier: "exclusive", active: true,
+      id: "afogados", name: "Afogados", tier: "standard", active: true,
       city: "Recife", neighborhood: "Afogados",
       address: "R. São Miguel, 893 - Afogados, Recife - PE, 50850-000",
-      phone: "(81) 98943-4807", whatsapp: "5581989434807",
+      phone: "(81) 98697-7782", whatsapp: "558186049894",
+      group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Afogados", "Mustardinha", "Mangueira", "San Martin"],
       maps: "https://maps.app.goo.gl/oLBbLy97QV9abz8Z6", lat: -8.0769, lng: -34.9069,
       image: "https://static.wixstatic.com/media/837beb_41a09b408639439bb12a7153cc3ace0a~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AFG.png"
     },
     {
-      id: "agua-fria", name: "Água Fria", tier: "exclusive", active: true,
+      id: "agua-fria", name: "Água Fria", tier: "standard", active: true,
       city: "Recife", neighborhood: "Beberibe",
       address: "Av. Beberibe, 2600 - Beberibe, Recife - PE, 52130-035",
-      phone: "(81) 98943-2074", whatsapp: "5581989432074",
+      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Água Fria", "Beberibe", "Fundão", "Cajueiro"],
       maps: "https://maps.app.goo.gl/67mnmfj3dFcoeNuq6", lat: -8.0086, lng: -34.8919,
       image: "https://static.wixstatic.com/media/837beb_f6a67ac9cc3c4ef99ca13852a6d51fac~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AGUA.png"
     },
     {
-      id: "bomba-do-hemeterio", name: "Bomba do Hemetério", tier: "exclusive", active: true,
+      id: "bomba-do-hemeterio", name: "Bomba do Hemetério", tier: "standard", active: true,
       city: "Recife", neighborhood: "Bomba do Hemetério",
       address: "R. Padre Oliveira, 772 - Bomba do Hemetério, Recife - PE, 52080-130",
-      phone: "(81) 98943-8666", whatsapp: "5581989438666",
+      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Bomba do Hemetério", "Alto José do Pinho", "Dois Unidos", "Arruda"],
       maps: "https://maps.app.goo.gl/9XnC4tkLJmyRwLpS8", lat: -8.0156, lng: -34.9039,
       image: "https://static.wixstatic.com/media/837beb_2c803543c9ed44bca7967e30d6a6b7e4~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/BOMBA.png"
     },
@@ -114,11 +142,20 @@ window.CDC_DEFAULT_CONFIG = {
       id: "areias", name: "Areias", tier: "standard", active: true,
       city: "Recife", neighborhood: "Areias - Estância",
       address: "R. Tucunaré, 55 - Areias, Recife - PE, 50771-510",
-      phone: "(81) 98734-8391", whatsapp: "5581987348391",
+      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      neighborhoodsServed: ["Areias", "Tejipió", "Jiquiá", "Estância", "Barro"],
       maps: "https://maps.app.goo.gl/tpCzs3X7ZokMmWkB9", lat: -8.0900, lng: -34.9250,
       image: "https://static.wixstatic.com/media/837beb_404fa4604f4f4a49b83a89f308971e71~mv2.jpg/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AREIAS.jpg"
     }
   ],
+
+  /* Modalidades e convênios (base oficial) */
+  modalities: ["Musculação", "Muay Thai", "Zumba", "Pilates", "Jump", "Pump", "Local", "Step", "Cross Training", "Ritbox", "Funcional", "HIIT", "Alongamento"],
+  conceptExtraModalities: ["Spinning", "Yoga", "Cross", "Hyrox"],
+  totalpass: { "concept-casa-caiada": "TP4", "ouro-preto": "TP3", "peixinhos": "TP3", "avenida-norte": "TP3", "agua-fria": "TP1+", "afogados": "TP1+", "areias": "TP1+" },
+  acceptsWellhub: false,
+  experimental: { days: 3, conceptDays: 1, validDays: "Terça a sexta", note: "Válida apenas de terça a sexta, sem compromisso. Agendar até 1h antes do fechamento." },
 
   /* Popups / campanhas — gestão pelo admin */
   popups: [
@@ -213,74 +250,67 @@ window.CDC_DEFAULT_CONFIG = {
     { name: "Akitem Imóvel", category: "Serviços", benefit: "Condição especial para alunos", city: "Jardim Atlântico, Olinda", address: "Av. Fagundes Varela, 365, sala 7 - Jardim Atlântico", instagram: "akitemimovel", phone: "(81) 99679-0310" },
     { name: "Lancerr Contabilidade", category: "Serviços", benefit: "Condição especial para alunos", city: "Casa Caiada, Olinda", address: "Rua Otaviano Pessoa Monteiro, 627, sala 10 - Casa Caiada", instagram: "lancerr.contabilidade", phone: "(81) 98822-7342" },
     { name: "Troca de Óleo Garagem", category: "Serviços", benefit: "Desconto para alunos", city: "Casa Caiada, Olinda", address: "Av. Gov. Carlos de Lima Cavalcante, 2295 - Casa Caiada", instagram: "trocadeoleo.garagem", phone: "(81) 99846-9643" }
-   ],
+  ],
 
-   /* Planos — estrutura por unidade/tier. Valores específicos por grupo de unidades. */
-   plans: {
-     /* TIER EXCLUSIVE — Areias, Afogados, Água Fria, Bomba do Hemetério */
-     "exclusive": {
-       tier: "exclusive",
-       unitsLabel: "Areias, Afogados, Água Fria, Bomba do Hemetério",
-       unitIds: ["areias", "afogados", "agua-fria", "bomba-do-hemeterio"],
-       items: [
-         {
-           id: "basic-plus", name: "Basic+", price: "R$ 109,99", period: "/mês",
-           enrollment: "+ R$ 50,00", description: "Flexibilidade com recorrência segura",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades", "Sem comprometer limite do cartão"],
-           badges: [{ label: "Não compromete limite", type: "success" }],
-           featured: false
-         },
-         {
-           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 99,90", total: "R$ 1.198,80",
-           enrollment: "+ R$ 50,00", description: "Plano anual com melhor custo-benefício",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"],
-           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
-           featured: true
-         },
-         {
-           id: "monthly", name: "Mensal", price: "R$ 150,00", period: "/mês",
-           enrollment: "+ R$ 50,00", description: "Máxima flexibilidade",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"],
-           badges: [],
-           featured: false
-         }
-       ]
-     },
-     /* TIER STANDARD — Av. Norte, Ouro Preto, Peixinhos */
-     "standard": {
-       tier: "standard",
-       unitsLabel: "Av. Norte, Ouro Preto, Peixinhos",
-       unitIds: ["avenida-norte", "ouro-preto", "peixinhos"],
-       items: [
-         {
-           id: "basic-plus", name: "Basic+", price: "R$ 129,99", period: "/mês",
-           enrollment: "+ R$ 50,00", description: "Flexibilidade com recorrência segura",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades", "Sem comprometer limite", "30 dias de carência"],
-           badges: [{ label: "Não compromete limite", type: "success" }, { label: "Carência 30 dias", type: "info" }],
-           featured: false
-         },
-         {
-           id: "annual-vip", name: "Anual VIP", price: "12x de R$ 109,90", total: "R$ 1.318,80",
-           enrollment: "+ R$ 50,00", description: "Melhor custo-benefício para acesso total",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"],
-           badges: [{ label: "Compromete limite do cartão", type: "warning" }, { label: "120 dias de carência", type: "info" }],
-           featured: true
-         },
-         {
-           id: "monthly", name: "Mensal", price: "R$ 160,00", period: "/mês",
-           enrollment: "+ R$ 50,00", description: "Máxima flexibilidade",
-           features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"],
-           badges: [],
-           featured: false
-         }
-       ]
-     }
-   },
+  /* Acesso ao painel admin (demo). Em produção use o backend + hash. */
+  admin: {
+    user: "admin",
+    // senha padrão de demonstração: ciadocorpo2026  (troque no primeiro acesso)
+    passHint: "ciadocorpo2026"
+  }
+};
 
-   /* Acesso ao painel admin (demo). Em produção use o backend + hash. */
-   admin: {
-     user: "admin",
-     // senha padrão de demonstração: ciadocorpo2026  (troque no primeiro acesso)
-     passHint: "ciadocorpo2026"
-   }
- };
+/* ============================================================
+   PLANOS POR UNIDADE (editável no admin > Planos)
+   Cada unidade tem seu próprio conjunto de planos. Unidades do
+   mesmo grupo começam com os mesmos valores, mas são independentes
+   (editar uma não altera as outras).
+   badge.c: green | blue | amber
+   ============================================================ */
+window.CDC_DEFAULT_CONFIG.plans = (function () {
+  var PREMIUM = [
+    { key: "basic", name: "Basic+", desc: "Flexibilidade com recorrência segura",
+      price: "R$ 129,99", unit: "/mês", old: "", note: "+ R$ 50,00", featured: false, cta: "Quero o Basic+",
+      badges: [{ t: "Não compromete limite", c: "green" }, { t: "Carência 30 dias", c: "blue" }],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades", "Sem comprometer limite", "30 dias de carência"] },
+    { key: "vip", name: "Anual VIP", desc: "Melhor custo-benefício para acesso total",
+      price: "12x de R$ 109,90", unit: "", old: "R$ 1.318,80", note: "+ R$ 50,00", featured: true, cta: "Quero o Anual VIP",
+      badges: [{ t: "Compromete limite do cartão", c: "amber" }, { t: "120 dias de carência", c: "blue" }],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"] },
+    { key: "mensal", name: "Mensal", desc: "Máxima flexibilidade",
+      price: "R$ 160,00", unit: "/mês", old: "", note: "+ R$ 50,00", featured: false, cta: "Quero o Mensal",
+      badges: [],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"] }
+  ];
+  var EXCLUSIVE = [
+    { key: "basic", name: "Basic+", desc: "Flexibilidade com recorrência segura",
+      price: "R$ 109,99", unit: "/mês", old: "", note: "+ R$ 50,00", featured: false, cta: "Quero o Basic+",
+      badges: [{ t: "Não compromete limite", c: "green" }],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades", "Sem comprometer limite do cartão"] },
+    { key: "vip", name: "Anual VIP", desc: "Plano anual com melhor custo-benefício",
+      price: "12x de R$ 99,90", unit: "", old: "R$ 1.198,80", note: "+ R$ 50,00", featured: true, cta: "Quero o Anual VIP",
+      badges: [{ t: "Compromete limite do cartão", c: "amber" }, { t: "120 dias de carência", c: "blue" }],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"] },
+    { key: "mensal", name: "Mensal", desc: "Máxima flexibilidade",
+      price: "R$ 150,00", unit: "/mês", old: "", note: "+ R$ 50,00", featured: false, cta: "Quero o Mensal",
+      badges: [],
+      features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"] }
+  ];
+  function grp(tierLabel, included, tpl) {
+    return { tierLabel: tierLabel, includedText: included, items: JSON.parse(JSON.stringify(tpl)) };
+  }
+  var PREMIUM_INC = "Av. Norte, Ouro Preto, Peixinhos, Areias";
+  var EXCLUSIVE_INC = "Afogados, Água Fria, Bomba do Hemetério";
+  return {
+    groupsOrder: ["Premium Standard", "Exclusive"],
+    byUnit: {
+      "avenida-norte":      grp("Premium Standard", PREMIUM_INC, PREMIUM),
+      "ouro-preto":         grp("Premium Standard", PREMIUM_INC, PREMIUM),
+      "peixinhos":          grp("Premium Standard", PREMIUM_INC, PREMIUM),
+      "areias":             grp("Premium Standard", PREMIUM_INC, PREMIUM),
+      "afogados":           grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
+      "agua-fria":          grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
+      "bomba-do-hemeterio": grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE)
+    }
+  };
+})();

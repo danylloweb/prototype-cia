@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Linux/FUSE temp artifacts
+.fuse_hidden*
+
+# Editor/temp files
+*.tmp
+__t.tmp
+
+# Windows "downloaded file" metadata
+*:Zone.Identifier
