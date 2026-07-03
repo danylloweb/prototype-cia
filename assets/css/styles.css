@@ -523,12 +523,19 @@ body.has-sticky .fab-whats{transform:translateY(-78px)}
 
 /* How it works */
 .how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:s}
-.how-step{position:relative;padding:30px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);transition:.3s var(--ease)}
-.how-step:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
-.how-step .n{width:48px;height:48px;border-radius:14px;background:var(--brand-grad);color:#fff;font-family:var(--font-display);font-weight:900;font-size:1.3rem;display:grid;place-items:center;margin-bottom:18px}
+.how-step{position:relative;padding:34px 30px 30px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
+/* número fantasma (marca d'água) */
+.how-step::before{content:counter(s);counter-increment:s;position:absolute;top:2px;right:16px;font-family:var(--font-display);font-weight:900;font-size:6rem;line-height:1;color:var(--brand);opacity:.07;pointer-events:none}
+/* barra de destaque no topo (revelada no hover) */
+.how-step::after{content:"";position:absolute;top:0;left:12px;right:12px;height:3px;border-radius:3px;background:var(--brand-grad);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
+.how-step:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
+.how-step:hover::after{transform:scaleX(1)}
+.how-step .n{position:relative;width:52px;height:52px;border-radius:16px;background:var(--brand-grad);color:#fff;font-family:var(--font-display);font-weight:900;font-size:1.35rem;display:grid;place-items:center;margin-bottom:20px;box-shadow:0 10px 22px var(--brand-glow);transition:transform .35s var(--ease)}
+.how-step:hover .n{transform:scale(1.08) rotate(-3deg)}
 .how-step h3{font-size:1.25rem;text-transform:uppercase;margin-bottom:8px}
 .how-step p{color:var(--text-soft);font-size:.95rem;margin:0}
-.how-step .arrow{position:absolute;right:-16px;top:50%;color:var(--brand);opacity:.4;z-index:2}
+.how-step .arrow{position:absolute;right:-16px;top:46px;color:var(--brand);opacity:.55;z-index:2;transition:transform .35s var(--ease),opacity .35s var(--ease)}
+.how-step:hover .arrow{opacity:1;transform:translateX(5px)}
 .how-step:last-child .arrow{display:none}
 @media(max-width:820px){.how-steps{grid-template-columns:1fr}.how-step .arrow{display:none}}
 
