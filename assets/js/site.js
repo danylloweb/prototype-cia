@@ -114,12 +114,9 @@
 
   function showPopup(p) {
     if (d.querySelector(".cdc-popup")) return;
-    var du = DATA.defaultUnit();
     var href = "#";
-    if (p.ctaType === "whatsapp") {
-      var num = p.ctaTarget || (du && du.whatsapp);
-      href = waLink(num, "Olá! Vim pela campanha do site da Cia do Corpo: " + p.headline);
-    } else if (p.ctaType === "link") { href = p.ctaTarget || "#"; }
+    // CTA de WhatsApp da campanha passa pelo quiz (qualifica o lead) — ver handler abaixo.
+    if (p.ctaType === "link") { href = p.ctaTarget || "#"; }
 
     var overlay = el(
       '<div class="cdc-popup" data-theme="' + (p.theme || "brand") + '">' +
@@ -129,7 +126,7 @@
           '<div class="cdc-popup-body">' +
             '<h3>' + p.headline + '</h3>' +
             '<p>' + p.body + '</p>' +
-            '<a class="btn btn-primary btn-lg btn-block cdc-popup-cta" ' + (p.ctaType === "whatsapp" || p.ctaType === "link" ? 'target="_blank" rel="noopener"' : '') + ' href="' + href + '">' + (p.ctaLabel || "Quero saber mais") + '</a>' +
+            '<a class="btn btn-primary btn-lg btn-block cdc-popup-cta" ' + (p.ctaType === "link" ? 'target="_blank" rel="noopener"' : '') + ' href="' + href + '">' + (p.ctaLabel || "Quero saber mais") + '</a>' +
           '</div>' +
         '</div>' +
       '</div>'
@@ -142,9 +139,14 @@
     function close() { overlay.classList.remove("show"); setTimeout(function () { overlay.remove(); }, 300); }
     overlay.querySelector(".cdc-popup-close").addEventListener("click", close);
     overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
-    overlay.querySelector(".cdc-popup-cta").addEventListener("click", function () {
+    overlay.querySelector(".cdc-popup-cta").addEventListener("click", function (e) {
       if (w.CDC.track) w.CDC.track.event("popup_cta", { popup_id: p.id, popup_name: p.name });
       close();
+      // CTA de WhatsApp da campanha: abre o quiz para qualificar o lead antes do WhatsApp
+      if (p.ctaType === "whatsapp") {
+        e.preventDefault();
+        if (w.CDC.exp && w.CDC.exp.openQuiz) w.CDC.exp.openQuiz();
+      }
     });
   }
 
@@ -249,6 +251,15 @@
     var plansCfg = cfg.plans || {};
     var byUnit = plansCfg.byUnit || {};
     var units = DATA.activeUnits().filter(function (u) { return byUnit[u.id]; });
+    // Fallback: uma config salva no localStorage de versão antiga (ex.: ids de unidade
+    // diferentes) deixaria a seção de planos vazia. Nesse caso, renderiza a partir do
+    // seed (config.js) para a seção nunca sumir.
+    if (!units.length && DATA.seed) {
+      var seed = DATA.seed();
+      plansCfg = (seed && seed.plans) || {};
+      byUnit = plansCfg.byUnit || {};
+      units = ((seed && seed.units) || []).filter(function (u) { return u.active !== false && byUnit[u.id]; });
+    }
     if (!units.length) return;
     var selWrap = d.querySelector('[data-cdc="plan-unit-select"]');
     var titleEl = d.querySelector('[data-cdc="plan-unit-title"]');
