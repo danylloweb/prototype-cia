@@ -245,9 +245,9 @@
       } else {
         // resultado PERSONALIZADO — reflete objetivo, momento, modalidade e a unidade escolhida
         var unitOpts = DATA.activeUnits().map(function (x) { return '<option value="' + x.id + '"' + (u && x.id === u.id ? " selected" : "") + '>' + x.name + ' — ' + x.city + '</option>'; }).join("");
-        // Recomendação de plano pelo momento: quem já treina -> Anual VIP (melhor custo); começando/voltando -> Basic+ (flexível)
-        var recKey = (ans.momento === "ativo") ? "vip" : "basic";
-        var planoNome = recKey === "vip" ? "Anual VIP" : "Basic+";
+        // Recomendação sempre no Anual VIP (melhor custo-benefício, acesso completo com Muay Thai incluso)
+        var recKey = "vip";
+        var planoNome = "Anual VIP";
         var PLAN_PRICE = {
           vip:   { 1: "12x de R$ 249,90", 2: "12x de R$ 99,90", 3: "12x de R$ 109,90" },
           basic: { 1: "R$ 289,99/mês",    2: "R$ 109,99/mês",   3: "R$ 129,99/mês" }
