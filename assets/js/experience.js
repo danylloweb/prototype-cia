@@ -363,6 +363,11 @@
   d.addEventListener("click", function (e) {
     var ps = e.target.closest("[data-plan-select]");
     if (ps) { e.preventDefault(); openQuiz({ planKey: ps.getAttribute("data-plan-key"), unitId: ps.getAttribute("data-unit") }); return; }
+    // Todo CTA de WhatsApp/matrícula passa pelo quiz antes (qualifica o lead).
+    // Cobre wa-default (header, hero, CTAs, FAB, barra fixa), "Agendar aula" dos
+    // cards de unidade e os CTAs da página de unidade — todos têm um destes atributos.
+    var wa = e.target.closest('[data-cdc="wa-default"], [data-cta="whatsapp_click"]');
+    if (wa) { e.preventDefault(); openQuiz({ unitId: wa.getAttribute("data-unit") || undefined }); return; }
     if (e.target.closest("[data-quiz]")) { e.preventDefault(); openQuiz(); }
     if (e.target.closest("[data-open-units]")) { e.preventDefault(); openUnitPicker(); }
     if (e.target.closest("[data-partner-form]")) { e.preventDefault(); openPartnerForm(); }
