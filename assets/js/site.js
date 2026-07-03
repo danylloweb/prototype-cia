@@ -63,7 +63,7 @@
     var cfg = DATA.get();
     var o = cfg.offer || {};
     d.querySelectorAll('[data-cdc="offer-badge"]').forEach(function (e) { e.textContent = o.badge || ""; });
-    d.querySelectorAll('[data-cdc="years"]').forEach(function (e) { e.textContent = (cfg.meta.yearsActive || 11) + ""; });
+    d.querySelectorAll('[data-cdc="years"]').forEach(function (e) { e.textContent = (cfg.meta.yearsActive || 13) + ""; });
     var du = DATA.defaultUnit();
     if (du) {
       var msg = "Olá! Vim pelo site da Cia do Corpo e quero agendar minha aula experimental gratuita.";
@@ -191,7 +191,7 @@
         "@type": "Organization", "@id": cfg.meta.domain + "/#org", name: cfg.meta.siteName,
         legalName: cfg.meta.legalName, url: cfg.meta.domain, email: cfg.meta.email,
         sameAs: [cfg.meta.instagram, cfg.meta.facebook],
-        foundingDate: (new Date().getFullYear() - (cfg.meta.yearsActive || 11)) + ""
+        foundingDate: (new Date().getFullYear() - (cfg.meta.yearsActive || 13)) + ""
       }].concat(units)
     };
     var s = d.createElement("script"); s.type = "application/ld+json";
