@@ -229,7 +229,6 @@
     var feats = (item.features || []).map(function (f) { return '<li>' + CHK + ' ' + esc(f) + '</li>'; }).join("");
     var priceOld = item.old ? '<span class="old">' + esc(item.old) + '</span>' : '';
     var priceSmall = item.unit ? '<small>' + esc(item.unit) + '</small>' : '';
-    var msg = "Olá! Vim pelo site da Cia do Corpo e quero o plano " + item.name + " na unidade " + unit.name + ".";
     return el(
       '<article class="plan' + (item.featured ? ' featured' : '') + ' reveal">' +
         (item.featured ? '<span class="ribbon">Mais escolhido</span>' : '') +
@@ -238,8 +237,8 @@
         (item.note ? '<div class="plan-note">' + esc(item.note) + '</div>' : '') +
         (badges ? '<div class="plan-badges">' + badges + '</div>' : '') +
         '<ul>' + feats + '</ul>' +
-        '<a class="btn ' + (item.featured ? 'btn-primary' : 'btn-ghost') + ' btn-block" target="_blank" rel="noopener" href="' + waLink(unit.whatsapp, msg) + '" ' +
-          'data-cta="whatsapp_click" data-unit="' + unit.id + '" data-unit-name="' + esc(unit.name) + '" data-plan="' + esc(item.key || "") + '">' + esc(item.cta || ("Quero o " + item.name)) + '</a>' +
+        '<button type="button" class="btn ' + (item.featured ? 'btn-primary' : 'btn-ghost') + ' btn-block" ' +
+          'data-plan-select data-plan-key="' + esc(item.key || "") + '" data-unit="' + unit.id + '" data-unit-name="' + esc(unit.name) + '">' + esc(item.cta || ("Quero o " + item.name)) + '</button>' +
       '</article>'
     );
   }

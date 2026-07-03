@@ -135,11 +135,23 @@
     { k: "origem", q: "Só pra te receber do jeito certo:", when: function (a) { return a.momento === "voltando" || a.momento === "ativo"; }, o: [["ciadocorpo", "Já treinei na Cia do Corpo", "🏠"], ["outra", "Já treinei em outra academia", "🏋️"]] },
     { k: "modalidade", q: "O que mais te anima?", o: [["musculacao", "Musculação", "🏋️"], ["coletivas", "Aulas coletivas", "🎵"], ["lutas", "Muay Thai", "🥊"], ["tudo", "Quero tudo", "✨"]] }
   ];
-  function openQuiz() {
+  function planItemFor(un, key) {
+    if (!un || !key) return null;
+    var cfg = DATA.get();
+    var pg = (cfg.plans && cfg.plans.byUnit) ? cfg.plans.byUnit[un.id] : null;
+    if (!pg) return null;
+    return (pg.items || []).filter(function (it) { return it.key === key; })[0] || null;
+  }
+  var PLAN_NAMES = { basic: "Basic+", vip: "Anual VIP", mensal: "Mensal" };
+  function qesc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+
+  function openQuiz(opts) {
+    opts = opts || {};
     if (d.querySelector(".quiz")) return;
-    if (T) T.event("quiz_start", {});
+    var preKey = opts.planKey || null;
+    if (T) T.event(preKey ? "plan_select_start" : "quiz_start", preKey ? { plano: preKey } : {});
     var ans = {}, step = 0;
-    var u = myUnit();
+    var u = (opts.unitId && DATA.unitById(opts.unitId)) || myUnit();
     var ov = h('<div class="quiz"><div class="quiz-card"><button class="quiz-x" aria-label="Fechar">&times;</button>' +
       '<div class="quiz-progress"><i></i></div><div class="quiz-body"></div></div></div>');
     d.body.appendChild(ov); requestAnimationFrame(function () { ov.classList.add("show"); });
@@ -149,7 +161,76 @@
 
     function steps() { return QUIZ.filter(function (q) { return !q.when || q.when(ans); }); }
     function setProg() { ov.querySelector(".quiz-progress i").style.width = (step / (steps().length + 1) * 100) + "%"; }
+    function renderSelected() {
+      var prog = ov.querySelector(".quiz-progress i"); if (prog) prog.style.width = "100%";
+      var body = ov.querySelector(".quiz-body");
+      var planName = (planItemFor(u, preKey) || {}).name || PLAN_NAMES[preKey] || "Seu plano";
+      var unitOpts = DATA.activeUnits().map(function (x) { return '<option value="' + x.id + '"' + (u && x.id === u.id ? " selected" : "") + '>' + x.name + ' — ' + x.city + '</option>'; }).join("");
+      body.innerHTML = '<span class="quiz-step">Seu plano selecionado</span>' +
+        '<div class="quiz-result"><div class="quiz-badge">' + qesc(planName) + '</div>' +
+        '<h3>' + qesc(planName) + ' — ótima escolha</h3>' +
+        '<ul id="quizFeats" style="list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px"></ul>' +
+        '<div id="quizPrice" style="margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
+        '<div class="quiz-field">' +
+          '<div id="quizUnitConfirm"><label style="display:block;margin-bottom:6px">Sua unidade</label>' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06)">' +
+              '<b id="quizUnitName"></b>' +
+              '<button type="button" class="quiz-unit-change" style="background:none;border:none;color:var(--brand,#ff5a00);font-weight:700;font-size:.8rem;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap">Trocar minha unidade</button>' +
+            '</div>' +
+          '</div>' +
+          '<div id="quizUnitPick" style="display:none"><label>Onde quer treinar?</label><select class="quiz-unit">' + unitOpts + '</select></div>' +
+        '</div>' +
+        '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
+          [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+        '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
+          [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+        '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
+        '<button class="quiz-restart">Escolher outro plano</button>';
+      function itemNow() { return planItemFor(DATA.unitById(body.querySelector(".quiz-unit").value) || u, preKey); }
+      function priceText(it) { return it ? ((it.price || "") + (it.unit || "") + (it.note ? (" " + it.note) : "")) : ""; }
+      function refresh() {
+        var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
+        var nEl = body.querySelector("#quizUnitName"); if (nEl) nEl.textContent = un.name;
+        var it = itemNow();
+        var feats = (it && it.features) || [];
+        body.querySelector("#quizFeats").innerHTML = feats.map(function (f) { return '<li style="display:flex;gap:8px;align-items:flex-start;font-size:.92rem"><span style="color:var(--brand,#ff5a00);font-weight:800;line-height:1.3">✓</span><span>' + qesc(f) + '</span></li>'; }).join("");
+        var pt = priceText(it);
+        body.querySelector("#quizPrice").innerHTML = pt
+          ? ('Na unidade <b>' + qesc(un.name) + '</b>, o ' + qesc(planName) + ' sai por <b>' + qesc(pt) + '</b>.<br><span style="opacity:.65">Condição final confirmada no atendimento — e você ainda testa 3 dias grátis antes.</span>')
+          : ('Na unidade <b>' + qesc(un.name) + '</b>. Condição confirmada no atendimento — com 3 dias grátis antes.');
+      }
+      var confirmBox = body.querySelector("#quizUnitConfirm");
+      var pickBox = body.querySelector("#quizUnitPick");
+      refresh();
+      body.querySelector(".quiz-unit-change").onclick = function () { confirmBox.style.display = "none"; pickBox.style.display = "block"; };
+      body.querySelector(".quiz-unit").onchange = function () { refresh(); confirmBox.style.display = "block"; pickBox.style.display = "none"; };
+      body.querySelector(".quiz-restart").onclick = close;
+      body.querySelector("#quizGo").onclick = function () {
+        var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
+        var it = itemNow();
+        var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
+        var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
+        var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
+        var feats = (it && it.features) || [];
+        var lines = [
+          "Olá! Escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
+          "",
+          "*Plano selecionado:* " + planName,
+          "*Condição (a partir de):* " + (priceText(it) || "a confirmar no atendimento"),
+          "*Unidade:* " + (un ? un.name : "-"),
+          "*Melhor dia:* " + diaLabel,
+          "*Período:* " + perLabel
+        ];
+        if (feats.length) lines.push("*Inclui:* " + feats.join(" · "));
+        lines.push("", "Pode me ajudar a agendar?");
+        var msg = encodeURIComponent(lines.join("\n"));
+        if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select" });
+        w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
+        close();
+      };
+    }
     function render() {
+      if (preKey) { renderSelected(); return; }
       setProg();
       var list = steps();
       var body = ov.querySelector(".quiz-body");
@@ -187,7 +268,7 @@
           '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
             [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
-            [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 23h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+            [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
           '<button class="quiz-restart">Refazer</button>';
         function refreshPrice() {
@@ -280,6 +361,8 @@
 
   /* Delegação de cliques */
   d.addEventListener("click", function (e) {
+    var ps = e.target.closest("[data-plan-select]");
+    if (ps) { e.preventDefault(); openQuiz({ planKey: ps.getAttribute("data-plan-key"), unitId: ps.getAttribute("data-unit") }); return; }
     if (e.target.closest("[data-quiz]")) { e.preventDefault(); openQuiz(); }
     if (e.target.closest("[data-open-units]")) { e.preventDefault(); openUnitPicker(); }
     if (e.target.closest("[data-partner-form]")) { e.preventDefault(); openPartnerForm(); }
