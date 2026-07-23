@@ -2,7 +2,7 @@
    CIA DO CORPO — Configuração central / dados padrão (seed)
    Fonte única de verdade para o site público e o painel admin.
    A camada data-service.js sobrepõe esta seed com:
-     backend API  >  localStorage (edições do admin)  >  esta seed
+     localStorage (edições do admin)  >  backend (S3 config.json)  >  esta seed
    ============================================================ */
 
 window.CDC_DEFAULT_CONFIG = {
