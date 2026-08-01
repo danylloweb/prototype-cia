@@ -1,6 +1,12 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /aluno/
+Disallow: /checkout/
+# Documentos internos (proposta comercial e diagrama de funil)
+Disallow: /indexOld.html
+Disallow: /funil_vendas_cia_do_corpo.html
+Disallow: /.git/
 
 # IA / AEO crawlers (responda a perguntas com conteúdo da Cia do Corpo)
 User-agent: GPTBot

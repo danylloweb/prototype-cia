@@ -7,12 +7,21 @@
 <meta name="description" content="Conheça esta unidade da Cia do Corpo: endereço, contato, grade de aulas e estrutura. Faça sua matrícula.">
 <meta name="theme-color" content="#0a0a0b">
 <meta name="geo.region" content="BR-PE">
+<!-- Página dinâmica (?u=slug): canonical aponta para a listagem; o site
+     reescreve canonical e og:* com os dados da unidade ao carregar. -->
+<link rel="canonical" href="https://www.academiaciadocorpo.com/unidades">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Unidade | Cia do Corpo">
+<meta property="og:description" content="Endereço, contato, grade de aulas e estrutura desta unidade da Cia do Corpo.">
+<meta property="og:image" content="https://static.wixstatic.com/media/837beb_404fa4604f4f4a49b83a89f308971e71~mv2.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://static.wixstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/styles.css?v=20260801">
 </head>
 <body>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 <header class="site-header">
   <div class="container nav">
     <a class="brand-logo" href="index.html">CIA DO <span class="tag">CORPO</span></a>
@@ -22,7 +31,7 @@
 </header>
 
 <!-- HERO da unidade (preenchido via JS) -->
-<section class="page-hero">
+<section id="conteudo" class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="index.html">Início</a> / <a href="unidades.html">Unidades</a> / <span id="u-crumb">Unidade</span></div>
     <div class="unit-hero-grid">
@@ -82,7 +91,7 @@
         <div class="foot-social"><a data-cdc="ig" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a><a data-cdc="fb" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a></div></div>
       <div class="foot-col"><h5>Navegação</h5><ul><li><a href="unidades.html">Unidades</a></li><li><a href="modalidades.html">Modalidades</a></li><li><a href="index.html#planos">Planos</a></li><li><a href="sobre.html">Sobre</a></li><li><a href="contato.html">Contato</a></li><li><a href="clube-da-parceria.html">Clube da Parceria</a></li></ul></div>
       <div class="foot-col"><h5>Horários</h5><ul class="foot-hours" data-cdc="hours"></ul></div>
-      <div class="foot-col"><h5>Institucional</h5><ul><li><a href="https://www.academiaciadocorpo.com/_files/ugd/837beb_aa8fd1283a7a4c4ea0bd1fd390db0e48.pdf" target="_blank" rel="noopener">Normas Internas de Uso</a></li><li><a href="#" data-cdc="privacy">Preferências de privacidade</a></li><li><a href="admin/index.html">Área administrativa</a></li><li>CNPJ <span data-cdc="cnpj"></span></li></ul></div>
+      <div class="foot-col"><h5>Institucional</h5><ul><li><a href="https://www.academiaciadocorpo.com/_files/ugd/837beb_aa8fd1283a7a4c4ea0bd1fd390db0e48.pdf" target="_blank" rel="noopener">Normas Internas de Uso</a></li><li><a href="#" data-cdc="privacy">Preferências de privacidade</a></li><li>CNPJ <span data-cdc="cnpj"></span></li></ul></div>
     </div>
     <div class="foot-bottom"><span>© <span data-year>2026</span> Cia do Corpo Gym.</span><span>Recife &amp; Olinda — PE</span></div>
   </div>
@@ -90,7 +99,7 @@
 
 <a class="fab-whats" data-cdc="wa-default" href="#" aria-label="Falar no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg></a>
 
-<script src="assets/js/config.js"></script><script src="assets/js/data-service.js"></script><script src="assets/js/telemetry.js"></script><script src="assets/js/site.js"></script><script src="assets/js/experience.js"></script><script src="assets/js/main.js"></script>
+<script src="assets/js/config.js?v=20260801"></script><script src="assets/js/data-service.js?v=20260801"></script><script src="assets/js/telemetry.js?v=20260801"></script><script src="assets/js/site.js?v=20260801"></script><script src="assets/js/experience.js?v=20260801"></script><script src="assets/js/main.js?v=20260801"></script>
 <script>
 (function(){
   var DATA = window.CDC.data;
@@ -102,7 +111,14 @@
   document.title = "Cia do Corpo " + u.name + " | Academia em " + u.city;
   var md = document.querySelector('meta[name="description"]');
   if(md) md.setAttribute("content", "Cia do Corpo unidade "+u.name+": "+u.address+". Estrutura moderna, grade de aulas e matrícula pelo WhatsApp.");
-  var can = document.createElement("link"); can.rel="canonical"; can.href="https://www.academiaciadocorpo.com/unidade?u="+u.id; document.head.appendChild(can);
+  // Reaproveita a tag do head (dois canonical confundem os buscadores)
+  var can = document.querySelector('link[rel="canonical"]');
+  if(!can){ can = document.createElement("link"); can.rel="canonical"; document.head.appendChild(can); }
+  can.href = "https://www.academiaciadocorpo.com/unidade?u=" + u.id;
+  function setMeta(sel, val){ var m = document.querySelector(sel); if(m && val) m.setAttribute("content", val); }
+  setMeta('meta[property="og:title"]', "Cia do Corpo " + u.name + " | Academia em " + u.city);
+  setMeta('meta[property="og:description"]', "Unidade " + u.name + ": " + u.address + ". Estrutura moderna, grade de aulas e matrícula pelo WhatsApp.");
+  if(u.image) setMeta('meta[property="og:image"]', u.image);
 
   document.getElementById("u-crumb").textContent = u.name;
   document.getElementById("u-name").textContent = "Cia do Corpo " + u.name;
@@ -119,7 +135,7 @@
   var waMsg = "Olá! Vim pela página da unidade "+u.name+" e quero fazer minha matrícula.";
   var waHref = "https://wa.me/"+u.whatsapp+"?text="+encodeURIComponent(waMsg);
   ["u-wa","u-wa2"].forEach(function(idd){ var a=document.getElementById(idd); a.href=waHref; a.setAttribute("data-cta","whatsapp_click"); a.setAttribute("data-unit",u.id); a.setAttribute("data-unit-name",u.name); });
-  var call=document.getElementById("u-call"); call.href="tel:+55"+u.phone.replace(/\\D/g,""); call.setAttribute("data-cta","call_click"); call.setAttribute("data-unit",u.id);
+  var call=document.getElementById("u-call"); call.href="tel:+55"+u.phone.replace(/\D/g,""); call.setAttribute("data-cta","call_click"); call.setAttribute("data-unit",u.id);
 
   document.getElementById("u-map").src = "https://www.google.com/maps?q="+encodeURIComponent(u.address)+"&output=embed";
 
@@ -130,11 +146,39 @@
   var byDay = {}; days.forEach(function(d){ byDay[d]=[]; });
   grid.forEach(function(c){ if(byDay[c.day]) byDay[c.day].push(c); });
   Object.keys(byDay).forEach(function(d){ byDay[d].sort(function(a,b){ return a.time.localeCompare(b.time); }); });
-  document.getElementById("u-grade").innerHTML = days.filter(function(d){return byDay[d].length;}).map(function(d){
-    return '<div class="grade-day"><h4>'+d+'</h4><ul>'+byDay[d].map(function(c){
-      return '<li><b>'+esc(c.time)+'</b><span>'+esc(c.name)+'</span></li>';
-    }).join("")+'</ul></div>';
-  }).join("") || '<p class="section-sub">Grade em atualização. Consulte a recepção da unidade.</p>';
+  var withClasses = days.filter(function(d){ return byDay[d].length; });
+  var gradeHost = document.getElementById("u-grade");
+  if(!withClasses.length){
+    gradeHost.innerHTML = '<p class="section-sub">Grade em atualização. Consulte a recepção da unidade.</p>';
+  } else {
+    // Hoje primeiro: quem abre a página quer saber o que tem hoje
+    var todayName = days[(new Date().getDay()+6)%7];
+    var chips = '<div class="grade-filter" role="tablist" aria-label="Filtrar por dia">' +
+      '<button type="button" class="grade-chip active" data-day="all" role="tab">Todos</button>' +
+      withClasses.map(function(d){
+        return '<button type="button" class="grade-chip" data-day="'+esc(d)+'" role="tab">' + esc(d) +
+               (d===todayName ? ' <i>hoje</i>' : '') + '</button>';
+      }).join("") + '</div>';
+
+    gradeHost.insertAdjacentHTML("beforebegin", chips);
+    gradeHost.innerHTML = withClasses.map(function(d){
+      return '<div class="grade-day'+(d===todayName?' is-today':'')+'" data-day="'+esc(d)+'">' +
+        '<h4>'+esc(d)+(d===todayName?'<span class="grade-today">hoje</span>':'')+'</h4><ul>'+byDay[d].map(function(c){
+          return '<li><b>'+esc(c.time)+'</b><span>'+esc(c.name)+'</span></li>';
+        }).join("")+'</ul>' +
+        '<div class="grade-foot">'+byDay[d].length+' aula'+(byDay[d].length>1?'s':'')+'</div></div>';
+    }).join("");
+
+    var filterHost = gradeHost.previousElementSibling;
+    filterHost.addEventListener("click", function(e){
+      var b = e.target.closest(".grade-chip"); if(!b) return;
+      var day = b.getAttribute("data-day");
+      filterHost.querySelectorAll(".grade-chip").forEach(function(x){ x.classList.toggle("active", x===b); });
+      gradeHost.querySelectorAll(".grade-day").forEach(function(card){
+        card.hidden = day !== "all" && card.getAttribute("data-day") !== day;
+      });
+    });
+  }
 
   // JSON-LD da unidade
   var ld = { "@context":"https://schema.org","@type":"ExerciseGym","name":"Cia do Corpo — "+u.name,

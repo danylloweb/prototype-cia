@@ -82,7 +82,7 @@ window.CDC_DEFAULT_CONFIG = {
       id: "avenida-norte", name: "Avenida Norte", tier: "standard", active: true,
       city: "Recife", neighborhood: "Casa Amarela",
       address: "Av. Norte Miguel Arraes de Alencar, 6350 - Casa Amarela, Recife - PE, 52071-035",
-      phone: "(81) 98943-1738", whatsapp: "558186049894",
+      phone: "(81) 98943-1738", whatsapp: "5581989431738",
       group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Casa Amarela", "Tamarineira", "Encruzilhada", "Parnamirim", "Vasco da Gama"],
       maps: "https://g.co/kgs/MDRq364", lat: -8.0186, lng: -34.9176,
@@ -92,7 +92,7 @@ window.CDC_DEFAULT_CONFIG = {
       id: "ouro-preto", name: "Ouro Preto", tier: "standard", active: true,
       city: "Olinda", neighborhood: "Ouro Preto",
       address: "Av. Argentina Castelo Branco, 175 - Ouro Preto, Olinda - PE, 53370-540",
-      phone: "(81) 98943-8592", whatsapp: "558186049894",
+      phone: "(81) 98943-8592", whatsapp: "5581989438592",
       group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Ouro Preto", "Alto da Bondade"],
       maps: "https://maps.app.goo.gl/zuVMjNU1khcbtVf59", lat: -8.0050, lng: -34.8550,
@@ -102,37 +102,37 @@ window.CDC_DEFAULT_CONFIG = {
       id: "peixinhos", name: "Peixinhos", tier: "standard", active: true,
       city: "Olinda", neighborhood: "Peixinhos",
       address: "Av. Antônio da Costa Azevedo, 566 - Peixinhos, Olinda - PE, 53220-130",
-      phone: "(81) 98944-4888", whatsapp: "558186049894",
+      phone: "(81) 98944-4888", whatsapp: "5581989444888",
       group: 3, priceFrom: "12x de R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Peixinhos", "Sítio Novo", "Salgadinho"],
       maps: "https://maps.app.goo.gl/AtURzTjUgjaZowK16", lat: -8.0186, lng: -34.8839,
       image: "https://static.wixstatic.com/media/837beb_2eb8474fbd2a464eaf0460616efe4ebc~mv2.jpg/v1/fill/w_900,h_560,al_c,q_85,enc_auto/PX.jpg"
     },
     {
-      id: "afogados", name: "Afogados", tier: "standard", active: true,
+      id: "afogados", name: "Afogados", tier: "exclusive", active: true,
       city: "Recife", neighborhood: "Afogados",
       address: "R. São Miguel, 893 - Afogados, Recife - PE, 50850-000",
-      phone: "(81) 98697-7782", whatsapp: "558186049894",
+      phone: "(81) 98943-4807", whatsapp: "5581989434807",
       group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Afogados", "Mustardinha", "Mangueira", "San Martin"],
       maps: "https://maps.app.goo.gl/oLBbLy97QV9abz8Z6", lat: -8.0769, lng: -34.9069,
       image: "https://static.wixstatic.com/media/837beb_41a09b408639439bb12a7153cc3ace0a~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AFG.png"
     },
     {
-      id: "agua-fria", name: "Água Fria", tier: "standard", active: true,
+      id: "agua-fria", name: "Água Fria", tier: "exclusive", active: true,
       city: "Recife", neighborhood: "Beberibe",
       address: "Av. Beberibe, 2600 - Beberibe, Recife - PE, 52130-035",
-      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      phone: "(81) 98943-2074", whatsapp: "5581989432074",
       group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Água Fria", "Beberibe", "Fundão", "Cajueiro"],
       maps: "https://maps.app.goo.gl/67mnmfj3dFcoeNuq6", lat: -8.0086, lng: -34.8919,
       image: "https://static.wixstatic.com/media/837beb_f6a67ac9cc3c4ef99ca13852a6d51fac~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AGUA.png"
     },
     {
-      id: "bomba-do-hemeterio", name: "Bomba do Hemetério", tier: "standard", active: true,
+      id: "bomba-do-hemeterio", name: "Bomba do Hemetério", tier: "exclusive", active: true,
       city: "Recife", neighborhood: "Bomba do Hemetério",
       address: "R. Padre Oliveira, 772 - Bomba do Hemetério, Recife - PE, 52080-130",
-      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      phone: "(81) 98943-8666", whatsapp: "5581989438666",
       group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Bomba do Hemetério", "Alto José do Pinho", "Dois Unidos", "Arruda"],
       maps: "https://maps.app.goo.gl/9XnC4tkLJmyRwLpS8", lat: -8.0156, lng: -34.9039,
@@ -142,7 +142,7 @@ window.CDC_DEFAULT_CONFIG = {
       id: "areias", name: "Areias", tier: "standard", active: true,
       city: "Recife", neighborhood: "Areias - Estância",
       address: "R. Tucunaré, 55 - Areias, Recife - PE, 50771-510",
-      phone: "(81) 98943-8666", whatsapp: "558186049894",
+      phone: "(81) 98734-8391", whatsapp: "5581987348391",
       group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Areias", "Tejipió", "Jiquiá", "Estância", "Barro"],
       maps: "https://maps.app.goo.gl/tpCzs3X7ZokMmWkB9", lat: -8.0900, lng: -34.9250,
@@ -250,14 +250,10 @@ window.CDC_DEFAULT_CONFIG = {
     { name: "Akitem Imóvel", category: "Serviços", benefit: "Condição especial para alunos", city: "Jardim Atlântico, Olinda", address: "Av. Fagundes Varela, 365, sala 7 - Jardim Atlântico", instagram: "akitemimovel", phone: "(81) 99679-0310" },
     { name: "Lancerr Contabilidade", category: "Serviços", benefit: "Condição especial para alunos", city: "Casa Caiada, Olinda", address: "Rua Otaviano Pessoa Monteiro, 627, sala 10 - Casa Caiada", instagram: "lancerr.contabilidade", phone: "(81) 98822-7342" },
     { name: "Troca de Óleo Garagem", category: "Serviços", benefit: "Desconto para alunos", city: "Casa Caiada, Olinda", address: "Av. Gov. Carlos de Lima Cavalcante, 2295 - Casa Caiada", instagram: "trocadeoleo.garagem", phone: "(81) 99846-9643" }
-  ],
-
-  /* Acesso ao painel admin (demo). Em produção use o backend + hash. */
-  admin: {
-    user: "admin",
-    // senha padrão de demonstração: ciadocorpo2026  (troque no primeiro acesso)
-    passHint: "ciadocorpo2026"
-  }
+  ]
+  /* Credenciais do admin-protótipo NÃO ficam aqui: este arquivo é servido em
+     todas as páginas públicas. A senha é definida no primeiro acesso a
+     /admin/ e guardada no navegador de quem administra. */
 };
 
 /* ============================================================

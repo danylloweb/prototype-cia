@@ -23,11 +23,20 @@
   }
 
   /* ---------- auth ---------- */
-  function currentPass() { return localStorage.getItem(PASS_KEY) || (cfg.admin && cfg.admin.passHint) || "ciadocorpo2026"; }
+  /* Sem senha embutida no código: no primeiro acesso quem administra define
+     a sua, guardada apenas neste navegador. (Protótipo — o painel de verdade
+     é o Sales, com autenticação no servidor.) */
+  function currentPass() { return localStorage.getItem(PASS_KEY) || ""; }
   function doLogin(e) {
     e.preventDefault();
     var u = $("#lg-user").value.trim(), p = $("#lg-pass").value;
-    if (u === (cfg.admin ? cfg.admin.user : "admin") && p === currentPass()) {
+    var saved = currentPass();
+    if (!saved) {
+      if (p.length < 8) { $("#lg-err").textContent = "Primeiro acesso: defina uma senha com pelo menos 8 caracteres."; return; }
+      localStorage.setItem(PASS_KEY, p);
+      sessionStorage.setItem(AUTH_KEY, "1"); showApp(); return;
+    }
+    if (u === ((cfg.admin && cfg.admin.user) || "admin") && p === saved) {
       sessionStorage.setItem(AUTH_KEY, "1"); showApp();
     } else { $("#lg-err").textContent = "Usuário ou senha inválidos."; }
   }

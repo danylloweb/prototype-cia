@@ -11,3 +11,6 @@ __t.tmp
 
 # Windows "downloaded file" metadata
 *:Zone.Identifier
+
+# Config local do Claude Code (ambiente de desenvolvimento)
+.claude/
