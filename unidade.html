@@ -146,38 +146,31 @@
   var byDay = {}; days.forEach(function(d){ byDay[d]=[]; });
   grid.forEach(function(c){ if(byDay[c.day]) byDay[c.day].push(c); });
   Object.keys(byDay).forEach(function(d){ byDay[d].sort(function(a,b){ return a.time.localeCompare(b.time); }); });
+  // Grade semanal (horas nas linhas, dias nas colunas): mostra a semana
+  // inteira de uma vez, como o quadro afixado na recepção.
   var withClasses = days.filter(function(d){ return byDay[d].length; });
   var gradeHost = document.getElementById("u-grade");
   if(!withClasses.length){
     gradeHost.innerHTML = '<p class="section-sub">Grade em atualização. Consulte a recepção da unidade.</p>';
   } else {
-    // Hoje primeiro: quem abre a página quer saber o que tem hoje
     var todayName = days[(new Date().getDay()+6)%7];
-    var chips = '<div class="grade-filter" role="tablist" aria-label="Filtrar por dia">' +
-      '<button type="button" class="grade-chip active" data-day="all" role="tab">Todos</button>' +
-      withClasses.map(function(d){
-        return '<button type="button" class="grade-chip" data-day="'+esc(d)+'" role="tab">' + esc(d) +
-               (d===todayName ? ' <i>hoje</i>' : '') + '</button>';
-      }).join("") + '</div>';
-
-    gradeHost.insertAdjacentHTML("beforebegin", chips);
-    gradeHost.innerHTML = withClasses.map(function(d){
-      return '<div class="grade-day'+(d===todayName?' is-today':'')+'" data-day="'+esc(d)+'">' +
-        '<h4>'+esc(d)+(d===todayName?'<span class="grade-today">hoje</span>':'')+'</h4><ul>'+byDay[d].map(function(c){
-          return '<li><b>'+esc(c.time)+'</b><span>'+esc(c.name)+'</span></li>';
-        }).join("")+'</ul>' +
-        '<div class="grade-foot">'+byDay[d].length+' aula'+(byDay[d].length>1?'s':'')+'</div></div>';
+    var hours = Object.keys(grid.reduce(function(acc,c){ acc[c.time]=1; return acc; },{})).sort();
+    var head = '<div class="wgrid-cell wgrid-corner">Hora</div>' + withClasses.map(function(d){
+      return '<div class="wgrid-cell wgrid-head'+(d===todayName?' is-today':'')+'">' +
+             esc(d) + (d===todayName?'<i>hoje</i>':'') + '</div>';
     }).join("");
-
-    var filterHost = gradeHost.previousElementSibling;
-    filterHost.addEventListener("click", function(e){
-      var b = e.target.closest(".grade-chip"); if(!b) return;
-      var day = b.getAttribute("data-day");
-      filterHost.querySelectorAll(".grade-chip").forEach(function(x){ x.classList.toggle("active", x===b); });
-      gradeHost.querySelectorAll(".grade-day").forEach(function(card){
-        card.hidden = day !== "all" && card.getAttribute("data-day") !== day;
-      });
-    });
+    var rows = hours.map(function(t){
+      return '<div class="wgrid-cell wgrid-hour">'+esc(t)+'</div>' + withClasses.map(function(d){
+        var here = byDay[d].filter(function(c){ return c.time===t; });
+        return '<div class="wgrid-cell wgrid-slot'+(d===todayName?' is-today':'')+'">' +
+          here.map(function(c){ return '<span class="wgrid-class">'+esc(c.name)+'</span>'; }).join("") +
+          '</div>';
+      }).join("");
+    }).join("");
+    gradeHost.innerHTML =
+      '<div class="wgrid-scroll"><div class="wgrid" style="--cols:'+withClasses.length+'">' +
+      head + rows + '</div></div>' +
+      '<p class="wgrid-hint">Arraste para o lado para ver todos os dias →</p>';
   }
 
   // JSON-LD da unidade
