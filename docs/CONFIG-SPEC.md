@@ -43,7 +43,7 @@ navegador bloqueia o fetch e nada do painel chega aos visitantes:
 | `meta` | Dados da empresa, contatos, redes, horários gerais | ✅ OK |
 | `units` | Cards e páginas das unidades | ✅ OK (ver observações) |
 | `popups` | Popups/campanhas de todas as páginas | ✅ OK (manter sempre ≥1 ativo) |
-| `plans` | Página e seção de planos, por unidade | ⚠️ Formato errado (ver abaixo) |
+| `plans` | Página e seção de planos, por unidade | ⚠️ Vazio (`[]`) — site usa a seed; array de linhas agora é aceito (ver abaixo) |
 | `offer` | Faixa de campanha do topo (badge/título/subtítulo) | ❌ Faltando |
 | `modalities` | Lista de modalidades | ❌ Faltando |
 | `conceptExtraModalities` | Modalidades extras da unidade Concept | ❌ Faltando |
@@ -54,16 +54,46 @@ navegador bloqueia o fetch e nada do painel chega aos visitantes:
 | `totalpass` | Faixa TotalPass por unidade (`{ unitId: "TP3" }`) | ❌ Faltando |
 | `acceptsWellhub` | Booleano Wellhub/Gympass | ❌ Faltando |
 | `experimental` | Regras da aula experimental (dias, validade, observação) | ❌ Faltando |
-| `telemetry` | IDs públicos de tags: GTM, GA4, Meta Pixel, Clarity | ❌ Faltando |
+| `telemetry` | IDs públicos de tags: GTM, GA4, Meta Pixel, Clarity | ⚠️ Presente com placeholders (`"xxxxxxxx"` etc.) — o site ignora IDs fora do formato real; publicar os IDs verdadeiros para a medição funcionar |
 
 Campos de cada seção: seguir exatamente o `config-exemplo.json`.
 
-## `plans` — formato exigido (hoje está incompatível)
+## `plans` — dois formatos aceitos
 
-O config atual publica `plans` como linhas de banco
-(`{id, group, priceFrom: 99.99, matricula: 50, ...}`). O site **não consegue
-renderizar** planos assim e ignora a seção. O formato exigido é por unidade,
-com os cards completos:
+### Formato simples: linhas de preço por grupo (o que o painel Sales-Cia publica)
+
+O site converte as linhas do `publishBundle()` (Laravel,
+`app/Services/CompanyConfigService.php`) em overlay de preços sobre os cards
+padrão:
+
+```json
+"plans": [
+  { "id": 1, "group": 1, "groupLabel": "Standard", "priceFrom": 109.90,
+    "matricula": 50, "experimentalDays": 7, "recurring": false, "status": true }
+]
+```
+
+- Casamento linha ↔ unidade: primeiro por `groupLabel` ↔ `units[].tier`
+  ("Exclusive" ↔ `"exclusive"`), que é o dado confiável; o número do `group`
+  (enum do painel: 1=Standard, 2=Exclusive, 3=Concept) é usado só como
+  fallback quando label/tier não estão presentes. Sem `group`/`groupLabel`,
+  a linha aplica a todas as unidades.
+- Card de destino: `recurring: true` → Basic+ (recorrência); demais linhas →
+  plano em destaque (Anual VIP). Opcionalmente a linha pode trazer
+  `key`/`plan` (`vip` | `basic` | `mensal`) para mirar um card específico.
+- `status: false` é ignorada.
+- `priceFrom` numérico substitui só o valor dentro do formato do card
+  (ex.: card "12x de R$ 109,90" vira "12x de R$ <novo>"); string é usada como veio.
+- `matricula` numérico vira a nota "+ R$ X,XX" do card (0 remove a nota).
+- `experimentalDays`, `groupLabel`, `created_at`, `updated_at` são ignorados.
+- **Só preços e matrícula** são controlados assim — nome, descrição, badges e
+  features dos cards continuam sendo os padrão do site.
+- `plans: []` (vazio) mantém os planos padrão do site.
+
+### Formato completo: `plans.byUnit`
+
+Para controlar os cards inteiros (texto, badges, features), publicar por
+unidade:
 
 ```json
 "plans": {
@@ -105,7 +135,31 @@ com os cards completos:
 - `units[].priceFrom` está como "Consulte valores" em todas as unidades — é o
   que será exibido nos cards. Confirmar se é intencional.
 - `avenida-norte.experimentalDays: 7` difere das demais (3). Confirmar.
-- O único popup expira em `2026-07-30`; depois disso o site fica sem popup.
+- `popups: []` zera os popups do site (arrays substituem por inteiro) — é o
+  estado atual; ao publicar novos popups no formato do exemplo, eles voltam a
+  renderizar sem mudança no site.
+- `units[].group` publicado (todos `1`) está errado para as unidades exclusive
+  no cadastro do painel; o site contorna casando planos por
+  `groupLabel` ↔ `tier` e o quiz precifica pelos cards de `plans`, mas o ideal
+  é corrigir o grupo dessas unidades no painel.
+- `telemetry.capiEndpoint` ainda não tem consumidor no site (reservado).
+
+## Captura de leads (quiz → painel)
+
+O quiz pede nome + WhatsApp (e e-mail opcional) antes de abrir o WhatsApp e
+envia `POST {meta.apiBase}/landing/register-trial` com o header
+`X-Landing-Token: {meta.landingToken}` e o corpo
+`{name, phone, email, plan_id, unit_id, interest, date, time}`:
+
+- `meta.apiBase` e `meta.landingToken` vêm do config publicado; sem eles o
+  site só guarda o lead localmente (`localStorage.cdc_leads`) e segue pro
+  WhatsApp — o envio nunca bloqueia o redirecionamento (keepalive +
+  fire-and-forget).
+- `unit_id` = `units[].dbId` (id numérico publicado pelo painel);
+  `plan_id` = id da linha de `plans` resolvida pela mesma regra do overlay
+  (groupLabel ↔ tier; `recurring` = Basic+). Ambos podem ir `null`.
+- `date` = próxima ocorrência do dia escolhido; `time` = 08:00/14:00/19:00
+  conforme o período.
 - IDs das unidades (`units[].id`) são chaves usadas por `plans.byUnit`,
   `totalpass` e URLs (`unidade.html?u=<id>`) — não renomear sem combinar.
 

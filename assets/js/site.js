@@ -136,7 +136,22 @@
     markSeen(p.id);
     if (w.CDC.track) w.CDC.track.event("popup_view", { popup_id: p.id, popup_name: p.name });
 
-    function close() { overlay.classList.remove("show"); setTimeout(function () { overlay.remove(); }, 300); }
+    var card = overlay.querySelector(".cdc-popup-card");
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-modal", "true");
+    card.setAttribute("aria-label", p.name || "Campanha");
+    var opener = d.activeElement;
+    function close() {
+      d.removeEventListener("keydown", onKey, true);
+      overlay.classList.remove("show"); setTimeout(function () { overlay.remove(); }, 300);
+      if (opener && opener.focus) { try { opener.focus(); } catch (e) {} }
+    }
+    function onKey(e) { if (e.key === "Escape" || e.key === "Esc") { e.preventDefault(); close(); } }
+    d.addEventListener("keydown", onKey, true);
+    requestAnimationFrame(function () {
+      var cta = overlay.querySelector(".cdc-popup-cta");
+      try { (cta || card).focus({ preventScroll: true }); } catch (e) {}
+    });
     overlay.querySelector(".cdc-popup-close").addEventListener("click", close);
     overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
     overlay.querySelector(".cdc-popup-cta").addEventListener("click", function (e) {

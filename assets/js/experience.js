@@ -72,16 +72,17 @@
 
   /* Seletor de unidade (modal leve) com botão de GPS */
   function openUnitPicker() {
-    if (d.querySelector(".cdc-sheet")) return;
+    if (d.querySelector('.cdc-sheet[data-sheet="unit"]')) return;
     var units = DATA.activeUnits();
-    var sheet = h('<div class="cdc-sheet"><div class="cdc-sheet-card"><button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
+    var sheet = h('<div class="cdc-sheet" data-sheet="unit"><div class="cdc-sheet-card"><button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
       '<h3>Escolha sua unidade</h3><p>O site se adapta a você — CTAs e WhatsApp da unidade escolhida.</p>' +
       '<button class="geo-btn" id="geoBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg> <span>Usar minha localização (mais próxima)</span></button>' +
       '<div class="unit-pick-grid">' + units.map(function (u) {
         return '<button class="unit-pick-opt" data-u="' + u.id + '"><b>' + u.name + '</b><span>' + u.city + ' · ' + (u.neighborhood || "") + '</span></button>';
       }).join("") + '</div></div></div>');
     d.body.appendChild(sheet); requestAnimationFrame(function () { sheet.classList.add("show"); });
-    function close() { sheet.classList.remove("show"); setTimeout(function () { sheet.remove(); }, 250); }
+    function rawClose() { sheet.classList.remove("show"); setTimeout(function () { sheet.remove(); }, 250); }
+    var close = bindModalA11y(sheet, rawClose, "Escolha sua unidade");
     sheet.querySelector(".cdc-sheet-x").onclick = close;
     sheet.addEventListener("click", function (e) { if (e.target === sheet) close(); });
     sheet.querySelectorAll(".unit-pick-opt").forEach(function (b) { b.onclick = function () { setMyUnit(b.getAttribute("data-u")); close(); }; });
@@ -145,6 +146,100 @@
   var PLAN_NAMES = { basic: "Basic+", vip: "Anual VIP", mensal: "Mensal" };
   function qesc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
 
+  /* ---------- Captura de lead (quiz -> painel Sales) ----------
+     Antes de abrir o WhatsApp, o quiz pede nome + WhatsApp (e e-mail
+     opcional) e envia para o painel via POST /landing/register-trial,
+     autenticado pelo meta.landingToken publicado no config. O envio é
+     fire-and-forget (keepalive): falha de rede nunca bloqueia o
+     redirecionamento. Uma cópia fica em localStorage (cdc_leads). */
+  var LEAD_DAY = { terca: 2, quarta: 3, quinta: 4, sexta: 5 };
+  var LEAD_TIME = { manha: "08:00", tarde: "14:00", noite: "19:00" };
+  function leadFieldsHTML() {
+    return '<div class="quiz-lead">' +
+      '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar seu horário.</span></div>' +
+      '<div class="quiz-field"><label>Seu nome</label><input type="text" class="quiz-lead-name" autocomplete="name" placeholder="Como podemos te chamar?"></div>' +
+      '<div class="quiz-lead-row">' +
+        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="tel" inputmode="tel" placeholder="(81) 90000-0000"></div>' +
+        '<div class="quiz-field"><label>E-mail <span style="opacity:.55;font-weight:500">(opcional)</span></label><input type="email" class="quiz-lead-email" autocomplete="email" placeholder="voce@email.com"></div>' +
+      '</div></div>';
+  }
+  function bindLeadFields(body) {
+    var phone = body.querySelector(".quiz-lead-phone");
+    if (!phone) return;
+    phone.addEventListener("input", function () {
+      var v = phone.value.replace(/\D/g, "").slice(0, 11);
+      if (v.length > 6) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2, v.length > 10 ? 7 : 6) + "-" + v.slice(v.length > 10 ? 7 : 6);
+      else if (v.length > 2) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2);
+      else phone.value = v;
+    });
+    body.querySelectorAll(".quiz-lead input").forEach(function (el) {
+      el.addEventListener("input", function () { el.classList.remove("quiz-invalid"); });
+    });
+  }
+  function collectLead(body) {
+    var nameEl = body.querySelector(".quiz-lead-name"),
+        phoneEl = body.querySelector(".quiz-lead-phone"),
+        emailEl = body.querySelector(".quiz-lead-email");
+    if (!nameEl || !phoneEl) return null;
+    var name = (nameEl.value || "").trim();
+    var phone = (phoneEl.value || "").replace(/\D/g, "");
+    var email = (emailEl && emailEl.value || "").trim();
+    var ok = true;
+    function mark(el, bad) { el.classList.toggle("quiz-invalid", bad); if (bad) ok = false; }
+    mark(nameEl, name.length < 2);
+    mark(phoneEl, phone.length < 10 || phone.length > 13);
+    if (emailEl) mark(emailEl, !!email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email));
+    if (!ok) { (body.querySelector(".quiz-lead .quiz-invalid") || nameEl).focus(); return null; }
+    return { name: name, phone: phone, email: email };
+  }
+  function nextDateFor(dayKey) {
+    var target = LEAD_DAY[dayKey];
+    if (target == null) return "";
+    var dt = new Date();
+    do { dt.setDate(dt.getDate() + 1); } while (dt.getDay() !== target);
+    var m = dt.getMonth() + 1, dd = dt.getDate();
+    return dt.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd;
+  }
+  // Resolve o id numérico da linha de plano publicada pelo painel:
+  // mesma regra do overlay de preços (groupLabel<->tier; recurring = Basic+).
+  function planRowIdFor(un, planKey) {
+    var rows = DATA.get().planRows;
+    if (!Array.isArray(rows) || !un) return null;
+    var tier = String(un.tier || "").toLowerCase();
+    var match = rows.filter(function (r) {
+      if (!r || typeof r !== "object" || r.status === false) return false;
+      var label = String(r.groupLabel || "").toLowerCase();
+      if (label && tier) { if (label !== tier) return false; }
+      else if (r.group != null && un.group != null && r.group !== un.group) return false;
+      return planKey === "basic" ? r.recurring === true : r.recurring !== true;
+    })[0];
+    return (match && match.id != null) ? match.id : null;
+  }
+  function submitLead(info) {
+    try {
+      var arr = JSON.parse(localStorage.getItem("cdc_leads") || "[]");
+      arr.push(Object.assign({ t: Date.now() }, info));
+      if (arr.length > 500) arr = arr.slice(arr.length - 500);
+      localStorage.setItem("cdc_leads", JSON.stringify(arr));
+    } catch (e) {}
+    if (T) T.event("lead_submit", { unit: info.unit_slug || "", plano: info.plan_key || "" });
+    var meta = DATA.get().meta || {};
+    var base = String(meta.apiBase || "").replace(/\/+$/, "");
+    if (!base || !meta.landingToken || !w.fetch) return;
+    try {
+      fetch(base + "/landing/register-trial", {
+        method: "POST",
+        keepalive: true,
+        headers: { "Content-Type": "application/json", "X-Landing-Token": meta.landingToken },
+        body: JSON.stringify({
+          name: info.name, phone: info.phone, email: info.email || null,
+          plan_id: info.plan_id, unit_id: info.unit_id,
+          interest: info.interest || null, date: info.date, time: info.time
+        })
+      }).catch(function () { /* offline/painel fora: lead segue no localStorage */ });
+    } catch (e) {}
+  }
+
   function openQuiz(opts) {
     opts = opts || {};
     if (d.querySelector(".quiz")) return;
@@ -155,7 +250,8 @@
     var ov = h('<div class="quiz"><div class="quiz-card"><button class="quiz-x" aria-label="Fechar">&times;</button>' +
       '<div class="quiz-progress"><i></i></div><div class="quiz-body"></div></div></div>');
     d.body.appendChild(ov); requestAnimationFrame(function () { ov.classList.add("show"); });
-    function close() { ov.classList.remove("show"); setTimeout(function () { ov.remove(); }, 250); }
+    function rawClose() { ov.classList.remove("show"); setTimeout(function () { ov.remove(); }, 250); }
+    var close = bindModalA11y(ov, rawClose, "Monte seu plano");
     ov.querySelector(".quiz-x").onclick = close;
     ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
 
@@ -184,8 +280,10 @@
           [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
           [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+        leadFieldsHTML() +
         '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
         '<button class="quiz-restart">Escolher outro plano</button>';
+      bindLeadFields(body);
       function itemNow() { return planItemFor(DATA.unitById(body.querySelector(".quiz-unit").value) || u, preKey); }
       function priceText(it) { return it ? ((it.price || "") + (it.unit || "") + (it.note ? (" " + it.note) : "")) : ""; }
       function refresh() {
@@ -206,14 +304,23 @@
       body.querySelector(".quiz-unit").onchange = function () { refresh(); confirmBox.style.display = "block"; pickBox.style.display = "none"; };
       body.querySelector(".quiz-restart").onclick = close;
       body.querySelector("#quizGo").onclick = function () {
+        var lead = collectLead(body);
+        if (!lead) return;
         var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
         var it = itemNow();
         var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
         var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
         var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
+        submitLead({
+          name: lead.name, phone: lead.phone, email: lead.email,
+          plan_id: planRowIdFor(un, preKey), unit_id: un ? un.dbId : null,
+          unit_slug: un ? un.id : "", plan_key: preKey,
+          interest: "Site — plano escolhido: " + planName + "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
+          date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
+        });
         var feats = (it && it.features) || [];
         var lines = [
-          "Olá! Escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
+          "Olá! Sou " + lead.name + " — escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
           "",
           "*Plano selecionado:* " + planName,
           "*Condição (a partir de):* " + (priceText(it) || "a confirmar no atendimento"),
@@ -258,7 +365,23 @@
         var reason = recKey === "vip"
           ? "Como você <b>" + (MOM[ans.momento] || "já treina") + "</b>, o <b>Anual VIP</b> te dá o melhor custo-benefício: acesso completo em 12x, com Muay Thai incluso."
           : "Como você <b>" + (MOM[ans.momento] || "quer começar") + "</b>, o <b>Basic+</b> é ideal: mensal, flexível, sem fidelidade longa e sem comprometer o limite do cartão.";
-        function priceFor(un) { if (!un) return ""; var g = un.group || 2; return (PLAN_PRICE[recKey][g] || "") + (un.matricula ? (" + matrícula " + un.matricula) : ""); }
+        // Preço vem dos cards de planos da config (mesma fonte da página de
+        // planos, já com overlay do backend); a tabela fixa é só fallback —
+        // o group publicado pelo backend não segue a numeração antiga.
+        function priceFor(un) {
+          if (!un) return "";
+          var price = "";
+          try {
+            var pu = DATA.get().plans.byUnit[un.id];
+            var it = ((pu && pu.items) || []).filter(function (i) { return i.key === recKey; })[0];
+            if (it && it.price) price = it.price + (it.unit || "");
+          } catch (e) {}
+          if (!price) { var g = un.group || 2; price = PLAN_PRICE[recKey][g] || ""; }
+          // Só anexa a matrícula quando é um valor de verdade: o painel pode
+          // publicar "Consulte valores", que viraria "+ matrícula Consulte valores"
+          var mat = String(un.matricula || "");
+          return price + (/\d/.test(mat) ? (" + matrícula " + mat) : "");
+        }
         body.innerHTML = '<span class="quiz-step">Seu plano recomendado</span>' +
           '<div class="quiz-result"><div class="quiz-badge">' + planoNome + '</div>' +
           '<h3>' + planoNome + ' — feito pra você</h3>' +
@@ -269,8 +392,10 @@
             [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
             [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+          leadFieldsHTML() +
           '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
           '<button class="quiz-restart">Refazer</button>';
+        bindLeadFields(body);
         function refreshPrice() {
           var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
           var p = priceFor(un); var el = body.querySelector("#quizPrice");
@@ -280,12 +405,24 @@
         body.querySelector(".quiz-unit").onchange = refreshPrice;
         body.querySelector(".quiz-restart").onclick = function () { step = 0; ans = {}; render(); };
         body.querySelector("#quizGo").onclick = function () {
+          var lead = collectLead(body);
+          if (!lead) return;
           var uid = body.querySelector(".quiz-unit").value; var un = DATA.unitById(uid) || u;
           var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
           var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
           var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
+          submitLead({
+            name: lead.name, phone: lead.phone, email: lead.email,
+            plan_id: planRowIdFor(un, recKey), unit_id: un ? un.dbId : null,
+            unit_slug: un ? un.id : "", plan_key: recKey,
+            interest: "Quiz do site — objetivo: " + (ans.objetivo_label || "-") + "; momento: " + (ans.momento_label || "-") +
+              (ans.origem_label ? ("; já treinou: " + ans.origem_label) : "") +
+              "; interesse: " + (ans.modalidade_label || "-") + "; plano: " + planoNome +
+              "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
+            date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
+          });
           var lines = [
-            "Olá! Montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
+            "Olá! Sou " + lead.name + " — montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
             "",
             "*Objetivo:* " + (ans.objetivo_label || "-"),
             "*Momento:* " + (ans.momento_label || "-")
@@ -313,11 +450,11 @@
 
   /* ---------- Quero ser parceiro (form -> painel + WhatsApp central) ---------- */
   function openPartnerForm() {
-    if (d.querySelector(".cdc-sheet")) return;
+    if (d.querySelector('.cdc-sheet[data-sheet="partner"]')) return;
     var cfg = DATA.get();
     var cats = cfg.partnerCategories || [];
     if (T) T.event("partner_form_open", {});
-    var sheet = h('<div class="cdc-sheet"><div class="cdc-sheet-card">' +
+    var sheet = h('<div class="cdc-sheet" data-sheet="partner"><div class="cdc-sheet-card">' +
       '<button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
       '<h3>Quero ser parceiro</h3><p>Preencha e o time da Cia do Corpo entra em contato para montar a parceria.</p>' +
       '<form id="pform">' +
@@ -329,10 +466,11 @@
         '<div class="field"><label>Cidade</label><input name="cidade"></div></div>' +
         '<div class="field"><label>Qual benefício quer oferecer aos alunos?</label><textarea name="beneficio" placeholder="Ex.: 15% de desconto, 1ª avaliação grátis..."></textarea></div>' +
         '<button type="submit" class="btn btn-primary btn-lg btn-block">Enviar para a Cia do Corpo</button>' +
-        '<p style="font-size:.78rem;color:var(--text-soft);margin:12px 0 0;text-align:center">Registramos seu contato no painel e abrimos o WhatsApp com a central.</p>' +
+        '<p style="font-size:.78rem;color:var(--text-soft);margin:12px 0 0;text-align:center">Abrimos o WhatsApp com a central para você enviar sua proposta.</p>' +
       '</form></div></div>');
     d.body.appendChild(sheet); requestAnimationFrame(function () { sheet.classList.add("show"); });
-    function close() { sheet.classList.remove("show"); setTimeout(function () { sheet.remove(); }, 250); }
+    function rawClose() { sheet.classList.remove("show"); setTimeout(function () { sheet.remove(); }, 250); }
+    var close = bindModalA11y(sheet, rawClose, "Quero ser parceiro");
     sheet.querySelector(".cdc-sheet-x").onclick = close;
     sheet.addEventListener("click", function (e) { if (e.target === sheet) close(); });
     sheet.querySelector("#pform").addEventListener("submit", function (e) {
@@ -351,13 +489,45 @@
       var card = sheet.querySelector(".cdc-sheet-card");
       card.innerHTML = '<button class="cdc-sheet-x" aria-label="Fechar">&times;</button>' +
         '<div style="text-align:center;padding:14px 0"><div style="font-size:3rem;margin-bottom:6px">✅</div>' +
-        '<h3>Recebido!</h3><p>Seu contato foi registrado e abrimos o WhatsApp com a central. Em breve a Cia do Corpo fala com você.</p>' +
+        '<h3>Quase lá!</h3><p>Abrimos o WhatsApp com a central — é só enviar a mensagem para a Cia do Corpo falar com você.</p>' +
         '<button class="btn btn-primary" id="pfdone">Fechar</button></div>';
       card.querySelector(".cdc-sheet-x").onclick = close; card.querySelector("#pfdone").onclick = close;
     });
   }
 
   function h(s) { var t = d.createElement("template"); t.innerHTML = s.trim(); return t.content.firstChild; }
+
+  /* Acessibilidade dos modais: anuncia como diálogo, fecha no Esc, leva o
+     foco para dentro e devolve para quem abriu. Retorna a função de fechar
+     já com a limpeza do listener. */
+  function bindModalA11y(overlay, closeFn, label) {
+    var opener = d.activeElement;
+    var card = overlay.firstElementChild || overlay;
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-modal", "true");
+    if (label) card.setAttribute("aria-label", label);
+    if (!card.hasAttribute("tabindex")) card.setAttribute("tabindex", "-1");
+    function onKey(e) {
+      if (e.key === "Escape" || e.key === "Esc") { e.preventDefault(); wrapped(); return; }
+      if (e.key !== "Tab") return;
+      var f = overlay.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && d.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && d.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    function wrapped() {
+      d.removeEventListener("keydown", onKey, true);
+      closeFn();
+      if (opener && opener.focus) { try { opener.focus(); } catch (e) {} }
+    }
+    d.addEventListener("keydown", onKey, true);
+    requestAnimationFrame(function () {
+      var target = overlay.querySelector("input,select,textarea,button:not([aria-label='Fechar'])") || card;
+      try { target.focus({ preventScroll: true }); } catch (e) {}
+    });
+    return wrapped;
+  }
 
   /* Delegação de cliques */
   d.addEventListener("click", function (e) {

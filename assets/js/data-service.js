@@ -27,11 +27,77 @@
     return over;
   }
 
+  function moneyBR(v) {
+    var s = Number(v).toFixed(2).split(".");
+    return "R$ " + s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + s[1];
+  }
+
+  /* `plans` publicado pelo painel (Sales-Cia) vem como linhas de preço por
+     grupo: { id: <nº>, group: 1|2|3, groupLabel, priceFrom, matricula,
+     recurring, status, ... }. Vira um overlay de preços sobre os cards da
+     seed: texto, badges e features continuam locais; o painel controla só os
+     valores. Uma linha casa com as unidades do mesmo `group` (ou todas, se
+     não tiver group) e escolhe o card assim: key/plan explícito se bater com
+     um item; senão recurring=true vai no Basic+ (recorrência) e o restante no
+     card destacado (Anual VIP). Linhas com status=false são ignoradas.
+     priceFrom numérico substitui só o valor dentro do formato do card
+     ("12x de R$ 109,90" mantém o "12x de"). */
+  function plansFromRows(rows, units) {
+    var seedPlans = (w.CDC_DEFAULT_CONFIG || {}).plans;
+    if (!seedPlans || !seedPlans.byUnit) return null;
+    var plans = deepClone(seedPlans);
+    var unitInfo = {};
+    ((units && units.length ? units : (w.CDC_DEFAULT_CONFIG.units || []))).forEach(function (u) {
+      if (u && u.id) unitInfo[u.id] = { group: u.group, tier: String(u.tier || "").toLowerCase() };
+    });
+    var applied = false;
+    Object.keys(plans.byUnit).forEach(function (unitId) {
+      var items = plans.byUnit[unitId].items || [];
+      rows.forEach(function (row) {
+        if (!row || typeof row !== "object") return;
+        if (row.status === false) return;
+        // Casa a linha com a unidade pelo groupLabel ↔ tier ("Exclusive" ↔
+        // "exclusive"), que é o dado confiável do cadastro; o número do
+        // `group` é só fallback — no painel ele está errado para as unidades
+        // exclusive (todas publicadas como 1/Standard).
+        var info = unitInfo[unitId] || {};
+        var rowLabel = String(row.groupLabel || "").toLowerCase();
+        if (rowLabel && info.tier) {
+          if (rowLabel !== info.tier) return;
+        } else if (row.group != null && info.group != null && row.group !== info.group) {
+          return;
+        }
+        var key = String(row.key || row.planKey || row.plan || "").toLowerCase();
+        var item = items.filter(function (i) { return i.key === key; })[0];
+        if (!item && row.recurring === true) item = items.filter(function (i) { return i.key === "basic"; })[0];
+        if (!item) item = items.filter(function (i) { return i.featured; })[0];
+        if (!item) return;
+        if (typeof row.priceFrom === "number" && row.priceFrom > 0) {
+          item.price = /R\$\s?[\d.,]+/.test(item.price)
+            ? item.price.replace(/R\$\s?[\d.,]+/, moneyBR(row.priceFrom))
+            : moneyBR(row.priceFrom);
+          applied = true;
+        } else if (typeof row.priceFrom === "string" && row.priceFrom.trim()) {
+          item.price = row.priceFrom.trim();
+          applied = true;
+        }
+        if (typeof row.matricula === "number") {
+          item.note = row.matricula > 0 ? "+ " + moneyBR(row.matricula) : "";
+          applied = true;
+        } else if (typeof row.matricula === "string" && row.matricula.trim()) {
+          var m = row.matricula.trim();
+          item.note = /^\+/.test(m) ? m : "+ " + m;
+          applied = true;
+        }
+      });
+    });
+    return applied ? plans : null;
+  }
+
   /* Converte o JSON publicado pelo backend ({ bundle: {...} }) para o
-     formato interno do site. Só aceita as seções conhecidas; `plans` do
-     backend hoje vem como linhas de banco (id/group/priceFrom) e não no
-     formato plans.byUnit que o site renderiza — enquanto o backend não
-     publicar nesse formato, os planos continuam vindo da seed. */
+     formato interno do site. Só aceita as seções conhecidas. `plans` é
+     aceito em dois formatos: plans.byUnit completo (formato do site) ou
+     array de linhas do banco, convertido por plansFromRows(). */
   function normalizeRemote(raw) {
     var b = (raw && raw.bundle) ? raw.bundle : raw;
     if (!b || typeof b !== "object") return null;
@@ -42,7 +108,14 @@
      "partnersClub"].forEach(function (k) {
       if (b[k] !== undefined) out[k] = b[k];
     });
-    if (b.plans && b.plans.byUnit) out.plans = b.plans;
+    if (b.plans && b.plans.byUnit) {
+      out.plans = b.plans;
+    } else if (Array.isArray(b.plans) && b.plans.length) {
+      var converted = plansFromRows(b.plans, b.units);
+      if (converted) out.plans = converted;
+      // Linhas cruas ficam disponíveis para o envio de leads (plan_id do painel)
+      out.planRows = b.plans;
+    }
     return out;
   }
 

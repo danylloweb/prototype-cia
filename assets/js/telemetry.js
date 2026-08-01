@@ -9,7 +9,21 @@
 
 (function (w, d) {
   var CONSENT_KEY = "cdc_consent_v1";
-  var tel = (w.CDC && w.CDC.data) ? w.CDC.data.get().telemetry : {};
+  var tel = ((w.CDC && w.CDC.data) ? w.CDC.data.get().telemetry : {}) || {};
+
+  /* IDs precisam ter o formato real da plataforma; valores placeholder
+     publicados no config (ex.: "xxxxxxxx") são ignorados em vez de
+     injetar tags quebradas. Clarity exige ao menos um dígito para
+     distinguir de placeholders só com letras. */
+  function validId(v, re) {
+    return (typeof v === "string" && re.test(v.trim())) ? v.trim() : "";
+  }
+  tel = Object.assign({}, tel, {
+    gtmId: validId(tel.gtmId, /^GTM-[A-Z0-9]{4,}$/i),
+    ga4Id: validId(tel.ga4Id, /^G-[A-Z0-9]{4,}$/i),
+    metaPixelId: validId(tel.metaPixelId, /^\d{5,20}$/),
+    clarityId: validId(tel.clarityId, /^(?=.*\d)[a-z0-9]{6,20}$/i)
+  });
 
   /* ---- dataLayer + Consent Mode default (antes de qualquer tag) ---- */
   w.dataLayer = w.dataLayer || [];
