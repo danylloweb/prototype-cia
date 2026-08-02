@@ -715,6 +715,9 @@ body.has-sticky .fab-whats{transform:translateY(-78px)}
 .wgrid-slot{display:flex;flex-direction:column;gap:5px;min-height:52px}
 .wgrid-slot.is-today{background:rgba(255,90,0,.05)}
 .wgrid-class{background:rgba(255,90,0,.12);color:#c2410c;border-radius:8px;padding:6px 9px;font-size:.8rem;font-weight:600;line-height:1.25;text-align:center}
+/* Instrutor: opcional, entra abaixo do nome da aula em peso menor */
+.wgrid-who{display:block;font-style:normal;font-weight:500;font-size:.72rem;opacity:.75;margin-top:2px}
+.wgrid-who::before{content:"com "}
 .wgrid-hint{display:none;margin:12px 0 0;font-size:.78rem;color:var(--text-soft);text-align:center}
 @media(max-width:820px){
   .wgrid-hint{display:block}

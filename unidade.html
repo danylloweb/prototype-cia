@@ -163,7 +163,12 @@
       return '<div class="wgrid-cell wgrid-hour">'+esc(t)+'</div>' + withClasses.map(function(d){
         var here = byDay[d].filter(function(c){ return c.time===t; });
         return '<div class="wgrid-cell wgrid-slot'+(d===todayName?' is-today':'')+'">' +
-          here.map(function(c){ return '<span class="wgrid-class">'+esc(c.name)+'</span>'; }).join("") +
+          here.map(function(c){
+            // instrutor é opcional: só entra quando a unidade preencheu
+            var who = (c.instructor||"").trim();
+            return '<span class="wgrid-class">'+esc(c.name)+
+                   (who ? '<i class="wgrid-who">'+esc(who)+'</i>' : '')+'</span>';
+          }).join("") +
           '</div>';
       }).join("");
     }).join("");
