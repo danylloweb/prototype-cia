@@ -10,6 +10,10 @@
 (function (w) {
   var LS_KEY = "cdc_site_config_v4";
   var REMOTE_URL = w.CDC_REMOTE_CONFIG_URL || "https://msadmin.s3.amazonaws.com/config.json";
+  /* O bucket S3 não responde com Access-Control-Allow-Origin, então o
+     navegador bloqueia a leitura do config publicado. O painel serve o
+     mesmo conteúdo com CORS liberado — usado quando o S3 falha. */
+  var REMOTE_FALLBACK_URL = w.CDC_REMOTE_CONFIG_FALLBACK || "https://portalcia.impactadigital.net/public-config";
   var REMOTE_KEY = "cdc_remote_config_v1";
 
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -147,9 +151,15 @@
     refreshRemote: function () {
       var self = this;
       if (!w.fetch || !REMOTE_URL) return;
-      fetch(REMOTE_URL, { cache: "no-store" }).then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
+      function buscar(url) {
+        return fetch(url, { cache: "no-store" }).then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        });
+      }
+      // S3 primeiro; se o CORS bloquear (ou der erro), tenta o painel
+      buscar(REMOTE_URL).catch(function () {
+        return REMOTE_FALLBACK_URL ? buscar(REMOTE_FALLBACK_URL) : Promise.reject();
       }).then(function (raw) {
         var norm = normalizeRemote(raw);
         if (!norm) return;
