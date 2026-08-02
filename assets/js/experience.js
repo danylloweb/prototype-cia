@@ -480,6 +480,26 @@
         instagram: f.instagram.value, cidade: f.cidade.value, beneficio: f.beneficio.value, ts: Date.now(), status: "novo" };
       try { var k = "cdc_partner_leads"; var arr = JSON.parse(localStorage.getItem(k) || "[]"); arr.push(data); localStorage.setItem(k, JSON.stringify(arr)); } catch (x) {}
       if (T) T.event("partner_lead", { empresa: data.empresa, categoria: data.categoria });
+      // Manda a inscrição para o painel: entra como "pendente" e alguém
+      // aprova por lá antes de aparecer no Clube da Parceria. Como o envio
+      // do lead, é fire-and-forget: não segura a abertura do WhatsApp.
+      (function () {
+        var meta = DATA.get().meta || {};
+        var base = String(meta.apiBase || "").replace(/\/+$/, "");
+        if (!base || !meta.landingToken || !w.fetch) return;
+        try {
+          fetch(base + "/landing/register-partner", {
+            method: "POST",
+            keepalive: true,
+            headers: { "Content-Type": "application/json", "X-Landing-Token": meta.landingToken },
+            body: JSON.stringify({
+              name: data.empresa, contact_name: data.nome, category: data.categoria,
+              phone: data.telefone, instagram: data.instagram || null,
+              city: data.cidade || null, benefit: data.beneficio || null
+            })
+          }).catch(function () { /* painel fora: fica no localStorage */ });
+        } catch (e) {}
+      })();
       var central = (cfg.meta && cfg.meta.partnerCentralWhatsapp) || "";
       var lines = ["*QUERO SER PARTE DO CLUBE DA PARCERIA*", "",
         "*Empresa:* " + data.empresa, "*Responsável:* " + data.nome, "*Categoria:* " + data.categoria,
