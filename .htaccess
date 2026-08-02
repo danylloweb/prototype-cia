@@ -1,0 +1,115 @@
+# ============================================================
+# Cia do Corpo — configuração do Apache
+# URLs limpas (/planos em vez de /planos.html), bloqueio de
+# arquivos internos e cache dos estáticos.
+# Servidor Nginx: este arquivo é ignorado — usar deploy/nginx.conf.example.
+# ============================================================
+
+# ---------- Bloqueios (antes de tudo) ----------
+# O deploy é um `git pull` na pasta servida, então .git fica dentro do
+# webroot: sem isso, /.git/config expõe o histórico e os acessos.
+RedirectMatch 404 (?i)/\.git(/|$)
+RedirectMatch 404 (?i)/\.github(/|$)
+# Documentação de deploy e specs internas
+RedirectMatch 404 (?i)^/(deploy|docs)(/|$)
+
+# Require é do Apache 2.4 (mod_authz_core); no 2.2 causaria erro 500,
+# por isso cada bloco fica condicionado ao módulo existir.
+<IfModule mod_authz_core.c>
+    <FilesMatch "(?i)^(\.htaccess|\.gitignore|\.DS_Store|.*\.md|.*\.tmp)$">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "(?i)^(indexOld\.html|funil_vendas_cia_do_corpo\.html)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(?i)^(\.htaccess|\.gitignore|\.DS_Store|.*\.md|.*\.tmp)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+    <FilesMatch "(?i)^(indexOld\.html|funil_vendas_cia_do_corpo\.html)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+Options -Indexes
+
+# ---------- URLs limpas ----------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1) /index.html -> / (precisa vir antes da regra genérica, senão
+    #    /index.html viraria /index em vez da raiz)
+    RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+    RewriteRule ^ /%1 [R=301,L,NE]
+
+    # 2) /pagina.html -> /pagina (301). Só reage à requisição original do
+    #    cliente (THE_REQUEST), então não entra em loop com a regra 3.
+    RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+    RewriteRule ^ /%1 [R=301,L,NE]
+
+    # 3) /pagina/ -> /pagina (barra final só faz sentido em diretório real).
+    #    O destino vem de REQUEST_URI, que já é o caminho da URL: substituição
+    #    relativa aqui viraria o caminho do disco no Location.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} ^(.+)/$
+    RewriteRule ^ %1 [R=301,L,NE]
+
+    # 4) /pagina -> serve pagina.html internamente (sem mudar a URL).
+    #    Substituição relativa e teste por REQUEST_FILENAME: assim funciona
+    #    tanto com o site na raiz do DocumentRoot quanto numa subpasta.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>
+
+# ---------- Página 404 ----------
+ErrorDocument 404 /404.html
+
+# ---------- Cache ----------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    # HTML sempre revalidado: o deploy troca o conteúdo sem mudar o nome
+    ExpiresByType text/html "access plus 0 seconds"
+    # Estáticos são versionados por ?v= — cache longo é seguro
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    # Imagens não são versionadas: 30 dias para poder trocar uma foto
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/avif "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # CSS/JS são versionados por ?v= no HTML: trocar o arquivo muda a URL,
+    # então cache eterno é seguro.
+    <FilesMatch "\.(css|js|woff2)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    # Imagens NÃO têm ?v=: com "immutable" o navegador nunca revalidaria e
+    # uma foto trocada continuaria antiga por um ano. Cache de 30 dias e
+    # revalidação ao expirar.
+    <FilesMatch "\.(jpg|jpeg|png|avif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    <FilesMatch "\.html$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ---------- Compressão ----------
+<IfModule mod_deflate.c>
+    # text/javascript é o Content-Type que o Apache envia para .js — sem ele
+    # na lista, os scripts iam sem compressão.
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+        text/javascript application/javascript application/json image/svg+xml
+</IfModule>

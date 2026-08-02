@@ -1,0 +1,69 @@
+# ============================================================
+# Cia do Corpo — equivalente do .htaccess para Nginx
+# O Nginx ignora .htaccess: se o servidor for Nginx, copie este bloco
+# para o server{} do site (ex.: /etc/nginx/sites-available/ciadocorpo)
+# e recarregue com `nginx -t && systemctl reload nginx`.
+# ============================================================
+
+server {
+    listen 80;
+    server_name www.academiaciadocorpo.com academiaciadocorpo.com;
+    root /var/www/html/prototype-cia;
+    index index.html;
+
+    # ---------- Bloqueios ----------
+    # O deploy é um `git pull` na pasta servida: sem isto, /.git/config
+    # expõe o histórico do repositório e as credenciais de acesso.
+    location ~ /\.git { deny all; return 404; }
+    location ~ /\.(htaccess|gitignore|DS_Store)$ { deny all; return 404; }
+    location ~* \.(md|tmp)$ { deny all; return 404; }
+
+    # Documentos internos (proposta comercial e diagrama de funil)
+    location ~* ^/(indexOld\.html|funil_vendas_cia_do_corpo\.html)$ { deny all; return 404; }
+
+    # ---------- URLs limpas ----------
+    # /pagina.html -> /pagina (301, preservando a query string)
+    if ($request_uri ~ ^/(.*)\.html(\?|$)) {
+        return 301 /$1$is_args$args;
+    }
+    # /index -> / (o `if` acima já transformou /index.html em /index)
+    location = /index { return 301 /; }
+
+    # /pagina/ -> /pagina
+    rewrite ^/(.+)/$ /$1 permanent;
+
+    # Serve pagina.html sem mostrar a extensão
+    location / {
+        try_files $uri $uri.html $uri/ =404;
+    }
+
+    # ---------- Página 404 ----------
+    error_page 404 /404.html;
+    location = /404.html { internal; }
+
+    # ---------- Cache ----------
+    # HTML sempre revalidado: o deploy troca o conteúdo sem mudar o nome
+    location ~* \.html$ {
+        add_header Cache-Control "no-cache, must-revalidate";
+    }
+    # CSS/JS são versionados por ?v= — cache eterno é seguro
+    location ~* \.(css|js|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    # Imagens não têm ?v=: sem "immutable", para uma foto trocada não ficar
+    # congelada no navegador do visitante
+    location ~* \.(jpg|jpeg|png|avif|webp|svg|ico)$ {
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # ---------- Compressão ----------
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 512;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/json image/svg+xml;
+}
