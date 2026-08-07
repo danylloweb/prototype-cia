@@ -21,6 +21,7 @@ site/
   index.html              Home (landing page de conversão)
   unidades.html           Lista de unidades (renderizada da config)
   unidade.html            Página individual de unidade (?u=ID)
+  anamnese.html           Wizard de anamnese (rota /anamnese/{codigo})
   modalidades.html        Modalidades
   planos.html             Planos (Hexa, Plus, Kids)
   sobre.html              Institucional
@@ -35,7 +36,9 @@ site/
     js/telemetry.js       Telemetria + consent LGPD
     js/site.js            Render dinâmico (unidades, popups, schema, logo)
     js/experience.js      Geolocalização, quiz, barra fixa
+    js/anamnese.js        Fluxo de anamnese por código (GET/POST + autosave)
     js/main.js            Interações de UI
+    css/anamnese.css      UI da anamnese (wizard, cards, assinatura)
     img/
       LOGO-HORI-BRA.png   Logo oficial horizontal branco (PNG)
       LOGO-HORI-BRA.avif  Versão AVIF (fallback Wix CDN se necessário)

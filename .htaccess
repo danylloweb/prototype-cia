@@ -40,6 +40,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # URL de anamnese com código único
+    RewriteRule ^anamnese/([^/]+)/?$ /anamnese.html?codigo=$1 [L,QSA,NC]
+
     # 1) /index.html -> / (precisa vir antes da regra genérica, senão
     #    /index.html viraria /index em vez da raiz)
     RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]

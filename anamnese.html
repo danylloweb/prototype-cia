@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anamnese | Cia do Corpo</title>
+  <meta name="description" content="Preencha sua anamnese digital da Cia do Corpo de forma rápida e segura.">
+  <meta name="theme-color" content="#0a0a0b">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260801">
+  <link rel="stylesheet" href="assets/css/anamnese.css?v=20260807">
+</head>
+<body class="anamnese-body">
+  <main class="container py-4 py-md-5">
+    <section class="anamnese-shell mx-auto">
+      <header class="anamnese-head">
+        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+          <div>
+            <p class="anamnese-kicker mb-2"><i class="bi bi-heart-pulse-fill"></i> Cia do Corpo</p>
+            <h1 class="h3 h2-md mb-2">Ficha de Anamnese</h1>
+            <p class="text-secondary mb-0">Responda em poucos minutos. Seus dados ajudam nossa equipe a montar um início seguro.</p>
+          </div>
+          <span id="leadCodeBadge" class="badge text-bg-dark rounded-pill px-3 py-2"></span>
+        </div>
+      </header>
+
+      <section id="stateLoading" aria-live="polite">
+        <div class="placeholder-glow mb-3"><span class="placeholder col-4 rounded-pill"></span></div>
+        <div class="anamnese-skeleton mb-3">
+          <span class="placeholder col-12"></span>
+          <span class="placeholder col-8"></span>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6"><div class="anamnese-skeleton"><span class="placeholder col-12"></span></div></div>
+          <div class="col-md-6"><div class="anamnese-skeleton"><span class="placeholder col-12"></span></div></div>
+          <div class="col-12"><div class="anamnese-skeleton"><span class="placeholder col-12"></span></div></div>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-4 text-secondary"><div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div><span>Carregando seus dados...</span></div>
+      </section>
+
+      <section id="stateInvalid" class="d-none text-center py-4">
+        <div class="invalid-icon mb-3"><i class="bi bi-exclamation-octagon"></i></div>
+        <h2 class="h4 mb-2">Link inválido ou expirado</h2>
+        <p class="text-secondary mb-4">Não foi possível localizar seu convite de anamnese. Fale com nossa equipe para receber um novo link.</p>
+        <a id="invalidContactBtn" href="contato.html" class="btn btn-primary btn-lg"><i class="bi bi-whatsapp me-2"></i>Entrar em contato com a academia</a>
+      </section>
+
+      <section id="stateForm" class="d-none">
+        <div class="progress anamnese-progress mb-3" role="progressbar" aria-label="Progresso do formulário" aria-valuemin="0" aria-valuemax="100">
+          <div id="wizardProgress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 33%;">Etapa 1 de 3</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <span class="badge rounded-pill text-bg-light border" id="stepBadge1">1. Dados pessoais</span>
+          <span class="badge rounded-pill text-bg-light border" id="stepBadge2">2. Questionário PAR-Q</span>
+          <span class="badge rounded-pill text-bg-light border" id="stepBadge3">3. Termo e assinatura</span>
+        </div>
+
+        <form id="anamneseForm" novalidate>
+          <div data-step="1">
+            <div class="card shadow-sm border-0 mb-3 rounded-4">
+              <div class="card-body p-4">
+                <h2 class="h5 mb-3">Dados pessoais</h2>
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label for="name" class="form-label">Nome *</label>
+                    <input id="name" name="name" class="form-control" required autocomplete="name">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="phone" class="form-label">Telefone *</label>
+                    <input id="phone" name="phone" class="form-control" required inputmode="tel" autocomplete="tel">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input id="email" name="email" type="email" class="form-control" autocomplete="email">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="cpf" class="form-label">CPF *</label>
+                    <input id="cpf" name="cpf" class="form-control" required inputmode="numeric">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12">
+                    <label for="address" class="form-label">Endereço completo *</label>
+                    <input id="address" name="address" class="form-control" required autocomplete="street-address">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="birthDate" class="form-label">Data de nascimento *</label>
+                    <input id="birthDate" name="birthDate" type="date" class="form-control" required>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label for="age" class="form-label">Idade</label>
+                    <input id="age" name="age" class="form-control" readonly>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="emergencyContact" class="form-label">Contato de emergência *</label>
+                    <input id="emergencyContact" name="emergencyContact" class="form-control" required>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="emergencyPhone" class="form-label">Telefone do contato *</label>
+                    <input id="emergencyPhone" name="emergencyPhone" class="form-control" required inputmode="tel">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div data-step="2" class="d-none">
+            <div id="medicalWarning" class="alert alert-danger d-none" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>Com base nas suas respostas recomendamos procurar avaliação médica antes de iniciar atividades físicas.
+            </div>
+            <div class="vstack gap-3 mb-3" id="parqCards"></div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-body p-4">
+                <h2 class="h5 mb-3">Objetivos e rotina</h2>
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label for="goal" class="form-label">Objetivo *</label>
+                    <select id="goal" name="goal" class="form-select" required>
+                      <option value="">Selecione</option>
+                      <option>Emagrecimento</option>
+                      <option>Hipertrofia</option>
+                      <option>Condicionamento</option>
+                      <option>Saúde</option>
+                      <option>Performance</option>
+                      <option>Reabilitação</option>
+                      <option>Ganho de Massa</option>
+                      <option>Outro</option>
+                    </select>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6 d-none" id="goalOtherWrap">
+                    <label for="goalOther" class="form-label">Qual objetivo?</label>
+                    <input id="goalOther" name="goalOther" class="form-control">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="trainingDays" class="form-label">Dias por semana *</label>
+                    <select id="trainingDays" name="trainingDays" class="form-select" required>
+                      <option value="">Selecione</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                    </select>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="trainingShift" class="form-label">Turno preferido *</label>
+                    <select id="trainingShift" name="trainingShift" class="form-select" required>
+                      <option value="">Selecione</option>
+                      <option>Manhã</option>
+                      <option>Tarde</option>
+                      <option>Noite</option>
+                      <option>Flexível</option>
+                    </select>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div data-step="3" class="d-none">
+            <div class="card shadow-sm border-0 rounded-4 mb-3">
+              <div class="card-body p-4">
+                <h2 class="h5 mb-3">Termo de responsabilidade</h2>
+                <div id="termsMissingAlert" class="alert alert-warning d-none" role="alert">
+                  O termo oficial ainda não foi configurado. O envio ficará indisponível até este texto ser informado.
+                </div>
+                <div id="termsContent" class="terms-box"></div>
+                <div class="form-check mt-3">
+                  <input class="form-check-input" type="checkbox" value="1" id="acceptedTerms" required>
+                  <label class="form-check-label" for="acceptedTerms">Declaro que li e concordo com o termo acima. *</label>
+                </div>
+                <div class="invalid-feedback d-block" id="acceptedTermsError"></div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-body p-4">
+                <h2 class="h5 mb-3">Assinatura digital *</h2>
+                <p class="text-secondary mb-3">Assine no quadro abaixo e clique em <b>Salvar</b>.</p>
+                <div class="signature-wrap">
+                  <canvas id="signatureCanvas" width="860" height="280" aria-label="Área de assinatura"></canvas>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                  <button type="button" id="signatureClear" class="btn btn-outline-secondary"><i class="bi bi-eraser me-1"></i>Limpar</button>
+                  <button type="button" id="signatureRedo" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise me-1"></i>Refazer</button>
+                  <button type="button" id="signatureSave" class="btn btn-dark"><i class="bi bi-floppy me-1"></i>Salvar</button>
+                </div>
+                <p class="mb-0 mt-3 small" id="signatureStatus">Nenhuma assinatura salva.</p>
+                <div class="invalid-feedback d-block" id="signatureError"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center pt-3">
+            <button type="button" id="prevBtn" class="btn btn-outline-dark d-none"><i class="bi bi-arrow-left me-1"></i>Voltar</button>
+            <div class="ms-auto d-flex gap-2">
+              <button type="button" id="nextBtn" class="btn btn-dark">Próxima etapa <i class="bi bi-arrow-right ms-1"></i></button>
+              <button type="submit" id="submitBtn" class="btn btn-primary d-none">
+                <span class="spinner-border spinner-border-sm me-2 d-none" id="submitSpinner" aria-hidden="true"></span>
+                Enviar anamnese
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section id="stateSuccess" class="d-none text-center py-4">
+        <div class="success-icon mb-3"><i class="bi bi-check-circle-fill"></i></div>
+        <h2 class="h3 mb-3">Obrigado!</h2>
+        <p class="mb-4">Sua anamnese foi registrada com sucesso.<br>Nossa equipe analisará suas respostas antes do início dos treinos.</p>
+        <a href="/" class="btn btn-primary btn-lg">Finalizar</a>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center text-bg-dark border-0" role="status" aria-live="polite" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="appToastBody"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="assets/js/config.js?v=20260801"></script>
+  <script src="assets/js/data-service.js?v=20260801"></script>
+  <script src="assets/js/anamnese.js?v=20260807"></script>
+</body>
+</html>
