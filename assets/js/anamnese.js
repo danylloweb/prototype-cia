@@ -1,14 +1,14 @@
 (function (w, d) {
   var cfg = w.CDC && w.CDC.data && w.CDC.data.get ? w.CDC.data.get() : null;
-  var TERMS_TEXT = w.CDC_ANAMNESE_TERMO || (cfg && cfg.meta && cfg.meta.anamneseTerms) || "";
-  var QUESTIONS = [
-    { id: 1, text: "Seu médico já lhe disse que possui doença cardiovascular ou hipertensão?" },
-    { id: 2, text: "Você sente dor no peito durante repouso ou atividade física?" },
-    { id: 3, text: "Você perdeu equilíbrio por tontura ou consciência nos últimos 12 meses?" },
-    { id: 4, text: "Possui alguma doença crônica além de hipertensão ou doença cardíaca?", extra: "chronic" },
-    { id: 5, text: "Possui ou teve problemas em ossos, articulações, ligamentos, músculos ou tendões?", extra: "ortho" },
-    { id: 6, text: "Seu médico recomendou realizar atividade física apenas sob supervisão?" },
-    { id: 7, text: "Pratica atividade física?", extra: "activity" }
+  var TERMS_TEXT = w.CDC_ANAMNESE_TERMO || (cfg && cfg.meta && cfg.meta.anamneseTerms) || "Declaro que estou em plenas condições de saúde e autorizado por meu médico a realizar atividades físicas, bem como não sou portador de nenhuma moléstia. Assumo total responsabilidade pelo meu estado de saúde, isentando a Academia e seus colaboradores sobre qualquer acontecimento dentro de suas dependências. Me responsabilizo a partir desta data a trazer meu atestado médico. Declaro ainda que todas as informações fornecidas são verdadeiras e exatas. Compreendo que qualquer omissão ou informação falsa pode afetar minha segurança no treino, bem como resultados e isento a academia de responsabilidades relacionadas a tais informações.";
+  const QUESTIONS = [
+    {id: 1, text: "Seu médico já lhe disse que possui doença cardiovascular ou hipertensão?"},
+    {id: 2, text: "Você sente dor no peito durante repouso ou atividade física?"},
+    {id: 3, text: "Você perdeu equilíbrio por tontura ou consciência nos últimos 12 meses?"},
+    {id: 4, text: "Possui alguma doença crônica além de hipertensão ou doença cardíaca?", extra: "chronic"},
+    {id: 5, text: "Possui ou teve problemas em ossos, articulações, ligamentos, músculos ou tendões?", extra: "ortho"},
+    {id: 6, text: "Seu médico recomendou realizar atividade física apenas sob supervisão?"},
+    {id: 7, text: "Pratica atividade física?", extra: "activity"}
   ];
 
   var STEP_TOTAL = 3;
@@ -668,20 +668,28 @@
   function configureTerms() {
     byId("termsContent").textContent = TERMS_TEXT || "Aguardando termo oficial da ficha de anamnese.";
     submitLockedByTerms = !TERMS_TEXT;
-    byId("termsMissingAlert").classList.toggle("d-none", !submitLockedByTerms);
+    byId("termsMissingAlert").classList.toggle("d-none", true);
+    byId("acceptedTerms").disabled = false;
   }
 
+  document.getElementById('anamneseForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    submitForm(event);
+    console.log('Formulário enviado!');
+    console.log('Botão:', document.getElementById('submitBtn'));
+
+    // Seu código aqui
+  });
   function submitForm(ev) {
     ev.preventDefault();
     if (!validateStep(null)) return;
 
-    var payload = collectFormData();
-    var submitBtn = byId("submitBtn");
-    var spinner = byId("submitSpinner");
+    const payload = collectFormData();
+    const submitBtn = byId("submitBtn");
+    const spinner = byId("submitSpinner");
     submitBtn.disabled = true;
     spinner.classList.remove("d-none");
-
-    fetch("/api/anamnese/" + encodeURIComponent(code), {
+    fetch("https://portalcia.impactadigital.net/anamnese/" + encodeURIComponent(code), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -689,11 +697,12 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     }).then(function (json) {
-      if (!json || json.success === false) throw new Error("Resposta inválida");
+      if (!json || json.success === false) throw new Error((json && json.message) ? json.message : "Resposta inválida");
       try { localStorage.removeItem(stateKey()); } catch (e) {}
       showState("stateSuccess");
-    }).catch(function () {
-      showToast("Não foi possível enviar agora. Tente novamente.", true);
+    }).catch(function (err) {
+      console.error("Anamnese submit failed", err);
+      showToast((err && err.message) ? err.message : "Não foi possível enviar agora. Tente novamente.", true);
     }).finally(function () {
       submitBtn.disabled = submitLockedByTerms;
       spinner.classList.add("d-none");
@@ -771,19 +780,20 @@
       showToast("Rascunho restaurado automaticamente.");
     }
 
-    fetch("/api/anamnese/" + encodeURIComponent(code), { method: "GET" })
+    fetch("https://portalcia.impactadigital.net/anamnese/" + encodeURIComponent(code), { method: "GET" })
       .then(function (res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
       })
       .then(function (json) {
-        if (!json || json.success !== true || !json.data || !json.data.lead) throw new Error("Código inválido");
+        if (!json || json.success !== true || !json.data || !json.data.lead) throw new Error((json && json.message) ? json.message : "Código inválido");
         applyLeadPrefill(json.data.lead);
         showState("stateForm");
         setStep(step);
         byId("submitBtn").disabled = submitLockedByTerms;
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.error("Anamnese load failed", err);
         showState("stateInvalid");
       });
   }
