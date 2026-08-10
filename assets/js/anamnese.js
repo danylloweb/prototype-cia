@@ -672,14 +672,14 @@
     byId("acceptedTerms").disabled = false;
   }
 
-  document.getElementById('anamneseForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-    submitForm(event);
-    console.log('Formulário enviado!');
-    console.log('Botão:', document.getElementById('submitBtn'));
-
-    // Seu código aqui
-  });
+  // document.getElementById('anamneseForm').addEventListener('submit', function (event) {
+  //   event.preventDefault();
+  //   submitForm(event);
+  //   console.log('Formulário enviado!');
+  //   console.log('Botão:', document.getElementById('submitBtn'));
+  //
+  //   // Seu código aqui
+  // });
   function submitForm(ev) {
     ev.preventDefault();
     if (!validateStep(null)) return;
