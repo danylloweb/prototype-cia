@@ -85,9 +85,44 @@
                     <input id="cpf" name="cpf" class="form-control" required inputmode="numeric">
                     <div class="invalid-feedback"></div>
                   </div>
+                  <div class="col-12 col-md-3">
+                    <label for="cep" class="form-label">CEP *</label>
+                    <input id="cep" name="cep" class="form-control" required inputmode="numeric" placeholder="00000-000" autocomplete="postal-code">
+                    <div class="invalid-feedback"></div>
+                    <small id="cepLoading" class="d-none text-muted"><i class="bi bi-hourglass-split"></i> Buscando...</small>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label for="addressNumber" class="form-label">Número *</label>
+                    <input id="addressNumber" name="addressNumber" class="form-control" required inputmode="numeric">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="addressStreet" class="form-label">Rua *</label>
+                    <input id="addressStreet" name="addressStreet" class="form-control" required autocomplete="street-address">
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="addressComplement" class="form-label">Complemento</label>
+                    <input id="addressComplement" name="addressComplement" class="form-control">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="addressDistrict" class="form-label">Bairro *</label>
+                    <input id="addressDistrict" name="addressDistrict" class="form-control" required>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label for="addressCity" class="form-label">Cidade *</label>
+                    <input id="addressCity" name="addressCity" class="form-control" required>
+                    <div class="invalid-feedback"></div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label for="addressState" class="form-label">Estado *</label>
+                    <input id="addressState" name="addressState" class="form-control" required maxlength="2">
+                    <div class="invalid-feedback"></div>
+                  </div>
                   <div class="col-12">
-                    <label for="address" class="form-label">Endereço completo *</label>
-                    <input id="address" name="address" class="form-control" required autocomplete="street-address">
+                    <label for="address" class="form-label d-none">Endereço completo (gerado automaticamente)</label>
+                    <input id="address" name="address" class="form-control d-none" required>
                     <div class="invalid-feedback"></div>
                   </div>
                   <div class="col-12 col-md-4">

@@ -33,9 +33,9 @@
   function isEmail(v) { return !v || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
 
   function parseCode() {
-    var match = w.location.pathname.match(/\/anamnese\/([^/?#]+)/i);
+    let match = w.location.pathname.match(/\/anamnese\/([^/?#]+)/i);
     if (match && match[1]) return decodeURIComponent(match[1]);
-    var q = new URLSearchParams(w.location.search).get("codigo");
+    const q = new URLSearchParams(w.location.search).get("code");
     return q ? decodeURIComponent(q) : "";
   }
 
@@ -116,6 +116,53 @@
       v = v.replace(/\.(\d{3})(\d)/, ".$1-$2");
       input.value = v;
     });
+  }
+
+  function maskCep(input) {
+    input.addEventListener("input", function () {
+      var v = toDigits(input.value).slice(0, 8);
+      if (v.length > 5) input.value = v.slice(0, 5) + "-" + v.slice(5);
+      else input.value = v;
+    });
+  }
+
+  function searchCep(cepValue) {
+    var cep = toDigits(cepValue);
+    if (cep.length !== 8) {
+      showToast("CEP deve ter 8 dígitos.", true);
+      return Promise.reject("Invalid CEP format");
+    }
+
+    var loadingEl = byId("cepLoading");
+    if (loadingEl) loadingEl.classList.remove("d-none");
+
+    return fetch("https://viacep.com.br/ws/" + cep + "/json/", { method: "GET" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (json) {
+        if (json.erro) {
+          showToast("CEP não encontrado.", true);
+          return;
+        }
+        byId("addressStreet").value = json.logradouro || "";
+        byId("addressDistrict").value = json.bairro || "";
+        byId("addressCity").value = json.localidade || "";
+        byId("addressState").value = json.uf || "";
+        if (byId("addressComplement")) byId("addressComplement").value = json.complemento || "";
+
+        clearInvalid(byId("cep"));
+        byId("addressNumber").focus();
+        showToast("Endereço preenchido automaticamente.");
+        scheduleAutosave();
+      })
+      .catch(function (err) {
+        showToast("Erro ao buscar CEP. Verifique a conexão.", true);
+      })
+      .finally(function () {
+        if (loadingEl) loadingEl.classList.add("d-none");
+      });
   }
 
   function calculateAge() {
@@ -384,13 +431,24 @@
       };
     });
 
+    // Montar endereço completo a partir dos campos individuais
+    var addressParts = [];
+    if (byId("addressStreet").value.trim()) addressParts.push(byId("addressStreet").value.trim());
+    if (byId("addressNumber").value.trim()) addressParts.push(byId("addressNumber").value.trim());
+    if (byId("addressComplement").value.trim()) addressParts.push(byId("addressComplement").value.trim());
+    if (byId("addressDistrict").value.trim()) addressParts.push(byId("addressDistrict").value.trim());
+    if (byId("addressCity").value.trim()) addressParts.push(byId("addressCity").value.trim());
+    if (byId("addressState").value.trim()) addressParts.push(byId("addressState").value.trim());
+    var fullAddress = addressParts.join(", ");
+    byId("address").value = fullAddress;
+
     return {
       personal: {
         name: byId("name").value.trim(),
         email: byId("email").value.trim() || null,
         phone: byId("phone").value.trim(),
         cpf: byId("cpf").value.trim(),
-        address: byId("address").value.trim(),
+        address: fullAddress,
         birth_date: byId("birthDate").value || null,
         age: Number(byId("age").value || 0),
         emergency_contact: byId("emergencyContact").value.trim(),
@@ -421,7 +479,12 @@
       mark(toDigits(byId("phone").value).length < 11, byId("phone"), "Telefone obrigatório no formato (00) 00000-0000.");
       mark(byId("email").value.trim() && !isEmail(byId("email").value.trim()), byId("email"), "E-mail inválido.");
       mark(toDigits(byId("cpf").value).length !== 11, byId("cpf"), "CPF obrigatório no formato 000.000.000-00.");
-      mark(!byId("address").value.trim(), byId("address"), "Informe o endereço completo.");
+      mark(toDigits(byId("cep").value).length !== 8, byId("cep"), "CEP obrigatório no formato 00000-000.");
+      mark(!byId("addressStreet").value.trim(), byId("addressStreet"), "Informe a rua.");
+      mark(!byId("addressNumber").value.trim(), byId("addressNumber"), "Informe o número.");
+      mark(!byId("addressDistrict").value.trim(), byId("addressDistrict"), "Informe o bairro.");
+      mark(!byId("addressCity").value.trim(), byId("addressCity"), "Informe a cidade.");
+      mark(!byId("addressState").value.trim(), byId("addressState"), "Informe o estado.");
       mark(!byId("birthDate").value, byId("birthDate"), "Informe a data de nascimento.");
       mark(!byId("emergencyContact").value.trim(), byId("emergencyContact"), "Informe o contato de emergência.");
       mark(toDigits(byId("emergencyPhone").value).length < 11, byId("emergencyPhone"), "Telefone de emergência obrigatório.");
@@ -498,6 +561,13 @@
     if (!code) return;
     var payload = collectFormData();
     payload._raw = {
+      cep: byId("cep").value,
+      addressStreet: byId("addressStreet").value,
+      addressNumber: byId("addressNumber").value,
+      addressComplement: byId("addressComplement").value,
+      addressDistrict: byId("addressDistrict").value,
+      addressCity: byId("addressCity").value,
+      addressState: byId("addressState").value,
       parqAnswers: QUESTIONS.reduce(function (acc, q) {
         var ans = answerYes(q.id);
         acc[q.id] = ans === null ? "" : (ans ? "yes" : "no");
@@ -540,6 +610,13 @@
     byId("email").value = p.email || "";
     byId("phone").value = p.phone || "";
     byId("cpf").value = p.cpf || "";
+    byId("cep").value = p.cep || "";
+    byId("addressStreet").value = p.addressStreet || "";
+    byId("addressNumber").value = p.addressNumber || "";
+    byId("addressComplement").value = p.addressComplement || "";
+    byId("addressDistrict").value = p.addressDistrict || "";
+    byId("addressCity").value = p.addressCity || "";
+    byId("addressState").value = p.addressState || "";
     byId("address").value = p.address || "";
     byId("birthDate").value = p.birth_date || "";
     byId("emergencyContact").value = p.emergency_contact || "";
@@ -630,8 +707,9 @@
     byId("prevBtn").addEventListener("click", function () { setStep(step - 1); });
 
     [
-      "name", "phone", "email", "cpf", "address", "birthDate",
-      "emergencyContact", "emergencyPhone", "goal", "goalOther",
+      "name", "phone", "email", "cpf", "cep", "addressStreet", "addressNumber", 
+      "addressComplement", "addressDistrict", "addressCity", "addressState",
+      "birthDate", "emergencyContact", "emergencyPhone", "goal", "goalOther",
       "trainingDays", "trainingShift", "acceptedTerms"
     ].forEach(function (id) {
       var el = byId(id);
@@ -644,6 +722,17 @@
       });
     });
     byId("birthDate").addEventListener("change", calculateAge);
+
+    // CEP lookup on blur
+    var cepField = byId("cep");
+    if (cepField) {
+      cepField.addEventListener("blur", function () {
+        var cepVal = this.value.trim();
+        if (cepVal && toDigits(cepVal).length === 8) {
+          searchCep(cepVal);
+        }
+      });
+    }
   }
 
   function initRefs() {
@@ -672,10 +761,11 @@
     maskPhone(byId("phone"));
     maskPhone(byId("emergencyPhone"));
     maskCpf(byId("cpf"));
+    maskCep(byId("cep"));
     bindEvents();
-    var signatureApi = setupSignatureCanvas();
+    const signatureApi = setupSignatureCanvas();
 
-    var draft = restoreDraft();
+    const draft = restoreDraft();
     if (draft) {
       applyDraft(draft, signatureApi);
       showToast("Rascunho restaurado automaticamente.");
