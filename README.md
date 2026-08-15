@@ -36,7 +36,7 @@ site/
     js/telemetry.js       Telemetria + consent LGPD
     js/site.js            Render dinâmico (unidades, popups, schema, logo)
     js/experience.js      Geolocalização, quiz, barra fixa
-    js/anamnese.js        Fluxo de anamnese por código (GET/POST + autosave)
+    js/anamnese.js        Fluxo de anamnese por código (GET/POST + rascunho de sessão)
     js/main.js            Interações de UI
     css/anamnese.css      UI da anamnese (wizard, cards, assinatura)
     img/

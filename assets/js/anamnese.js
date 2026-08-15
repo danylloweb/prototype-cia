@@ -1,802 +1,1188 @@
+/* ============================================================
+   CIA DO CORPO — Ficha de Anamnese
+   Fluxo em 3 etapas com rascunho de sessão (LGPD: nada persiste
+   depois que a aba fecha) e assinatura em canvas.
+   ============================================================ */
 (function (w, d) {
-  var cfg = w.CDC && w.CDC.data && w.CDC.data.get ? w.CDC.data.get() : null;
-  var TERMS_TEXT = w.CDC_ANAMNESE_TERMO || (cfg && cfg.meta && cfg.meta.anamneseTerms) || "Declaro que estou em plenas condições de saúde e autorizado por meu médico a realizar atividades físicas, bem como não sou portador de nenhuma moléstia. Assumo total responsabilidade pelo meu estado de saúde, isentando a Academia e seus colaboradores sobre qualquer acontecimento dentro de suas dependências. Me responsabilizo a partir desta data a trazer meu atestado médico. Declaro ainda que todas as informações fornecidas são verdadeiras e exatas. Compreendo que qualquer omissão ou informação falsa pode afetar minha segurança no treino, bem como resultados e isento a academia de responsabilidades relacionadas a tais informações.";
-  const QUESTIONS = [
-    {id: 1, text: "Seu médico já lhe disse que possui doença cardiovascular ou hipertensão?"},
-    {id: 2, text: "Você sente dor no peito durante repouso ou atividade física?"},
-    {id: 3, text: "Você perdeu equilíbrio por tontura ou consciência nos últimos 12 meses?"},
-    {id: 4, text: "Possui alguma doença crônica além de hipertensão ou doença cardíaca?", extra: "chronic"},
-    {id: 5, text: "Possui ou teve problemas em ossos, articulações, ligamentos, músculos ou tendões?", extra: "ortho"},
-    {id: 6, text: "Seu médico recomendou realizar atividade física apenas sob supervisão?"},
-    {id: 7, text: "Pratica atividade física?", extra: "activity"}
+  "use strict";
+
+  var DEFAULT_TERMS = "Declaro que estou em plenas condições de saúde e autorizado por meu médico a realizar atividades físicas, bem como não sou portador de nenhuma moléstia. Assumo total responsabilidade pelo meu estado de saúde, isentando a Academia e seus colaboradores sobre qualquer acontecimento dentro de suas dependências. Me responsabilizo a partir desta data a trazer meu atestado médico. Declaro ainda que todas as informações fornecidas são verdadeiras e exatas. Compreendo que qualquer omissão ou informação falsa pode afetar minha segurança no treino, bem como resultados e isento a academia de responsabilidades relacionadas a tais informações.";
+
+  var QUESTIONS = [
+    { id: 1, text: "Seu médico já lhe disse que você tem doença do coração ou pressão alta?" },
+    { id: 2, text: "Você sente dor no peito, em repouso ou durante atividade física?" },
+    { id: 3, text: "Você teve tontura, desmaio ou perda de equilíbrio nos últimos 12 meses?" },
+    { id: 4, text: "Tem alguma doença crônica além de pressão alta ou problema no coração?", extra: "chronic" },
+    { id: 5, text: "Tem ou já teve problema em ossos, articulações, ligamentos, músculos ou tendões?", extra: "ortho" },
+    { id: 6, text: "Algum médico recomendou que você só faça atividade física com supervisão?" },
+    { id: 7, text: "Você já pratica alguma atividade física hoje?", extra: "activity" }
   ];
 
+  var GOALS_FIXED = ["Emagrecimento", "Hipertrofia", "Condicionamento", "Saúde", "Performance", "Reabilitação", "Ganho de Massa"];
+  var UFS = "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
   var STEP_TOTAL = 3;
-  var step = 1;
-  var code = "";
-  var submitLockedByTerms = false;
-  var savedSignature = "";
-  var redoSignature = "";
-  var isDrawing = false;
-  var hasDrawnStroke = false;
-  var autosaveTimer = 0;
-  var toast = null;
-  var toastBody = null;
+  var STORE_PREFIX = "cdc_anamnese_";
+  var REQUEST_TIMEOUT = 15000;
 
-  var els = {};
+  /* Campos simples da etapa 1 e 2 — id do input -> chave do rascunho */
+  var FIELDS = [
+    "fName", "fPhone", "fEmail", "fCpf", "fBirth",
+    "fCep", "fStreet", "fNumber", "fComplement", "fDistrict", "fCity", "fState",
+    "fEmergName", "fEmergPhone",
+    "fGoal", "fGoalOther", "fDays", "fShift"
+  ];
+  var EXTRA_FIELDS = ["qChronicWhat", "qChronicMedsList", "qChronicMedsWhich", "qOrthoWhat", "qActivityWhat", "qActivityTime"];
+
+  var state = {
+    step: 1,
+    code: "",
+    apiBase: "",
+    lead: null,
+    submitted: false,
+    sending: false,
+    dirty: false
+  };
+  var sign = null;
+  var saveTimer = 0;
+
+  /* ---------------------------------------------------------- utilidades */
 
   function byId(id) { return d.getElementById(id); }
-  function $all(sel, root) { return Array.prototype.slice.call((root || d).querySelectorAll(sel)); }
-  function stateKey() { return "anamnese_" + code; }
-  function toDigits(v) { return String(v || "").replace(/\D/g, ""); }
-  function safeStr(v) { return String(v == null ? "" : v); }
-  function isEmail(v) { return !v || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+  function all(sel, root) { return Array.prototype.slice.call((root || d).querySelectorAll(sel)); }
+  function digits(v) { return String(v == null ? "" : v).replace(/\D/g, ""); }
+  function trim(v) { return String(v == null ? "" : v).trim(); }
+  function val(id) { var el = byId(id); return el ? trim(el.value) : ""; }
+  function setVal(id, v) { var el = byId(id); if (el) el.value = v == null ? "" : v; }
 
-  function parseCode() {
-    let match = w.location.pathname.match(/\/anamnese\/([^/?#]+)/i);
-    if (match && match[1]) return decodeURIComponent(match[1]);
-    const q = new URLSearchParams(w.location.search).get("code");
-    return q ? decodeURIComponent(q) : "";
+  function config() {
+    return (w.CDC && w.CDC.data && typeof w.CDC.data.get === "function") ? w.CDC.data.get() : null;
   }
 
   function contactHref() {
-    var cfg = w.CDC && w.CDC.data && w.CDC.data.get ? w.CDC.data.get() : null;
-    var wa = cfg && cfg.meta && cfg.meta.partnerCentralWhatsapp ? toDigits(cfg.meta.partnerCentralWhatsapp) : "";
-    return wa ? ("https://wa.me/" + wa) : "contato.html";
+    var cfg = config();
+    var wa = cfg && cfg.meta ? digits(cfg.meta.partnerCentralWhatsapp) : "";
+    return wa ? ("https://wa.me/" + wa + "?text=" + encodeURIComponent("Olá! Preciso de ajuda com a minha ficha de anamnese.")) : "contato.html";
   }
 
-  function showState(name) {
-    ["stateLoading", "stateInvalid", "stateForm", "stateSuccess"].forEach(function (id) {
-      byId(id).classList.toggle("d-none", id !== name);
+  function apiUrl() {
+    return state.apiBase + "/" + encodeURIComponent(state.code);
+  }
+
+  function fetchJson(url, options) {
+    var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    var opts = options || {};
+    if (ctrl) opts.signal = ctrl.signal;
+    var timer = w.setTimeout(function () { if (ctrl) ctrl.abort(); }, REQUEST_TIMEOUT);
+
+    return fetch(url, opts).then(function (res) {
+      return res.text().then(function (text) {
+        var json = null;
+        try { json = text ? JSON.parse(text) : null; } catch (e) { /* resposta não-JSON */ }
+        return { ok: res.ok, status: res.status, json: json };
+      });
+    }).finally(function () { w.clearTimeout(timer); });
+  }
+
+  /* ------------------------------------------------------------- avisos */
+
+  function toast(message, kind) {
+    var host = byId("anToasts");
+    if (!host) return;
+    var el = d.createElement("div");
+    el.className = "an-toast" + (kind ? " is-" + kind : "");
+    var icon = kind === "bad"
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>';
+    el.innerHTML = icon + "<span></span>";
+    el.lastChild.textContent = message;
+    host.appendChild(el);
+    w.setTimeout(function () {
+      el.classList.add("leaving");
+      w.setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+    }, 3200);
+  }
+
+  function showScreen(name) {
+    ["stLoading", "stError", "stForm", "stDone"].forEach(function (id) {
+      var el = byId(id);
+      if (el) el.hidden = (id !== name);
     });
   }
 
-  function showToast(msg, danger) {
-    if (!toast) return;
-    toastBody.textContent = msg;
-    var root = byId("appToast");
-    root.classList.toggle("text-bg-danger", !!danger);
-    root.classList.toggle("text-bg-dark", !danger);
-    toast.show();
+  /* --------------------------------------------------------- erros de campo */
+
+  function fieldOf(el) { return el ? el.closest(".field") : null; }
+
+  function setError(el, message) {
+    var box = fieldOf(el);
+    if (!box) return;
+    box.classList.add("has-error");
+    var msg = box.querySelector(".err span");
+    if (msg) msg.textContent = message;
+    if (el.setAttribute) el.setAttribute("aria-invalid", "true");
   }
 
-  function setStep(next) {
-    step = Math.max(1, Math.min(STEP_TOTAL, next));
-    $all("[data-step]").forEach(function (block) {
-      block.classList.toggle("d-none", Number(block.getAttribute("data-step")) !== step);
-    });
-    byId("prevBtn").classList.toggle("d-none", step === 1);
-    byId("nextBtn").classList.toggle("d-none", step === STEP_TOTAL);
-    byId("submitBtn").classList.toggle("d-none", step !== STEP_TOTAL);
-    var pct = Math.round((step / STEP_TOTAL) * 100);
-    byId("wizardProgress").style.width = pct + "%";
-    byId("wizardProgress").textContent = "Etapa " + step + " de " + STEP_TOTAL;
-    [1, 2, 3].forEach(function (n) {
-      byId("stepBadge" + n).classList.toggle("text-bg-dark", n === step);
-      byId("stepBadge" + n).classList.toggle("text-bg-light", n !== step);
-    });
-    w.scrollTo({ top: 0, behavior: "smooth" });
+  function clearError(el) {
+    var box = fieldOf(el);
+    if (!box) return;
+    box.classList.remove("has-error");
+    var msg = box.querySelector(".err span");
+    if (msg) msg.textContent = "";
+    if (el.removeAttribute) el.removeAttribute("aria-invalid");
   }
 
-  function setInvalid(el, message) {
+  function setBlockError(errId, message) {
+    var el = byId(errId);
     if (!el) return;
-    el.classList.add("is-invalid");
-    var feedback = el.parentElement && el.parentElement.querySelector(".invalid-feedback");
-    if (feedback) feedback.textContent = message;
-  }
-
-  function clearInvalid(el) {
-    if (!el) return;
-    el.classList.remove("is-invalid");
-    var feedback = el.parentElement && el.parentElement.querySelector(".invalid-feedback");
-    if (feedback) feedback.textContent = "";
+    el.classList.toggle("show", !!message);
+    var span = el.querySelector("span");
+    if (span) span.textContent = message || "";
   }
 
   function clearAllErrors() {
-    $all(".is-invalid").forEach(function (el) { el.classList.remove("is-invalid"); });
-    $all(".invalid-feedback").forEach(function (el) { if (el.id !== "signatureError" && el.id !== "acceptedTermsError") el.textContent = ""; });
-    byId("signatureError").textContent = "";
-    byId("acceptedTermsError").textContent = "";
+    all(".field.has-error").forEach(function (f) {
+      f.classList.remove("has-error");
+      var m = f.querySelector(".err span");
+      if (m) m.textContent = "";
+    });
+    all("[aria-invalid]").forEach(function (el) { el.removeAttribute("aria-invalid"); });
+    all(".an-q.has-error").forEach(function (q) { q.classList.remove("has-error"); });
+    all(".an-err.show").forEach(function (e) {
+      e.classList.remove("show");
+      var s = e.querySelector("span");
+      if (s) s.textContent = "";
+    });
+    var wrap = byId("anSignWrap");
+    if (wrap) wrap.classList.remove("has-error");
   }
 
-  function maskPhone(input) {
+  /* ------------------------------------------------------------- máscaras */
+
+  function applyMask(input, maskFn) {
+    if (!input) return;
     input.addEventListener("input", function () {
-      var v = toDigits(input.value).slice(0, 11);
-      if (v.length > 6) input.value = "(" + v.slice(0, 2) + ") " + v.slice(2, 7) + "-" + v.slice(7);
-      else if (v.length > 2) input.value = "(" + v.slice(0, 2) + ") " + v.slice(2);
-      else input.value = v;
+      var atEnd = input.selectionStart === input.value.length;
+      input.value = maskFn(input.value);
+      if (atEnd && input.setSelectionRange) {
+        try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+      }
     });
   }
 
-  function maskCpf(input) {
-    input.addEventListener("input", function () {
-      var v = toDigits(input.value).slice(0, 11);
-      v = v.replace(/^(\d{3})(\d)/, "$1.$2");
-      v = v.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
-      v = v.replace(/\.(\d{3})(\d)/, ".$1-$2");
-      input.value = v;
-    });
+  function maskPhone(v) {
+    var n = digits(v).slice(0, 11);
+    if (n.length > 10) return "(" + n.slice(0, 2) + ") " + n.slice(2, 7) + "-" + n.slice(7);
+    if (n.length > 6) return "(" + n.slice(0, 2) + ") " + n.slice(2, 6) + "-" + n.slice(6);
+    if (n.length > 2) return "(" + n.slice(0, 2) + ") " + n.slice(2);
+    return n;
   }
 
-  function maskCep(input) {
-    input.addEventListener("input", function () {
-      var v = toDigits(input.value).slice(0, 8);
-      if (v.length > 5) input.value = v.slice(0, 5) + "-" + v.slice(5);
-      else input.value = v;
-    });
+  function maskCpf(v) {
+    var n = digits(v).slice(0, 11);
+    if (n.length > 9) return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6, 9) + "-" + n.slice(9);
+    if (n.length > 6) return n.slice(0, 3) + "." + n.slice(3, 6) + "." + n.slice(6);
+    if (n.length > 3) return n.slice(0, 3) + "." + n.slice(3);
+    return n;
   }
 
-  function searchCep(cepValue) {
-    var cep = toDigits(cepValue);
-    if (cep.length !== 8) {
-      showToast("CEP deve ter 8 dígitos.", true);
-      return Promise.reject("Invalid CEP format");
-    }
-
-    var loadingEl = byId("cepLoading");
-    if (loadingEl) loadingEl.classList.remove("d-none");
-
-    return fetch("https://viacep.com.br/ws/" + cep + "/json/", { method: "GET" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(function (json) {
-        if (json.erro) {
-          showToast("CEP não encontrado.", true);
-          return;
-        }
-        byId("addressStreet").value = json.logradouro || "";
-        byId("addressDistrict").value = json.bairro || "";
-        byId("addressCity").value = json.localidade || "";
-        byId("addressState").value = json.uf || "";
-        if (byId("addressComplement")) byId("addressComplement").value = json.complemento || "";
-
-        clearInvalid(byId("cep"));
-        byId("addressNumber").focus();
-        showToast("Endereço preenchido automaticamente.");
-        scheduleAutosave();
-      })
-      .catch(function (err) {
-        showToast("Erro ao buscar CEP. Verifique a conexão.", true);
-      })
-      .finally(function () {
-        if (loadingEl) loadingEl.classList.add("d-none");
-      });
+  function maskCep(v) {
+    var n = digits(v).slice(0, 8);
+    return n.length > 5 ? n.slice(0, 5) + "-" + n.slice(5) : n;
   }
 
-  function calculateAge() {
-    var birth = byId("birthDate").value;
-    if (!birth) { byId("age").value = ""; return; }
-    var b = new Date(birth + "T00:00:00");
-    if (Number.isNaN(b.getTime())) { byId("age").value = ""; return; }
-    var now = new Date();
-    var age = now.getFullYear() - b.getFullYear();
-    var m = now.getMonth() - b.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age -= 1;
-    byId("age").value = age >= 0 ? String(age) : "";
-  }
+  /* ----------------------------------------------------------- validações */
 
-  function renderParq() {
-    var host = byId("parqCards");
-    host.innerHTML = QUESTIONS.map(function (q) {
-      var extra = "";
-      if (q.extra === "chronic") {
-        extra = '' +
-          '<div class="reveal-wrap" data-extra="chronic">' +
-            '<label class="form-label mt-2">Descreva quais doenças.</label>' +
-            '<textarea class="form-control" rows="2" id="chronicDetails"></textarea>' +
-            '<div class="invalid-feedback"></div>' +
-            '<div class="mt-3">' +
-              '<p class="mb-2">Faz uso de medicamentos para doenças crônicas?</p>' +
-              '<div class="d-flex gap-3">' +
-                '<div class="form-check"><input class="form-check-input" type="radio" name="chronicMeds" id="chronicMedsYes" value="yes"><label class="form-check-label" for="chronicMedsYes">Sim</label></div>' +
-                '<div class="form-check"><input class="form-check-input" type="radio" name="chronicMeds" id="chronicMedsNo" value="no"><label class="form-check-label" for="chronicMedsNo">Não</label></div>' +
-              '</div>' +
-              '<div class="invalid-feedback d-block" id="chronicMedsError"></div>' +
-            '</div>' +
-            '<div class="reveal-wrap mt-3" data-extra="chronicMeds">' +
-              '<label class="form-label">Medicamentos</label>' +
-              '<input class="form-control" id="chronicMedsList">' +
-              '<div class="invalid-feedback"></div>' +
-              '<label class="form-label mt-2">Doença relacionada</label>' +
-              '<input class="form-control" id="chronicMedsDisease">' +
-              '<div class="invalid-feedback"></div>' +
-            '</div>' +
-          '</div>';
-      }
-      if (q.extra === "ortho") {
-        extra = '' +
-          '<div class="reveal-wrap" data-extra="ortho">' +
-            '<label class="form-label mt-2">Especifique</label>' +
-            '<textarea class="form-control" rows="2" id="orthoDetails"></textarea>' +
-            '<div class="invalid-feedback"></div>' +
-          '</div>';
-      }
-      if (q.extra === "activity") {
-        extra = '' +
-          '<div class="reveal-wrap" data-extra="activity">' +
-            '<label class="form-label mt-2">Atividade</label>' +
-            '<input class="form-control" id="activityName">' +
-            '<div class="invalid-feedback"></div>' +
-            '<label class="form-label mt-2">Tempo de prática</label>' +
-            '<input class="form-control" id="activityTime">' +
-            '<div class="invalid-feedback"></div>' +
-          '</div>';
-      }
-      return '' +
-      '<article class="parq-card card shadow-sm border-0">' +
-        '<div class="card-body">' +
-          '<p class="parq-title mb-3">' + q.id + '. ' + q.text + '</p>' +
-          '<div class="d-flex gap-3">' +
-            '<div class="form-check"><input class="form-check-input" type="radio" name="parq_' + q.id + '" id="parq_' + q.id + '_yes" value="yes"><label class="form-check-label" for="parq_' + q.id + '_yes">Sim</label></div>' +
-            '<div class="form-check"><input class="form-check-input" type="radio" name="parq_' + q.id + '" id="parq_' + q.id + '_no" value="no"><label class="form-check-label" for="parq_' + q.id + '_no">Não</label></div>' +
-          '</div>' +
-          '<div class="invalid-feedback d-block" id="parq_' + q.id + '_error"></div>' +
-          extra +
-        '</div>' +
-      '</article>';
-    }).join("");
+  function isEmail(v) { return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v); }
 
-    QUESTIONS.forEach(function (q) {
-      $all('input[name="parq_' + q.id + '"]').forEach(function (radio) {
-        radio.addEventListener("change", function () {
-          toggleParqExtras();
-          recomputeMedicalWarning();
-          scheduleAutosave();
-        });
-      });
-    });
-
-    $all("#goal, #goalOther, #trainingDays, #trainingShift, #chronicDetails, #orthoDetails, #activityName, #activityTime, #chronicMedsList, #chronicMedsDisease, [name='chronicMeds']").forEach(function (el) {
-      if (!el) return;
-      el.addEventListener("input", scheduleAutosave);
-      el.addEventListener("change", function () { toggleParqExtras(); scheduleAutosave(); });
-    });
-  }
-
-  function answerYes(questionId) {
-    var checked = d.querySelector('input[name="parq_' + questionId + '"]:checked');
-    return checked ? checked.value === "yes" : null;
-  }
-
-  function toggleReveal(selector, show) {
-    var el = d.querySelector(selector);
-    if (!el) return;
-    el.classList.toggle("show", !!show);
-  }
-
-  function toggleParqExtras() {
-    toggleReveal('[data-extra="chronic"]', answerYes(4) === true);
-    toggleReveal('[data-extra="ortho"]', answerYes(5) === true);
-    toggleReveal('[data-extra="activity"]', answerYes(7) === true);
-
-    var medsYes = d.querySelector('input[name="chronicMeds"]:checked');
-    toggleReveal('[data-extra="chronicMeds"]', answerYes(4) === true && medsYes && medsYes.value === "yes");
-
-    var isOtherGoal = byId("goal").value === "Outro";
-    byId("goalOtherWrap").classList.toggle("d-none", !isOtherGoal);
-  }
-
-  function recomputeMedicalWarning() {
-    var hasYes = QUESTIONS.some(function (q) { return answerYes(q.id) === true; });
-    byId("medicalWarning").classList.toggle("d-none", !hasYes);
-    return hasYes;
-  }
-
-  function setupSignatureCanvas() {
-    var canvas = byId("signatureCanvas");
-    var ctx = canvas.getContext("2d");
-    var ratio = Math.max(1, w.devicePixelRatio || 1);
-
-    function resize() {
-      var rect = canvas.getBoundingClientRect();
-      var width = Math.floor(rect.width);
-      var height = Math.floor(rect.height);
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
-      ctx.scale(ratio, ratio);
-      ctx.lineWidth = 2;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = "#111";
-      if (savedSignature) drawSignatureFromBase64(savedSignature);
-    }
-
-    function posFrom(ev) {
-      var rect = canvas.getBoundingClientRect();
-      var p = ev.touches && ev.touches[0] ? ev.touches[0] : ev;
-      return { x: p.clientX - rect.left, y: p.clientY - rect.top };
-    }
-
-    function start(ev) {
-      ev.preventDefault();
-      isDrawing = true;
-      var p = posFrom(ev);
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      hasDrawnStroke = true;
-      setSignatureStatus("Assinatura alterada. Clique em Salvar para confirmar.", "pending");
-    }
-
-    function move(ev) {
-      if (!isDrawing) return;
-      ev.preventDefault();
-      var p = posFrom(ev);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-    }
-
-    function end() {
-      isDrawing = false;
-    }
-
-    function clearCanvas(keepSaved) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!keepSaved) {
-        redoSignature = savedSignature;
-        savedSignature = "";
-      }
-      hasDrawnStroke = false;
-      setSignatureStatus("Nenhuma assinatura salva.", "");
-      byId("signatureError").textContent = "";
-      scheduleAutosave();
-    }
-
-    function drawSignatureFromBase64(base64) {
-      if (!base64) return;
-      var img = new Image();
-      img.onload = function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height);
-        hasDrawnStroke = true;
-      };
-      img.src = base64;
-    }
-
-    function saveSignature() {
-      if (!hasDrawnStroke) {
-        byId("signatureError").textContent = "Assinatura obrigatória.";
-        showToast("Assine no quadro antes de salvar.", true);
-        return;
-      }
-      savedSignature = canvas.toDataURL("image/png");
-      redoSignature = savedSignature;
-      setSignatureStatus("Assinatura salva com sucesso.", "saved");
-      byId("signatureError").textContent = "";
-      scheduleAutosave();
-      showToast("Assinatura salva.");
-    }
-
-    byId("signatureClear").addEventListener("click", function () { clearCanvas(false); });
-    byId("signatureRedo").addEventListener("click", function () {
-      if (!redoSignature) return;
-      savedSignature = redoSignature;
-      drawSignatureFromBase64(savedSignature);
-      setSignatureStatus("Assinatura restaurada.", "saved");
-      scheduleAutosave();
-    });
-    byId("signatureSave").addEventListener("click", saveSignature);
-
-    canvas.addEventListener("mousedown", start);
-    canvas.addEventListener("mousemove", move);
-    w.addEventListener("mouseup", end);
-    canvas.addEventListener("touchstart", start, { passive: false });
-    canvas.addEventListener("touchmove", move, { passive: false });
-    canvas.addEventListener("touchend", end);
-    w.addEventListener("resize", resize);
-    resize();
-
-    return {
-      drawFrom: function (base64) {
-        savedSignature = base64 || "";
-        redoSignature = base64 || "";
-        if (savedSignature) {
-          drawSignatureFromBase64(savedSignature);
-          setSignatureStatus("Assinatura restaurada do rascunho.", "saved");
-        }
-      }
-    };
-  }
-
-  function setSignatureStatus(text, type) {
-    var el = byId("signatureStatus");
-    el.textContent = text;
-    el.classList.remove("saved", "pending");
-    if (type) el.classList.add(type);
-  }
-
-  function collectFormData() {
-    var goal = byId("goal").value;
-    var goalOther = byId("goalOther").value.trim();
-
-    var parq = QUESTIONS.map(function (q) {
-      var yes = answerYes(q.id);
-      var details = null;
-      if (q.id === 4 && yes) {
-        var meds = d.querySelector('input[name="chronicMeds"]:checked');
-        details = "Doenças: " + byId("chronicDetails").value.trim();
-        details += " | Usa medicamentos: " + (meds ? (meds.value === "yes" ? "Sim" : "Não") : "");
-        if (meds && meds.value === "yes") {
-          details += " | Medicamentos: " + byId("chronicMedsList").value.trim();
-          details += " | Doença relacionada: " + byId("chronicMedsDisease").value.trim();
-        }
-      }
-      if (q.id === 5 && yes) details = byId("orthoDetails").value.trim() || null;
-      if (q.id === 7 && yes) details = "Atividade: " + byId("activityName").value.trim() + " | Tempo: " + byId("activityTime").value.trim();
-      return {
-        question: q.id,
-        answer: yes === true,
-        details: details || null
-      };
-    });
-
-    // Montar endereço completo a partir dos campos individuais
-    var addressParts = [];
-    if (byId("addressStreet").value.trim()) addressParts.push(byId("addressStreet").value.trim());
-    if (byId("addressNumber").value.trim()) addressParts.push(byId("addressNumber").value.trim());
-    if (byId("addressComplement").value.trim()) addressParts.push(byId("addressComplement").value.trim());
-    if (byId("addressDistrict").value.trim()) addressParts.push(byId("addressDistrict").value.trim());
-    if (byId("addressCity").value.trim()) addressParts.push(byId("addressCity").value.trim());
-    if (byId("addressState").value.trim()) addressParts.push(byId("addressState").value.trim());
-    var fullAddress = addressParts.join(", ");
-    byId("address").value = fullAddress;
-
-    return {
-      personal: {
-        name: byId("name").value.trim(),
-        email: byId("email").value.trim() || null,
-        phone: byId("phone").value.trim(),
-        cpf: byId("cpf").value.trim(),
-        address: fullAddress,
-        birth_date: byId("birthDate").value || null,
-        age: Number(byId("age").value || 0),
-        emergency_contact: byId("emergencyContact").value.trim(),
-        emergency_phone: byId("emergencyPhone").value.trim()
-      },
-      parq: parq,
-      goal: goal === "Outro" ? goalOther : goal,
-      training_days: byId("trainingDays").value,
-      training_shift: byId("trainingShift").value,
-      medical_warning: recomputeMedicalWarning(),
-      accepted_terms: byId("acceptedTerms").checked,
-      signature: savedSignature
-    };
-  }
-
-  function validateStep(stepNumber) {
-    clearAllErrors();
-    var firstInvalid = null;
-
-    function mark(cond, el, msg) {
-      if (!cond) return;
-      if (!firstInvalid) firstInvalid = el;
-      setInvalid(el, msg);
-    }
-
-    if (stepNumber === 1 || stepNumber === null) {
-      mark(!byId("name").value.trim(), byId("name"), "Informe seu nome.");
-      mark(toDigits(byId("phone").value).length < 11, byId("phone"), "Telefone obrigatório no formato (00) 00000-0000.");
-      mark(byId("email").value.trim() && !isEmail(byId("email").value.trim()), byId("email"), "E-mail inválido.");
-      mark(toDigits(byId("cpf").value).length !== 11, byId("cpf"), "CPF obrigatório no formato 000.000.000-00.");
-      mark(toDigits(byId("cep").value).length !== 8, byId("cep"), "CEP obrigatório no formato 00000-000.");
-      mark(!byId("addressStreet").value.trim(), byId("addressStreet"), "Informe a rua.");
-      mark(!byId("addressNumber").value.trim(), byId("addressNumber"), "Informe o número.");
-      mark(!byId("addressDistrict").value.trim(), byId("addressDistrict"), "Informe o bairro.");
-      mark(!byId("addressCity").value.trim(), byId("addressCity"), "Informe a cidade.");
-      mark(!byId("addressState").value.trim(), byId("addressState"), "Informe o estado.");
-      mark(!byId("birthDate").value, byId("birthDate"), "Informe a data de nascimento.");
-      mark(!byId("emergencyContact").value.trim(), byId("emergencyContact"), "Informe o contato de emergência.");
-      mark(toDigits(byId("emergencyPhone").value).length < 11, byId("emergencyPhone"), "Telefone de emergência obrigatório.");
-    }
-
-    if (stepNumber === 2 || stepNumber === null) {
-      QUESTIONS.forEach(function (q) {
-        var ans = answerYes(q.id);
-        if (ans === null) {
-          var err = byId("parq_" + q.id + "_error");
-          err.textContent = "Selecione Sim ou Não.";
-          if (!firstInvalid) firstInvalid = d.querySelector('input[name="parq_' + q.id + '"]');
-        } else {
-          byId("parq_" + q.id + "_error").textContent = "";
-        }
-      });
-
-      if (answerYes(4) === true) {
-        mark(!byId("chronicDetails").value.trim(), byId("chronicDetails"), "Descreva as doenças.");
-        var meds = d.querySelector('input[name="chronicMeds"]:checked');
-        if (!meds) {
-          byId("chronicMedsError").textContent = "Selecione Sim ou Não.";
-          if (!firstInvalid) firstInvalid = d.querySelector('input[name="chronicMeds"]');
-        } else {
-          byId("chronicMedsError").textContent = "";
-          if (meds.value === "yes") {
-            mark(!byId("chronicMedsList").value.trim(), byId("chronicMedsList"), "Informe os medicamentos.");
-            mark(!byId("chronicMedsDisease").value.trim(), byId("chronicMedsDisease"), "Informe a doença relacionada.");
-          }
-        }
-      }
-
-      if (answerYes(5) === true) {
-        mark(!byId("orthoDetails").value.trim(), byId("orthoDetails"), "Especifique o problema.");
-      }
-
-      if (answerYes(7) === true) {
-        mark(!byId("activityName").value.trim(), byId("activityName"), "Informe a atividade.");
-        mark(!byId("activityTime").value.trim(), byId("activityTime"), "Informe o tempo de prática.");
-      }
-
-      mark(!byId("goal").value, byId("goal"), "Selecione o objetivo.");
-      if (byId("goal").value === "Outro") {
-        mark(!byId("goalOther").value.trim(), byId("goalOther"), "Informe o objetivo.");
-      }
-      mark(!byId("trainingDays").value, byId("trainingDays"), "Selecione os dias por semana.");
-      mark(!byId("trainingShift").value, byId("trainingShift"), "Selecione o turno preferido.");
-    }
-
-    if (stepNumber === 3 || stepNumber === null) {
-      if (!byId("acceptedTerms").checked) {
-        byId("acceptedTermsError").textContent = "É obrigatório aceitar o termo.";
-        if (!firstInvalid) firstInvalid = byId("acceptedTerms");
-      }
-      if (!savedSignature) {
-        byId("signatureError").textContent = "Assinatura obrigatória.";
-        if (!firstInvalid) firstInvalid = byId("signatureCanvas");
-      }
-      if (submitLockedByTerms) {
-        byId("acceptedTermsError").textContent = "Envio bloqueado até o termo oficial ser configurado.";
-        if (!firstInvalid) firstInvalid = byId("termsContent");
-      }
-    }
-
-    if (firstInvalid) {
-      if (firstInvalid.scrollIntoView) firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (firstInvalid.focus) firstInvalid.focus({ preventScroll: true });
-      return false;
+  function isCpf(v) {
+    var n = digits(v);
+    if (n.length !== 11 || /^(\d)\1{10}$/.test(n)) return false;
+    var i, sum, rest;
+    for (var round = 0; round < 2; round++) {
+      sum = 0;
+      var size = 9 + round;
+      for (i = 0; i < size; i++) sum += parseInt(n.charAt(i), 10) * (size + 1 - i);
+      rest = (sum * 10) % 11;
+      if (rest === 10) rest = 0;
+      if (rest !== parseInt(n.charAt(size), 10)) return false;
     }
     return true;
   }
 
-  function saveDraftNow() {
-    if (!code) return;
-    var payload = collectFormData();
-    payload._raw = {
-      cep: byId("cep").value,
-      addressStreet: byId("addressStreet").value,
-      addressNumber: byId("addressNumber").value,
-      addressComplement: byId("addressComplement").value,
-      addressDistrict: byId("addressDistrict").value,
-      addressCity: byId("addressCity").value,
-      addressState: byId("addressState").value,
-      parqAnswers: QUESTIONS.reduce(function (acc, q) {
-        var ans = answerYes(q.id);
-        acc[q.id] = ans === null ? "" : (ans ? "yes" : "no");
-        return acc;
-      }, {}),
-      chronicDetails: byId("chronicDetails") ? byId("chronicDetails").value : "",
-      chronicMeds: (d.querySelector('input[name="chronicMeds"]:checked') || {}).value || "",
-      chronicMedsList: byId("chronicMedsList") ? byId("chronicMedsList").value : "",
-      chronicMedsDisease: byId("chronicMedsDisease") ? byId("chronicMedsDisease").value : "",
-      orthoDetails: byId("orthoDetails") ? byId("orthoDetails").value : "",
-      activityName: byId("activityName") ? byId("activityName").value : "",
-      activityTime: byId("activityTime") ? byId("activityTime").value : "",
-      goalOther: byId("goalOther") ? byId("goalOther").value : ""
-    };
-    payload._wizardStep = step;
-    try {
-      localStorage.setItem(stateKey(), JSON.stringify(payload));
-    } catch (e) {}
+  function ageFromDate(iso) {
+    if (!iso) return null;
+    var b = new Date(iso + "T00:00:00");
+    if (isNaN(b.getTime())) return null;
+    var now = new Date();
+    var age = now.getFullYear() - b.getFullYear();
+    var m = now.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age -= 1;
+    return age;
   }
 
-  function scheduleAutosave() {
-    w.clearTimeout(autosaveTimer);
-    autosaveTimer = w.setTimeout(saveDraftNow, 250);
+  function refreshAge() {
+    var age = ageFromDate(val("fBirth"));
+    setVal("fAge", age != null && age >= 0 && age < 120 ? String(age) + " anos" : "");
+    var alert = byId("anMinorAlert");
+    if (alert) alert.classList.toggle("show", age != null && age >= 0 && age < 18);
   }
 
-  function restoreDraft() {
-    try {
-      var raw = localStorage.getItem(stateKey());
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (e) {
-      return null;
-    }
+  /* ------------------------------------------------------------ PAR-Q */
+
+  function parqAnswer(id) {
+    var checked = d.querySelector('input[name="parq_' + id + '"]:checked');
+    return checked ? checked.value === "yes" : null;
   }
 
-  function applyDraft(draft, signatureApi) {
-    if (!draft) return;
-    var p = draft.personal || {};
-    byId("name").value = p.name || "";
-    byId("email").value = p.email || "";
-    byId("phone").value = p.phone || "";
-    byId("cpf").value = p.cpf || "";
-    byId("cep").value = p.cep || "";
-    byId("addressStreet").value = p.addressStreet || "";
-    byId("addressNumber").value = p.addressNumber || "";
-    byId("addressComplement").value = p.addressComplement || "";
-    byId("addressDistrict").value = p.addressDistrict || "";
-    byId("addressCity").value = p.addressCity || "";
-    byId("addressState").value = p.addressState || "";
-    byId("address").value = p.address || "";
-    byId("birthDate").value = p.birth_date || "";
-    byId("emergencyContact").value = p.emergency_contact || "";
-    byId("emergencyPhone").value = p.emergency_phone || "";
-    calculateAge();
+  function optionMarkup(qid, value, label) {
+    return '<label class="an-opt opt-' + value + '">' +
+             '<input type="radio" name="parq_' + qid + '" value="' + value + '">' +
+             '<span>' + label + '</span>' +
+           '</label>';
+  }
 
-    var raw = draft._raw || {};
-    QUESTIONS.forEach(function (q) {
-      var val = raw.parqAnswers && raw.parqAnswers[q.id] ? raw.parqAnswers[q.id] : "";
-      if (val === "yes") byId("parq_" + q.id + "_yes").checked = true;
-      if (val === "no") byId("parq_" + q.id + "_no").checked = true;
+  function revealMarkup(key, inner) {
+    return '<div class="an-reveal" data-reveal="' + key + '"><div class="an-reveal-in">' + inner + '</div></div>';
+  }
+
+  function textField(id, label, required) {
+    return '<div class="field">' +
+             '<label for="' + id + '">' + label + (required ? ' <span class="req">*</span>' : '') + '</label>' +
+             '<input id="' + id + '">' +
+             '<span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>' +
+           '</div>';
+  }
+
+  function renderParq() {
+    var host = byId("anParq");
+    if (!host) return;
+
+    host.innerHTML = QUESTIONS.map(function (q) {
+      var extra = "";
+
+      if (q.extra === "chronic") {
+        extra = revealMarkup("chronic",
+          '<div class="field">' +
+            '<label for="qChronicWhat">Quais doenças? <span class="req">*</span></label>' +
+            '<textarea id="qChronicWhat" rows="2" style="min-height:80px"></textarea>' +
+            '<span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>' +
+          '</div>' +
+          '<div>' +
+            '<p style="font-weight:600;margin:0 0 10px">Você toma remédio para essa condição? <span class="req">*</span></p>' +
+            '<div class="an-opts">' +
+              '<label class="an-opt opt-yes"><input type="radio" name="chronicMeds" value="yes"><span>Sim</span></label>' +
+              '<label class="an-opt opt-no"><input type="radio" name="chronicMeds" value="no"><span>Não</span></label>' +
+            '</div>' +
+            '<span class="an-err" id="anChronicMedsErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>' +
+          '</div>' +
+          revealMarkup("chronicMeds",
+            textField("qChronicMedsList", "Quais remédios?", true) +
+            textField("qChronicMedsWhich", "Para qual doença?", true)
+          )
+        );
+      }
+
+      if (q.extra === "ortho") {
+        extra = revealMarkup("ortho",
+          '<div class="field">' +
+            '<label for="qOrthoWhat">Conte o que aconteceu <span class="req">*</span></label>' +
+            '<textarea id="qOrthoWhat" rows="2" style="min-height:80px" placeholder="Ex.: lesão no joelho direito em 2023"></textarea>' +
+            '<span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>' +
+          '</div>'
+        );
+      }
+
+      if (q.extra === "activity") {
+        extra = revealMarkup("activity",
+          textField("qActivityWhat", "Qual atividade?", true) +
+          textField("qActivityTime", "Há quanto tempo?", true)
+        );
+      }
+
+      return '<article class="an-q" data-q="' + q.id + '">' +
+               '<div class="an-q-head">' +
+                 '<span class="an-q-num">' + q.id + '</span>' +
+                 '<p class="an-q-text">' + q.text + '</p>' +
+               '</div>' +
+               '<div class="an-opts">' + optionMarkup(q.id, "yes", "Sim") + optionMarkup(q.id, "no", "Não") + '</div>' +
+               '<span class="an-err" id="anQErr' + q.id + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>' +
+               extra +
+             '</article>';
+    }).join("");
+
+    all('input[type="radio"]', host).forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        var card = radio.closest(".an-q");
+        if (card) {
+          card.classList.remove("has-error");
+          var err = card.querySelector(".an-err");
+          if (err) err.classList.remove("show");
+        }
+        setBlockError("anChronicMedsErr", "");
+        syncReveals();
+        markDirty();
+      });
     });
 
-    if (byId("chronicDetails")) byId("chronicDetails").value = raw.chronicDetails || "";
-    if (byId("chronicMedsList")) byId("chronicMedsList").value = raw.chronicMedsList || "";
-    if (byId("chronicMedsDisease")) byId("chronicMedsDisease").value = raw.chronicMedsDisease || "";
-    if (byId("orthoDetails")) byId("orthoDetails").value = raw.orthoDetails || "";
-    if (byId("activityName")) byId("activityName").value = raw.activityName || "";
-    if (byId("activityTime")) byId("activityTime").value = raw.activityTime || "";
-    if (raw.chronicMeds === "yes" && byId("chronicMedsYes")) byId("chronicMedsYes").checked = true;
-    if (raw.chronicMeds === "no" && byId("chronicMedsNo")) byId("chronicMedsNo").checked = true;
-
-    byId("goal").value = draft.goal || "";
-    if (draft.goal && ["Emagrecimento", "Hipertrofia", "Condicionamento", "Saúde", "Performance", "Reabilitação", "Ganho de Massa"].indexOf(draft.goal) === -1) {
-      byId("goal").value = "Outro";
-      byId("goalOther").value = raw.goalOther || draft.goal;
-    }
-    byId("trainingDays").value = safeStr(draft.training_days || "");
-    byId("trainingShift").value = draft.training_shift || "";
-    byId("acceptedTerms").checked = !!draft.accepted_terms;
-
-    if (draft.signature) {
-      savedSignature = draft.signature;
-      signatureApi.drawFrom(draft.signature);
-    }
-
-    toggleParqExtras();
-    recomputeMedicalWarning();
-    if (draft._wizardStep) setStep(draft._wizardStep);
-  }
-
-  function applyLeadPrefill(lead) {
-    if (!lead) return;
-    if (!byId("name").value) byId("name").value = lead.name || "";
-    if (!byId("email").value) byId("email").value = lead.email || "";
-    if (!byId("phone").value) byId("phone").value = lead.phone || "";
-  }
-
-  function configureTerms() {
-    byId("termsContent").textContent = TERMS_TEXT || "Aguardando termo oficial da ficha de anamnese.";
-    submitLockedByTerms = !TERMS_TEXT;
-    byId("termsMissingAlert").classList.toggle("d-none", true);
-    byId("acceptedTerms").disabled = false;
-  }
-
-  // document.getElementById('anamneseForm').addEventListener('submit', function (event) {
-  //   event.preventDefault();
-  //   submitForm(event);
-  //   console.log('Formulário enviado!');
-  //   console.log('Botão:', document.getElementById('submitBtn'));
-  //
-  //   // Seu código aqui
-  // });
-  function submitForm(ev) {
-    ev.preventDefault();
-    if (!validateStep(null)) return;
-
-    const payload = collectFormData();
-    const submitBtn = byId("submitBtn");
-    const spinner = byId("submitSpinner");
-    submitBtn.disabled = true;
-    spinner.classList.remove("d-none");
-    fetch("https://portalcia.impactadigital.net/anamnese/" + encodeURIComponent(code), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    }).then(function (json) {
-      if (!json || json.success === false) throw new Error((json && json.message) ? json.message : "Resposta inválida");
-      try { localStorage.removeItem(stateKey()); } catch (e) {}
-      showState("stateSuccess");
-    }).catch(function (err) {
-      console.error("Anamnese submit failed", err);
-      showToast((err && err.message) ? err.message : "Não foi possível enviar agora. Tente novamente.", true);
-    }).finally(function () {
-      submitBtn.disabled = submitLockedByTerms;
-      spinner.classList.add("d-none");
-    });
-  }
-
-  function bindEvents() {
-    var form = byId("anamneseForm");
-    form.addEventListener("submit", submitForm);
-    byId("nextBtn").addEventListener("click", function () { if (validateStep(step)) setStep(step + 1); });
-    byId("prevBtn").addEventListener("click", function () { setStep(step - 1); });
-
-    [
-      "name", "phone", "email", "cpf", "cep", "addressStreet", "addressNumber", 
-      "addressComplement", "addressDistrict", "addressCity", "addressState",
-      "birthDate", "emergencyContact", "emergencyPhone", "goal", "goalOther",
-      "trainingDays", "trainingShift", "acceptedTerms"
-    ].forEach(function (id) {
+    EXTRA_FIELDS.forEach(function (id) {
       var el = byId(id);
       if (!el) return;
-      el.addEventListener("input", function () { clearInvalid(el); scheduleAutosave(); });
-      el.addEventListener("change", function () {
-        clearInvalid(el);
-        if (id === "goal") toggleParqExtras();
-        scheduleAutosave();
-      });
+      el.addEventListener("input", function () { clearError(el); markDirty(); });
     });
-    byId("birthDate").addEventListener("change", calculateAge);
+  }
 
-    // CEP lookup on blur
-    var cepField = byId("cep");
-    if (cepField) {
-      cepField.addEventListener("blur", function () {
-        var cepVal = this.value.trim();
-        if (cepVal && toDigits(cepVal).length === 8) {
-          searchCep(cepVal);
+  function toggleReveal(key, show) {
+    var el = d.querySelector('[data-reveal="' + key + '"]');
+    if (el) el.classList.toggle("show", !!show);
+  }
+
+  function syncReveals() {
+    toggleReveal("chronic", parqAnswer(4) === true);
+    toggleReveal("ortho", parqAnswer(5) === true);
+    toggleReveal("activity", parqAnswer(7) === true);
+
+    var meds = d.querySelector('input[name="chronicMeds"]:checked');
+    toggleReveal("chronicMeds", parqAnswer(4) === true && !!meds && meds.value === "yes");
+
+    QUESTIONS.forEach(function (q) {
+      var card = d.querySelector('.an-q[data-q="' + q.id + '"]');
+      if (card) card.classList.toggle("is-answered", parqAnswer(q.id) !== null);
+    });
+
+    var isOther = val("fGoal") === "Outro";
+    var otherField = byId("fGoalOtherField");
+    if (otherField) otherField.hidden = !isOther;
+
+    var hasYes = QUESTIONS.some(function (q) { return parqAnswer(q.id) === true; });
+    var alert = byId("anMedAlert");
+    if (alert) alert.classList.toggle("show", hasYes);
+    return hasYes;
+  }
+
+  /* --------------------------------------------------------- assinatura */
+
+  function createSignature() {
+    var canvas = byId("anSignature");
+    var wrap = byId("anSignWrap");
+    if (!canvas || !wrap) return null;
+
+    var ctx = canvas.getContext("2d");
+    var strokes = [];        /* [[{x,y} normalizado 0..1, ...], ...] */
+    var current = null;
+    var drawing = false;
+    var saved = "";
+    var box = { w: 0, h: 0 };
+
+    function paint() {
+      var ratio = Math.max(1, Math.min(3, w.devicePixelRatio || 1));
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#14141a";
+
+      strokes.forEach(function (stroke) {
+        if (!stroke.length) return;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
+        if (stroke.length === 1) {
+          ctx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
+        } else {
+          for (var i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
         }
+        ctx.stroke();
       });
+
+      wrap.classList.toggle("has-ink", strokes.length > 0);
     }
+
+    /* Redimensiona o buffer do canvas. Só roda quando o elemento está
+       visível — antes disso getBoundingClientRect() devolve 0x0 e o
+       canvas ficaria sem área de desenho. */
+    function fit() {
+      var rect = canvas.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return false;
+      var ratio = Math.max(1, Math.min(3, w.devicePixelRatio || 1));
+      var nextW = Math.round(rect.width * ratio);
+      var nextH = Math.round(rect.height * ratio);
+      box.w = rect.width;
+      box.h = rect.height;
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW;
+        canvas.height = nextH;
+      }
+      paint();
+      return true;
+    }
+
+    function pointFrom(ev) {
+      var rect = canvas.getBoundingClientRect();
+      var src = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+      return {
+        x: Math.min(1, Math.max(0, (src.clientX - rect.left) / (rect.width || 1))),
+        y: Math.min(1, Math.max(0, (src.clientY - rect.top) / (rect.height || 1)))
+      };
+    }
+
+    function start(ev) {
+      if (ev.button != null && ev.button !== 0) return;
+      ev.preventDefault();
+      if (!box.w && !fit()) return;
+      drawing = true;
+      current = [pointFrom(ev)];
+      strokes.push(current);
+      wrap.classList.add("is-active");
+      wrap.classList.remove("has-error");
+      paint();
+    }
+
+    function move(ev) {
+      if (!drawing || !current) return;
+      ev.preventDefault();
+      current.push(pointFrom(ev));
+      paint();
+    }
+
+    function end() {
+      if (!drawing) return;
+      drawing = false;
+      current = null;
+      wrap.classList.remove("is-active");
+      if (saved) {
+        saved = "";
+        wrap.classList.remove("is-saved");
+      }
+      setStatus("Toque em Salvar assinatura para confirmar.", "is-pending");
+      markDirty();
+    }
+
+    function setStatus(text, cls) {
+      var el = byId("anSignStatus");
+      if (!el) return;
+      el.className = "an-sign-status" + (cls ? " " + cls : "");
+      el.textContent = text;
+    }
+
+    /* Exporta recortado na área desenhada, em tamanho fixo — mantém o
+       PNG pequeno o bastante para o POST. */
+    function exportPng() {
+      if (!strokes.length) return "";
+      var minX = 1, minY = 1, maxX = 0, maxY = 0;
+      strokes.forEach(function (s) {
+        s.forEach(function (p) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        });
+      });
+      var pad = 0.04;
+      minX = Math.max(0, minX - pad); minY = Math.max(0, minY - pad);
+      maxX = Math.min(1, maxX + pad); maxY = Math.min(1, maxY + pad);
+
+      var srcW = Math.max(0.08, maxX - minX) * box.w;
+      var srcH = Math.max(0.08, maxY - minY) * box.h;
+
+      var outW = 600;
+      var outH = Math.max(120, Math.min(400, Math.round(outW * (srcH / srcW))));
+      var scale = Math.min(outW / srcW, outH / srcH);
+
+      var out = d.createElement("canvas");
+      out.width = outW;
+      out.height = outH;
+      var octx = out.getContext("2d");
+      octx.translate((outW - srcW * scale) / 2, (outH - srcH * scale) / 2);
+      octx.scale(scale, scale);
+      octx.translate(-minX * box.w, -minY * box.h);
+      octx.lineWidth = 2.2;
+      octx.lineCap = "round";
+      octx.lineJoin = "round";
+      octx.strokeStyle = "#14141a";
+      strokes.forEach(function (stroke) {
+        if (!stroke.length) return;
+        octx.beginPath();
+        octx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
+        if (stroke.length === 1) octx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
+        else for (var i = 1; i < stroke.length; i++) octx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
+        octx.stroke();
+      });
+      return out.toDataURL("image/png");
+    }
+
+    function inkLength() {
+      return strokes.reduce(function (acc, s) { return acc + s.length; }, 0);
+    }
+
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", move);
+    canvas.addEventListener("mouseleave", end);
+    w.addEventListener("mouseup", end);
+    canvas.addEventListener("touchstart", start, { passive: false });
+    canvas.addEventListener("touchmove", move, { passive: false });
+    canvas.addEventListener("touchend", end);
+    canvas.addEventListener("touchcancel", end);
+
+    /* O canvas nasce escondido (etapa 3). O observer garante que ele
+       ganhe tamanho no exato momento em que aparece na tela. */
+    if (typeof ResizeObserver === "function") {
+      new ResizeObserver(function () { fit(); }).observe(canvas);
+    } else {
+      w.addEventListener("resize", function () { fit(); });
+    }
+
+    byId("anSignSave").addEventListener("click", function () {
+      if (inkLength() < 4) {
+        wrap.classList.add("has-error");
+        setBlockError("anSignErr", "Faça sua assinatura no quadro antes de salvar.");
+        toast("Assine no quadro primeiro.", "bad");
+        return;
+      }
+      saved = exportPng();
+      wrap.classList.add("is-saved");
+      wrap.classList.remove("has-error");
+      setBlockError("anSignErr", "");
+      setStatus("Assinatura salva.", "is-saved");
+      toast("Assinatura salva.", "good");
+      markDirty();
+    });
+
+    byId("anSignUndo").addEventListener("click", function () {
+      if (!strokes.length) return;
+      strokes.pop();
+      saved = "";
+      wrap.classList.remove("is-saved");
+      paint();
+      setStatus(strokes.length ? "Toque em Salvar assinatura para confirmar." : "Nenhuma assinatura salva ainda.", strokes.length ? "is-pending" : "");
+      markDirty();
+    });
+
+    byId("anSignClear").addEventListener("click", function () {
+      strokes = [];
+      saved = "";
+      wrap.classList.remove("is-saved", "has-error");
+      paint();
+      setStatus("Nenhuma assinatura salva ainda.", "");
+      markDirty();
+    });
+
+    return {
+      fit: fit,
+      isSaved: function () { return !!saved; },
+      dataUrl: function () { return saved; },
+      strokes: function () { return strokes; },
+      restore: function (savedStrokes, savedPng) {
+        strokes = Array.isArray(savedStrokes) ? savedStrokes : [];
+        saved = savedPng || "";
+        fit();
+        paint();
+        if (saved) {
+          wrap.classList.add("is-saved");
+          setStatus("Assinatura salva.", "is-saved");
+        } else if (strokes.length) {
+          setStatus("Toque em Salvar assinatura para confirmar.", "is-pending");
+        }
+      },
+      reset: function () {
+        strokes = [];
+        saved = "";
+        wrap.classList.remove("is-saved", "has-error");
+        paint();
+        setStatus("Nenhuma assinatura salva ainda.", "");
+      }
+    };
   }
 
-  function initRefs() {
-    els.loading = byId("stateLoading");
-    els.invalid = byId("stateInvalid");
-    els.form = byId("stateForm");
-    els.success = byId("stateSuccess");
+  /* ---------------------------------------------------- rascunho (sessão) */
+
+  function storeKey() { return STORE_PREFIX + state.code; }
+
+  function draftSnapshot() {
+    var data = { step: state.step, fields: {}, parq: {}, chronicMeds: "", terms: false, consent: false };
+    FIELDS.concat(EXTRA_FIELDS).forEach(function (id) {
+      var el = byId(id);
+      if (el) data.fields[id] = el.value;
+    });
+    QUESTIONS.forEach(function (q) {
+      var a = parqAnswer(q.id);
+      data.parq[q.id] = a === null ? "" : (a ? "yes" : "no");
+    });
+    var meds = d.querySelector('input[name="chronicMeds"]:checked');
+    data.chronicMeds = meds ? meds.value : "";
+    data.terms = !!(byId("fTerms") && byId("fTerms").checked);
+    data.consent = !!(byId("fHealthConsent") && byId("fHealthConsent").checked);
+    if (sign) {
+      data.signStrokes = sign.strokes();
+      data.signPng = sign.dataUrl();
+    }
+    return data;
   }
 
-  function init() {
-    initRefs();
-    toastBody = byId("appToastBody");
-    toast = new bootstrap.Toast(byId("appToast"), { delay: 2600 });
+  /* sessionStorage: o rascunho morre junto com a aba (LGPD) */
+  function saveDraft() {
+    if (!state.code || state.submitted) return;
+    try {
+      w.sessionStorage.setItem(storeKey(), JSON.stringify(draftSnapshot()));
+    } catch (e) { /* cota cheia ou storage bloqueado — segue sem rascunho */ }
+  }
 
-    code = parseCode();
-    byId("invalidContactBtn").href = contactHref();
-    byId("leadCodeBadge").textContent = code ? ("Código: " + code) : "Código ausente";
-    if (!code) {
-      showState("stateInvalid");
+  function markDirty() {
+    state.dirty = true;
+    w.clearTimeout(saveTimer);
+    saveTimer = w.setTimeout(saveDraft, 300);
+  }
+
+  function readDraft() {
+    try {
+      var raw = w.sessionStorage.getItem(storeKey());
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function dropDraft() {
+    try { w.sessionStorage.removeItem(storeKey()); } catch (e) {}
+  }
+
+  function applyDraft(draft) {
+    if (!draft) return false;
+    var fields = draft.fields || {};
+    Object.keys(fields).forEach(function (id) {
+      var el = byId(id);
+      if (el) el.value = fields[id];
+    });
+
+    QUESTIONS.forEach(function (q) {
+      var answer = (draft.parq || {})[q.id];
+      if (answer !== "yes" && answer !== "no") return;
+      var input = d.querySelector('input[name="parq_' + q.id + '"][value="' + answer + '"]');
+      if (input) input.checked = true;
+    });
+
+    if (draft.chronicMeds === "yes" || draft.chronicMeds === "no") {
+      var meds = d.querySelector('input[name="chronicMeds"][value="' + draft.chronicMeds + '"]');
+      if (meds) meds.checked = true;
+    }
+
+    if (byId("fTerms")) byId("fTerms").checked = !!draft.terms;
+    if (byId("fHealthConsent")) byId("fHealthConsent").checked = !!draft.consent;
+    if (sign) sign.restore(draft.signStrokes, draft.signPng);
+
+    refreshAge();
+    syncReveals();
+    goToStep(draft.step || 1, true);
+    return true;
+  }
+
+  /* Preenche só o que veio da academia e só onde estiver vazio. */
+  function applyLeadPrefill() {
+    var lead = state.lead;
+    if (!lead) return;
+    if (!val("fName") && lead.name) setVal("fName", lead.name);
+    if (!val("fEmail") && lead.email) setVal("fEmail", lead.email);
+    if (!val("fPhone") && lead.phone) setVal("fPhone", maskPhone(lead.phone));
+  }
+
+  function resetForm() {
+    FIELDS.concat(EXTRA_FIELDS).forEach(function (id) { setVal(id, ""); });
+    all('#anParq input[type="radio"]').forEach(function (r) { r.checked = false; });
+    if (byId("fTerms")) byId("fTerms").checked = false;
+    if (byId("fHealthConsent")) byId("fHealthConsent").checked = false;
+    if (sign) sign.reset();
+    clearAllErrors();
+    refreshAge();
+    syncReveals();
+  }
+
+  /* ------------------------------------------------------------- etapas */
+
+  function goToStep(next, skipScroll) {
+    state.step = Math.max(1, Math.min(STEP_TOTAL, next));
+
+    all("[data-block]").forEach(function (block) {
+      block.hidden = Number(block.getAttribute("data-block")) !== state.step;
+    });
+
+    all(".an-step").forEach(function (item) {
+      var n = Number(item.getAttribute("data-step"));
+      item.classList.toggle("is-current", n === state.step);
+      item.classList.toggle("is-done", n < state.step);
+      item.setAttribute("aria-current", n === state.step ? "step" : "false");
+    });
+
+    byId("anPrev").hidden = state.step === 1;
+    byId("anNext").hidden = state.step === STEP_TOTAL;
+    byId("anSubmit").hidden = state.step !== STEP_TOTAL;
+
+    if (state.step === STEP_TOTAL && sign) sign.fit();
+    if (!skipScroll) {
+      var panel = byId("anPanel");
+      var top = panel ? panel.getBoundingClientRect().top + w.pageYOffset - 90 : 0;
+      w.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+    markDirty();
+  }
+
+  /* ---------------------------------------------------------- validação */
+
+  /* Devolve { step, el } do primeiro problema, ou null se estiver tudo certo. */
+  function validate(scope) {
+    clearAllErrors();
+    var first = null;
+
+    function fail(step, el, message) {
+      if (!el) return;
+      setError(el, message);
+      if (!first) first = { step: step, el: el };
+    }
+
+    var checkStep1 = scope === 1 || scope === "all";
+    var checkStep2 = scope === 2 || scope === "all";
+    var checkStep3 = scope === 3 || scope === "all";
+
+    if (checkStep1) {
+      if (val("fName").length < 3) fail(1, byId("fName"), "Escreva seu nome completo.");
+      else if (val("fName").split(/\s+/).length < 2) fail(1, byId("fName"), "Inclua nome e sobrenome.");
+
+      var phone = digits(val("fPhone"));
+      if (phone.length < 10 || phone.length > 11) fail(1, byId("fPhone"), "Informe o telefone com DDD.");
+
+      var email = val("fEmail");
+      if (email && !isEmail(email)) fail(1, byId("fEmail"), "Confira o e-mail digitado.");
+
+      if (!val("fCpf")) fail(1, byId("fCpf"), "Informe o seu CPF.");
+      else if (!isCpf(val("fCpf"))) fail(1, byId("fCpf"), "Esse CPF não é válido. Confira os números.");
+
+      var birth = val("fBirth");
+      var age = ageFromDate(birth);
+      if (!birth) fail(1, byId("fBirth"), "Informe a data de nascimento.");
+      else if (age === null) fail(1, byId("fBirth"), "Data inválida.");
+      else if (age < 0) fail(1, byId("fBirth"), "A data não pode estar no futuro.");
+      else if (age > 110) fail(1, byId("fBirth"), "Confira o ano de nascimento.");
+      else if (age < 3) fail(1, byId("fBirth"), "Confira a data de nascimento.");
+
+      if (digits(val("fCep")).length !== 8) fail(1, byId("fCep"), "O CEP tem 8 números.");
+      if (!val("fStreet")) fail(1, byId("fStreet"), "Informe a rua.");
+      if (!val("fNumber")) fail(1, byId("fNumber"), "Informe o número.");
+      if (!val("fDistrict")) fail(1, byId("fDistrict"), "Informe o bairro.");
+      if (!val("fCity")) fail(1, byId("fCity"), "Informe a cidade.");
+      if (UFS.indexOf(val("fState").toUpperCase()) === -1) fail(1, byId("fState"), "UF inválida.");
+
+      if (val("fEmergName").length < 3) fail(1, byId("fEmergName"), "Informe quem devemos avisar.");
+      var ePhone = digits(val("fEmergPhone"));
+      if (ePhone.length < 10 || ePhone.length > 11) fail(1, byId("fEmergPhone"), "Informe o telefone com DDD.");
+      else if (ePhone === phone) fail(1, byId("fEmergPhone"), "Use um telefone diferente do seu.");
+    }
+
+    if (checkStep2) {
+      QUESTIONS.forEach(function (q) {
+        if (parqAnswer(q.id) !== null) return;
+        var card = d.querySelector('.an-q[data-q="' + q.id + '"]');
+        if (card) card.classList.add("has-error");
+        setBlockError("anQErr" + q.id, "Escolha Sim ou Não.");
+        if (!first) first = { step: 2, el: card };
+      });
+
+      if (parqAnswer(4) === true) {
+        if (!val("qChronicWhat")) fail(2, byId("qChronicWhat"), "Conte quais doenças.");
+        var meds = d.querySelector('input[name="chronicMeds"]:checked');
+        if (!meds) {
+          setBlockError("anChronicMedsErr", "Escolha Sim ou Não.");
+          if (!first) first = { step: 2, el: byId("anChronicMedsErr") };
+        } else if (meds.value === "yes") {
+          if (!val("qChronicMedsList")) fail(2, byId("qChronicMedsList"), "Informe os remédios.");
+          if (!val("qChronicMedsWhich")) fail(2, byId("qChronicMedsWhich"), "Informe a doença.");
+        }
+      }
+      if (parqAnswer(5) === true && !val("qOrthoWhat")) fail(2, byId("qOrthoWhat"), "Conte o que aconteceu.");
+      if (parqAnswer(7) === true) {
+        if (!val("qActivityWhat")) fail(2, byId("qActivityWhat"), "Informe a atividade.");
+        if (!val("qActivityTime")) fail(2, byId("qActivityTime"), "Informe há quanto tempo.");
+      }
+
+      if (!val("fGoal")) fail(2, byId("fGoal"), "Escolha o seu objetivo.");
+      else if (val("fGoal") === "Outro" && !val("fGoalOther")) fail(2, byId("fGoalOther"), "Conte qual é o objetivo.");
+      if (!val("fDays")) fail(2, byId("fDays"), "Escolha quantos dias por semana.");
+      if (!val("fShift")) fail(2, byId("fShift"), "Escolha o turno.");
+    }
+
+    if (checkStep3) {
+      if (!byId("fTerms").checked) {
+        setBlockError("anTermsErr", "É preciso aceitar o termo para enviar.");
+        if (!first) first = { step: 3, el: byId("fTerms") };
+      }
+      if (!byId("fHealthConsent").checked) {
+        setBlockError("anConsentErr", "Precisamos da sua autorização para usar os dados de saúde.");
+        if (!first) first = { step: 3, el: byId("fHealthConsent") };
+      }
+      if (!sign || !sign.isSaved()) {
+        byId("anSignWrap").classList.add("has-error");
+        setBlockError("anSignErr", sign && sign.strokes().length
+          ? "Sua assinatura ainda não foi salva."
+          : "A assinatura é obrigatória.");
+        if (!first) first = { step: 3, el: byId("anSignWrap") };
+      }
+    }
+
+    return first;
+  }
+
+  /* Leva o usuário até o problema, mesmo que ele esteja em outra etapa. */
+  function focusProblem(problem) {
+    if (!problem) return;
+    if (problem.step !== state.step) goToStep(problem.step, true);
+    w.setTimeout(function () {
+      var el = problem.el;
+      if (!el) return;
+      var target = el.closest(".an-q") || el.closest(".field") || el;
+      if (target.scrollIntoView) target.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (el.focus) {
+        try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      }
+    }, 60);
+  }
+
+  /* ------------------------------------------------------------- payload */
+
+  function fullAddress() {
+    var parts = [val("fStreet"), val("fNumber"), val("fComplement"), val("fDistrict"), val("fCity"), val("fState").toUpperCase()];
+    return parts.filter(Boolean).join(", ");
+  }
+
+  function buildPayload() {
+    var parq = QUESTIONS.map(function (q) {
+      var yes = parqAnswer(q.id) === true;
+      var details = null;
+
+      if (q.id === 4 && yes) {
+        var meds = d.querySelector('input[name="chronicMeds"]:checked');
+        details = "Doenças: " + val("qChronicWhat");
+        details += " | Usa medicamentos: " + (meds ? (meds.value === "yes" ? "Sim" : "Não") : "");
+        if (meds && meds.value === "yes") {
+          details += " | Medicamentos: " + val("qChronicMedsList");
+          details += " | Doença relacionada: " + val("qChronicMedsWhich");
+        }
+      }
+      if (q.id === 5 && yes) details = val("qOrthoWhat") || null;
+      if (q.id === 7 && yes) details = "Atividade: " + val("qActivityWhat") + " | Tempo: " + val("qActivityTime");
+
+      return { question: q.id, answer: yes, details: details };
+    });
+
+    var goal = val("fGoal");
+    var age = ageFromDate(val("fBirth"));
+
+    return {
+      personal: {
+        name: val("fName"),
+        email: val("fEmail") || null,
+        phone: val("fPhone"),
+        cpf: val("fCpf"),
+        address: fullAddress(),
+        cep: val("fCep"),
+        address_street: val("fStreet"),
+        address_number: val("fNumber"),
+        address_complement: val("fComplement") || null,
+        address_district: val("fDistrict"),
+        address_city: val("fCity"),
+        address_state: val("fState").toUpperCase(),
+        birth_date: val("fBirth") || null,
+        age: age == null ? 0 : age,
+        emergency_contact: val("fEmergName"),
+        emergency_phone: val("fEmergPhone")
+      },
+      parq: parq,
+      goal: goal === "Outro" ? val("fGoalOther") : goal,
+      training_days: val("fDays"),
+      training_shift: val("fShift"),
+      medical_warning: QUESTIONS.some(function (q) { return parqAnswer(q.id) === true; }),
+      accepted_terms: byId("fTerms").checked,
+      health_data_consent: byId("fHealthConsent").checked,
+      signature: sign ? sign.dataUrl() : ""
+    };
+  }
+
+  /* --------------------------------------------------------------- envio */
+
+  function submit(ev) {
+    if (ev) ev.preventDefault();
+    if (state.sending) return;
+
+    var problem = validate("all");
+    if (problem) {
+      focusProblem(problem);
+      toast("Falta preencher alguma coisa. Levamos você até lá.", "bad");
       return;
     }
 
-    showState("stateLoading");
-    renderParq();
-    configureTerms();
-    maskPhone(byId("phone"));
-    maskPhone(byId("emergencyPhone"));
-    maskCpf(byId("cpf"));
-    maskCep(byId("cep"));
-    bindEvents();
-    const signatureApi = setupSignatureCanvas();
+    var btn = byId("anSubmit");
+    state.sending = true;
+    btn.disabled = true;
+    btn.classList.add("btn-loading");
 
-    const draft = restoreDraft();
-    if (draft) {
-      applyDraft(draft, signatureApi);
-      showToast("Rascunho restaurado automaticamente.");
-    }
+    fetchJson(apiUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildPayload())
+    }).then(function (res) {
+      if (!res.ok || !res.json || res.json.success === false) {
+        var message = (res.json && res.json.message) ? res.json.message : "Não conseguimos enviar agora. Tente de novo em instantes.";
+        throw new Error(message);
+      }
+      state.submitted = true;
+      state.dirty = false;
+      dropDraft();
+      showScreen("stDone");
+      w.scrollTo({ top: 0, behavior: "smooth" });
+    }).catch(function (err) {
+      toast(err && err.message ? err.message : "Não conseguimos enviar agora. Tente de novo.", "bad");
+    }).finally(function () {
+      state.sending = false;
+      btn.disabled = false;
+      btn.classList.remove("btn-loading");
+    });
+  }
 
-    fetch("https://portalcia.impactadigital.net/anamnese/" + encodeURIComponent(code), { method: "GET" })
+  /* ----------------------------------------------------------- CEP */
+
+  var cepBusy = false;
+  var lastCepLookup = "";
+
+  function lookupCep() {
+    var cep = digits(val("fCep"));
+    if (cep.length !== 8 || cepBusy || cep === lastCepLookup) return;
+
+    cepBusy = true;
+    lastCepLookup = cep;
+    var note = byId("anCepNote");
+    if (note) note.classList.add("show");
+
+    fetchJson("https://viacep.com.br/ws/" + cep + "/json/", { method: "GET" })
       .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
+        if (!res.ok || !res.json) throw new Error("falha");
+        if (res.json.erro) {
+          setError(byId("fCep"), "CEP não encontrado. Confira os números.");
+          lastCepLookup = "";
+          return;
+        }
+        var j = res.json;
+        if (j.logradouro) setVal("fStreet", j.logradouro);
+        if (j.bairro) setVal("fDistrict", j.bairro);
+        if (j.localidade) setVal("fCity", j.localidade);
+        if (j.uf) setVal("fState", j.uf);
+        [byId("fStreet"), byId("fDistrict"), byId("fCity"), byId("fState")].forEach(clearError);
+        clearError(byId("fCep"));
+        toast("Endereço preenchido. Falta só o número.", "good");
+        var num = byId("fNumber");
+        if (num && !num.value && state.step === 1) num.focus();
+        markDirty();
       })
-      .then(function (json) {
-        if (!json || json.success !== true || !json.data || !json.data.lead) throw new Error((json && json.message) ? json.message : "Código inválido");
-        applyLeadPrefill(json.data.lead);
-        showState("stateForm");
-        setStep(step);
-        byId("submitBtn").disabled = submitLockedByTerms;
+      .catch(function () {
+        lastCepLookup = "";
+        toast("Não conseguimos buscar o CEP. Preencha o endereço à mão.", "bad");
       })
-      .catch(function (err) {
-        console.error("Anamnese load failed", err);
-        showState("stateInvalid");
+      .finally(function () {
+        cepBusy = false;
+        if (note) note.classList.remove("show");
       });
   }
 
-  d.addEventListener("DOMContentLoaded", init);
+  /* --------------------------------------------------------------- setup */
+
+  function bindForm() {
+    FIELDS.forEach(function (id) {
+      var el = byId(id);
+      if (!el) return;
+      el.addEventListener("input", function () { clearError(el); markDirty(); });
+      el.addEventListener("change", function () { clearError(el); markDirty(); });
+    });
+
+    applyMask(byId("fPhone"), maskPhone);
+    applyMask(byId("fEmergPhone"), maskPhone);
+    applyMask(byId("fCpf"), maskCpf);
+    applyMask(byId("fCep"), maskCep);
+
+    byId("fBirth").addEventListener("change", refreshAge);
+    byId("fBirth").addEventListener("input", refreshAge);
+    byId("fBirth").setAttribute("max", new Date().toISOString().slice(0, 10));
+
+    byId("fState").addEventListener("input", function () {
+      byId("fState").value = byId("fState").value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2);
+    });
+
+    byId("fGoal").addEventListener("change", syncReveals);
+
+    byId("fCep").addEventListener("blur", lookupCep);
+    byId("fCep").addEventListener("input", function () {
+      if (digits(val("fCep")).length === 8) lookupCep();
+    });
+
+    [byId("fTerms"), byId("fHealthConsent")].forEach(function (el) {
+      el.addEventListener("change", function () {
+        setBlockError(el.id === "fTerms" ? "anTermsErr" : "anConsentErr", "");
+        markDirty();
+      });
+    });
+
+    byId("anNext").addEventListener("click", function () {
+      var problem = validate(state.step);
+      if (problem) {
+        focusProblem(problem);
+        return;
+      }
+      goToStep(state.step + 1);
+    });
+
+    byId("anPrev").addEventListener("click", function () {
+      clearAllErrors();
+      goToStep(state.step - 1);
+    });
+
+    var form = byId("anForm");
+    form.addEventListener("submit", submit);
+
+    /* Enter em um campo não pode enviar a ficha no meio do caminho. */
+    form.addEventListener("keydown", function (ev) {
+      if (ev.key !== "Enter") return;
+      var tag = (ev.target.tagName || "").toLowerCase();
+      if (tag === "textarea" || tag === "button") return;
+      ev.preventDefault();
+      if (state.step < STEP_TOTAL) byId("anNext").click();
+      else byId("anSubmit").click();
+    });
+
+    /* Confirmação em dois toques, sem diálogo nativo do navegador. */
+    var wipeBtn = byId("anWipe");
+    var wipeArmed = 0;
+    wipeBtn.addEventListener("click", function () {
+      if (!wipeArmed) {
+        wipeBtn.textContent = "Tem certeza? Toque de novo para apagar";
+        wipeArmed = w.setTimeout(function () {
+          wipeArmed = 0;
+          wipeBtn.textContent = "Apagar o que preenchi";
+        }, 5000);
+        return;
+      }
+      w.clearTimeout(wipeArmed);
+      wipeArmed = 0;
+      wipeBtn.textContent = "Apagar o que preenchi";
+      dropDraft();
+      resetForm();
+      applyLeadPrefill();
+      goToStep(1);
+      /* depois de goToStep, que reagenda o autosave */
+      w.clearTimeout(saveTimer);
+      state.dirty = false;
+      dropDraft();
+      toast("Pronto, começamos do zero.", "good");
+    });
+
+    w.addEventListener("beforeunload", function (ev) {
+      if (!state.dirty || state.submitted) return;
+      ev.preventDefault();
+      ev.returnValue = "";
+    });
+  }
+
+  function fillStaticContent() {
+    var cfg = config();
+    var terms = (cfg && cfg.meta && cfg.meta.anamneseTerms) || w.CDC_ANAMNESE_TERMO || DEFAULT_TERMS;
+    byId("anTerms").textContent = terms;
+
+    var href = contactHref();
+    ["anHelpLink", "anErrorContact", "anFooterContact"].forEach(function (id) {
+      var el = byId(id);
+      if (el) el.href = href;
+    });
+
+    all("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
+  }
+
+  function readCode() {
+    var fromPath = w.location.pathname.match(/\/anamnese\/([^/?#]+)/i);
+    if (fromPath && fromPath[1]) return decodeURIComponent(fromPath[1]);
+    var qs = new URLSearchParams(w.location.search);
+    return trim(qs.get("codigo") || qs.get("code") || "");
+  }
+
+  function showLoadError(kind) {
+    var title = byId("anErrorTitle");
+    var text = byId("anErrorText");
+    var retry = byId("anRetryBtn");
+    if (kind === "network") {
+      title.textContent = "Não conseguimos carregar sua ficha";
+      text.textContent = "Parece que a conexão falhou. Verifique sua internet e tente de novo.";
+      retry.hidden = false;
+    } else {
+      title.textContent = "Link inválido ou expirado";
+      text.textContent = "Não conseguimos localizar seu convite de anamnese. Fale com a nossa equipe para receber um novo link.";
+      retry.hidden = true;
+    }
+    showScreen("stError");
+  }
+
+  function loadLead() {
+    showScreen("stLoading");
+    return fetchJson(apiUrl(), { method: "GET" })
+      .then(function (res) {
+        /* Só 404/410 significam "esse código não existe". Qualquer outra
+           falha é problema do servidor: pedir um link novo não resolveria. */
+        if (res.status === 404 || res.status === 410) {
+          showLoadError("invalid");
+          return;
+        }
+        if (!res.ok) {
+          showLoadError("network");
+          return;
+        }
+        if (!res.json || res.json.success === false || !res.json.data || !res.json.data.lead) {
+          showLoadError("invalid");
+          return;
+        }
+
+        showScreen("stForm");
+
+        var restored = applyDraft(readDraft());
+
+        state.lead = res.json.data.lead;
+        applyLeadPrefill();
+
+        if (restored) toast("Continuamos de onde você parou.", "good");
+        if (sign) sign.fit();
+      })
+      .catch(function () {
+        showLoadError("network");
+      });
+  }
+
+  function init() {
+    var cfg = config();
+    state.apiBase = (cfg && cfg.meta && cfg.meta.anamneseApi) || "https://portalcia.impactadigital.net/anamnese";
+    state.code = readCode();
+
+    fillStaticContent();
+
+    if (!state.code) {
+      showLoadError("invalid");
+      return;
+    }
+
+    var badge = byId("anCode");
+    if (badge) {
+      byId("anCodeText").textContent = "Código " + state.code;
+      badge.hidden = false;
+    }
+
+    renderParq();
+    sign = createSignature();
+    bindForm();
+    syncReveals();
+    refreshAge();
+
+    byId("anRetryBtn").addEventListener("click", loadLead);
+    loadLead();
+  }
+
+  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", init);
+  else init();
 })(window, document);
