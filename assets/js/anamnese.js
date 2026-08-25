@@ -931,6 +931,8 @@
       }
       state.submitted = true;
       state.dirty = false;
+      /* Ficha concluida = CompleteRegistration no Pixel da Meta. */
+      if (w.CDC && w.CDC.track) w.CDC.track.event("anamnese_submit", { location_page: "anamnese" });
       dropDraft();
       showScreen("stDone");
       w.scrollTo({ top: 0, behavior: "smooth" });

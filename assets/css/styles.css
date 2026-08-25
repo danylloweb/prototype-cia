@@ -816,3 +816,24 @@ img.av{object-fit:cover}
   .btn { width: auto; }
   .hero-actions .btn { flex: 1 1 auto; }
 }
+
+/* ---------- Consentimento: painel de preferências granular ---------- */
+.consent-prefs { margin: -4px 0 16px; border-top: 1px solid var(--line); }
+.consent-prefs[hidden] { display: none; }
+.consent-opt {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.consent-opt:last-child { border-bottom: 0; }
+.consent-opt-txt { display: block; }
+.consent-opt-txt strong { display: block; font-size: .88rem; font-weight: 700; }
+.consent-opt-txt em { display: block; font-style: normal; font-size: .78rem; color: var(--text-soft); margin-top: 2px; }
+.consent-opt input[type="checkbox"] {
+  flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--brand); cursor: pointer;
+}
+.consent-opt input[type="checkbox"]:disabled { cursor: default; opacity: .55; }
+.consent-actions .btn-text[hidden] { display: none; }
+@media (max-width: 480px) {
+  .consent-actions { flex-direction: column; align-items: stretch; }
+  .consent-actions .btn { width: 100%; justify-content: center; }
+}

@@ -1842,6 +1842,7 @@ function goStep(n) {
     document.getElementById('summaryUnit').textContent = selectedUnit || '—';
     updateSummaryPrices();
     startPixTimer();
+    cdcTrack('checkout_start');
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1892,6 +1893,29 @@ function finalize() {
   
   // Launch confetti on successful registration!
   launchConfetti();
+
+  cdcTrack('checkout_complete');
+}
+
+/* ─── TELEMETRIA (Pixel da Meta / GA4 via CDC.track) ───
+   O valor sai do resumo na tela ("R$ 109,90" -> 109.9) para o Pixel
+   receber value/currency e a campanha poder otimizar por receita. */
+function cdcValorResumo() {
+  var el = document.getElementById('summaryPrice');
+  if (!el) return 0;
+  var n = parseFloat(String(el.textContent).replace(/[^0-9,.-]/g, '').replace(/\./g, '').replace(',', '.'));
+  return isNaN(n) ? 0 : n;
+}
+function cdcTrack(evento) {
+  if (!window.CDC || !window.CDC.track) return;
+  window.CDC.track.event(evento, {
+    plan: selectedPlan || '',
+    unit: selectedUnit || '',
+    payment: (typeof currentPaymentType !== 'undefined' ? currentPaymentType : ''),
+    value: cdcValorResumo(),
+    currency: 'BRL',
+    location_page: 'checkout'
+  });
 }
 
 /* ─── MASKS ─── */
@@ -2542,5 +2566,8 @@ document.addEventListener('DOMContentLoaded', () => {
   Simular Matrícula
 </button>
 
+<script src="/assets/js/config.js?v=20260825"></script>
+<script src="/assets/js/data-service.js?v=20260825"></script>
+<script src="/assets/js/telemetry.js?v=20260825"></script>
 </body>
 </html>
