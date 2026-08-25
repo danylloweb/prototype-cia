@@ -178,7 +178,10 @@
       logFirstParty(name, params);
       w.dataLayer.push(Object.assign({ event: name, event_id: eventId }, params));
 
-      if (!FB_SKIP[name] && up.pixel && w.fbq) {
+      /* "up.pixel" so diz que o pixel ja subiu; quem manda e o consentimento
+         de agora. Sem checar current.marketing, revogar o consentimento no
+         meio da sessao nao interrompia os envios ate a proxima recarga. */
+      if (!FB_SKIP[name] && up.pixel && current && current.marketing && w.fbq) {
         var std = FB_STANDARD[name];
         if (std) w.fbq("track", std, params, { eventID: eventId });
         else w.fbq("trackCustom", name, params, { eventID: eventId });

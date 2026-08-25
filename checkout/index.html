@@ -1117,6 +1117,71 @@
     body.dark-theme .plan-card.selected, body.dark-theme .unit-card.selected {
       background: var(--primary-l);
     }
+
+    /* ─────────────── CONSENTIMENTO (LGPD) ───────────────
+       O banner do telemetry.js é injetado em document.body, e esta página
+       não carrega o /assets/css/styles.css do site — os tokens e o
+       .btn-primary daqui são outros. Então o bloco é reescrito com os
+       tokens do checkout (ganha dark-theme de graça, porque --white e
+       --border já trocam lá em cima) e fica todo escopado em .consent
+       para não vazar no resto da tela. */
+    .consent {
+      position: fixed; left: 16px; right: 16px; bottom: 16px;
+      max-width: 560px; padding: 22px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+      /* acima do .sim-btn-float (500), abaixo do toast (999) */
+      z-index: 600;
+      transform: translateY(140%);
+      transition: transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .consent.show { transform: translateY(0); }
+    .consent h4 { font-family: var(--font-h); font-size: 16px; font-weight: 800; color: var(--t1); margin-bottom: 6px; }
+    .consent p { font-size: 13.5px; color: var(--t3); margin-bottom: 16px; }
+    .consent p strong { color: var(--t2); font-weight: 600; }
+    .consent p a { color: var(--primary); text-decoration: underline; }
+
+    .consent-prefs { margin: -4px 0 16px; border-top: 1px solid var(--border); }
+    .consent-prefs[hidden] { display: none; }
+    .consent-opt {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .consent-opt:last-child { border-bottom: 0; }
+    .consent-opt-txt { display: block; }
+    .consent-opt-txt strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--t1); }
+    .consent-opt-txt em { display: block; font-style: normal; font-size: 12.5px; color: var(--t3); margin-top: 2px; }
+    .consent-opt input[type="checkbox"] {
+      flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px;
+      accent-color: var(--primary); cursor: pointer;
+    }
+    .consent-opt input[type="checkbox"]:disabled { cursor: default; opacity: .55; }
+
+    .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    /* o .btn-primary do checkout é width:100%; aqui ele divide a linha
+       com o "Só essenciais", então volta a ser automático. */
+    .consent-actions .btn { width: auto; padding: 12px 20px; font-size: 14px; }
+    .consent .btn-ghost {
+      background: var(--white); color: var(--t2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-h); font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, border-color .2s;
+    }
+    .consent .btn-ghost:hover { background: var(--surface2); border-color: var(--t4); }
+    .consent .btn-text {
+      background: none; border: 0; color: var(--t3);
+      font-family: var(--font-b); font-size: 13.5px; font-weight: 600;
+      cursor: pointer; padding: 12px 8px;
+    }
+    .consent .btn-text:hover { color: var(--t1); }
+    .consent-actions .btn-text[hidden] { display: none; }
+
+    @media (max-width: 560px) {
+      .consent { padding: 18px; }
+      .consent-actions { flex-direction: column; align-items: stretch; }
+      .consent-actions .btn { width: 100%; }
+    }
   </style>
 </head>
 <body>
