@@ -129,11 +129,17 @@
      ============================================================ */
 
   /* Eventos do site -> eventos padrão do Pixel. O que não estiver aqui
-     vai como evento personalizado (trackCustom). */
+     vai como evento personalizado (trackCustom).
+
+     partner_lead fica de fora de propósito: parceiro do Clube da Parceria
+     não gera receita, e jogá-lo no mesmo "Lead" que o aluno dilui a métrica
+     que as campanhas de matrícula otimizam. Ele sobe como evento próprio,
+     levando empresa/categoria junto. Todo evento de lead carrega tipo_lead
+     ("aluno" ou "parceiro") para dar Conversão Personalizada por parâmetro
+     no Meta, sem depender de regra de URL. */
   var FB_STANDARD = {
     lead_submit: "Lead",
     trial_request: "Lead",
-    partner_lead: "Lead",
     popup_cta: "Lead",
     whatsapp_click: "Contact",
     call_click: "Contact",

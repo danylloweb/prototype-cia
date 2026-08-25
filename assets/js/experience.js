@@ -222,7 +222,7 @@
       if (arr.length > 500) arr = arr.slice(arr.length - 500);
       localStorage.setItem("cdc_leads", JSON.stringify(arr));
     } catch (e) {}
-    if (T) T.event("lead_submit", { unit: info.unit_slug || "", plano: info.plan_key || "" });
+    if (T) T.event("lead_submit", { unit: info.unit_slug || "", plano: info.plan_key || "", tipo_lead: "aluno" });
     var meta = DATA.get().meta || {};
     var base = String(meta.apiBase || "").replace(/\/+$/, "");
     if (!base || !meta.landingToken || !w.fetch) return;
@@ -331,7 +331,7 @@
         if (feats.length) lines.push("*Inclui:* " + feats.join(" · "));
         lines.push("", "Pode me ajudar a agendar?");
         var msg = encodeURIComponent(lines.join("\n"));
-        if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select" });
+        if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select", tipo_lead: "aluno" });
         w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
         close();
       };
@@ -439,7 +439,7 @@
             "Pode me ajudar a agendar?"
           );
           var msg = encodeURIComponent(lines.join("\n"));
-          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz" });
+          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz", tipo_lead: "aluno" });
           w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
           close();
         };
@@ -479,7 +479,7 @@
       var data = { nome: f.nome.value, empresa: f.empresa.value, categoria: f.categoria.value, telefone: f.telefone.value,
         instagram: f.instagram.value, cidade: f.cidade.value, beneficio: f.beneficio.value, ts: Date.now(), status: "novo" };
       try { var k = "cdc_partner_leads"; var arr = JSON.parse(localStorage.getItem(k) || "[]"); arr.push(data); localStorage.setItem(k, JSON.stringify(arr)); } catch (x) {}
-      if (T) T.event("partner_lead", { empresa: data.empresa, categoria: data.categoria });
+      if (T) T.event("partner_lead", { empresa: data.empresa, categoria: data.categoria, tipo_lead: "parceiro" });
       // Manda a inscrição para o painel: entra como "pendente" e alguém
       // aprova por lá antes de aparecer no Clube da Parceria. Como o envio
       // do lead, é fire-and-forget: não segura a abertura do WhatsApp.

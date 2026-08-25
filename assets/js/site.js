@@ -155,7 +155,7 @@
     overlay.querySelector(".cdc-popup-close").addEventListener("click", close);
     overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
     overlay.querySelector(".cdc-popup-cta").addEventListener("click", function (e) {
-      if (w.CDC.track) w.CDC.track.event("popup_cta", { popup_id: p.id, popup_name: p.name });
+      if (w.CDC.track) w.CDC.track.event("popup_cta", { popup_id: p.id, popup_name: p.name, tipo_lead: "aluno" });
       close();
       // CTA de WhatsApp da campanha: abre o quiz para qualificar o lead antes do WhatsApp
       if (p.ctaType === "whatsapp") {
