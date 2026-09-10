@@ -106,6 +106,16 @@
   transition: width 0.1s ease-out;
 }
 
+/* Signature Canvas */
+#assignSignature {
+  display: block !important;
+  width: 100% !important;
+  touch-action: none !important;
+  cursor: crosshair !important;
+  background: #fff !important;
+  border-radius: 0.5rem !important;
+}
+
 /* Camera Container */
 .assign-camera-container {
   position: relative;
