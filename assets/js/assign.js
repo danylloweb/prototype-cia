@@ -194,53 +194,93 @@ class AssignmentFlow {
 
   setupSignatureCanvas() {
     const canvas = document.getElementById('assignSignature');
-    if (!canvas) return;
+    if (!canvas) {
+      console.error('Canvas element not found');
+      return;
+    }
 
-    // Set canvas resolution to match display size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    // Ensure canvas element is visible and has a parent
+    const wrap = document.getElementById('assignSignWrap');
+    if (!wrap) {
+      console.error('Sign wrap not found');
+      return;
+    }
 
-    const ctx = canvas.getContext('2d');
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#000';
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Wait for DOM to be fully rendered
+    setTimeout(() => {
+      // Set canvas resolution to match display size
+      const rect = canvas.getBoundingClientRect();
+      console.log('Canvas rect:', { width: rect.width, height: rect.height });
 
-    // Touch and mouse events
-    canvas.addEventListener('pointerdown', (e) => this.startDrawing(e, canvas, ctx));
-    canvas.addEventListener('pointermove', (e) => this.draw(e, canvas, ctx));
-    canvas.addEventListener('pointerup', () => this.stopDrawing(canvas));
-    canvas.addEventListener('pointerleave', () => this.stopDrawing(canvas));
+      canvas.width = canvas.offsetWidth || rect.width || 400;
+      canvas.height = canvas.offsetHeight || rect.height || 400;
 
-    // Buttons
-    document.getElementById('assignSignSave')?.addEventListener('click', () => this.saveSignature(canvas));
-    document.getElementById('assignSignClear')?.addEventListener('click', () => this.clearSignature(canvas, ctx));
-    document.getElementById('assignSignUndo')?.addEventListener('click', () => this.undoStroke(canvas, ctx));
+      console.log('Canvas dimensions set to:', { width: canvas.width, height: canvas.height });
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Failed to get 2D context');
+        return;
+      }
+
+      // Set up context
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#000';
+      ctx.fillStyle = '#fff';
+
+      // Fill background
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      console.log('Canvas background filled');
+
+      // Store context reference
+      this.canvasCtx = ctx;
+      this.canvas = canvas;
+
+      // Touch and mouse events
+      canvas.addEventListener('pointerdown', (e) => {
+        console.log('pointerdown');
+        this.startDrawing(e);
+      });
+      canvas.addEventListener('pointermove', (e) => this.draw(e));
+      canvas.addEventListener('pointerup', () => this.stopDrawing());
+      canvas.addEventListener('pointerleave', () => this.stopDrawing());
+
+      // Buttons
+      document.getElementById('assignSignSave')?.addEventListener('click', () => this.saveSignature());
+      document.getElementById('assignSignClear')?.addEventListener('click', () => this.clearSignature());
+      document.getElementById('assignSignUndo')?.addEventListener('click', () => this.undoStroke());
+
+      console.log('Signature canvas setup complete');
+    }, 100);
   }
 
-  startDrawing(e, canvas, ctx) {
-    const rect = canvas.getBoundingClientRect();
+  startDrawing(e) {
+    if (!this.canvas || !this.canvasCtx) return;
+
+    const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
+    console.log('Start drawing at:', { x, y });
 
     this.isDrawing = true;
     this.strokes.push([]);
 
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+    this.canvasCtx.beginPath();
+    this.canvasCtx.moveTo(x, y);
   }
 
-  draw(e, canvas, ctx) {
-    if (!this.isDrawing) return;
+  draw(e) {
+    if (!this.isDrawing || !this.canvas || !this.canvasCtx) return;
 
-    const rect = canvas.getBoundingClientRect();
+    const rect = this.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    this.canvasCtx.lineTo(x, y);
+    this.canvasCtx.stroke();
 
     const currentStroke = this.strokes[this.strokes.length - 1];
     if (currentStroke) {
@@ -248,55 +288,63 @@ class AssignmentFlow {
     }
   }
 
-  stopDrawing(canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.closePath();
+  stopDrawing() {
+    if (!this.canvasCtx) return;
+
+    this.canvasCtx.closePath();
     this.isDrawing = false;
+    console.log('Stop drawing, total strokes:', this.strokes.length);
   }
 
-  undoStroke(canvas, ctx) {
+  undoStroke() {
     if (this.strokes.length === 0) return;
 
     this.strokes.pop();
-    this.redrawSignature(canvas, ctx);
+    this.redrawSignature();
   }
 
-  clearSignature(canvas, ctx) {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  clearSignature() {
+    if (!this.canvas || !this.canvasCtx) return;
+
+    this.canvasCtx.fillStyle = '#fff';
+    this.canvasCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.strokes = [];
     this.signatureData = null;
     this.updateSignatureStatus();
   }
 
-  redrawSignature(canvas, ctx) {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  redrawSignature() {
+    if (!this.canvas || !this.canvasCtx) return;
+
+    this.canvasCtx.fillStyle = '#fff';
+    this.canvasCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.strokes.forEach(stroke => {
       if (stroke.length === 0) return;
 
-      ctx.beginPath();
-      ctx.moveTo(stroke[0].x, stroke[0].y);
+      this.canvasCtx.beginPath();
+      this.canvasCtx.moveTo(stroke[0].x, stroke[0].y);
 
       for (let i = 1; i < stroke.length; i++) {
-        ctx.lineTo(stroke[i].x, stroke[i].y);
+        this.canvasCtx.lineTo(stroke[i].x, stroke[i].y);
       }
 
-      ctx.stroke();
-      ctx.closePath();
+      this.canvasCtx.stroke();
+      this.canvasCtx.closePath();
     });
 
     this.updateSignatureStatus();
   }
 
-  saveSignature(canvas) {
+  saveSignature() {
     if (this.strokes.length === 0) {
-      this.showError('Assinatura vazia', 'Por favor, assine no quadro antes de continuar.');
+      this.showValidationError('Assinatura vazia', 'Por favor, assine no quadro antes de continuar.');
       return;
     }
 
-    this.signatureData = canvas.toDataURL('image/png');
+    if (!this.canvas) return;
+
+    this.signatureData = this.canvas.toDataURL('image/png');
     this.showToast('Assinatura salva com sucesso!', 'success');
     this.updateSignatureStatus(true);
   }
