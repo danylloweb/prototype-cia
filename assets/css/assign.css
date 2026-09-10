@@ -1,5 +1,22 @@
 /* Assign Page Styles */
 
+/* Override steps for 4 columns (assign has 4 steps vs anamnese's 3) */
+#assignSteps {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+@media (max-width: 768px) {
+  #assignSteps {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #assignSteps {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Info Grid */
 .assign-info-grid {
   display: grid;
