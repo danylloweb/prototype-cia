@@ -34,11 +34,12 @@
 
 /* Terms Container */
 .assign-terms-container {
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid #ddd;
   border-radius: 0.5rem;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: #fff;
 }
 
 .assign-terms-content {
@@ -47,7 +48,8 @@
   padding: 1.5rem;
   font-size: 0.95rem;
   line-height: 1.6;
-  background: var(--bg-primary, #fff);
+  background: #fff;
+  color: #000;
 }
 
 .assign-terms-content::-webkit-scrollbar {
