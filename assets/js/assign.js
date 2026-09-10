@@ -49,7 +49,7 @@ class AssignmentFlow {
     try {
       this.showState('stLoading');
 
-      const response = await fetch(`/signature/${this.code}`, {
+      const response = await fetch(`http://localhost:8005/signature/${this.code}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
@@ -90,8 +90,21 @@ class AssignmentFlow {
       this.termsText = await response.text();
       this.renderTerms();
     } catch (error) {
-      console.error('Terms load error:', error);
-      this.showToast('Erro ao carregar termos. Tente novamente.', 'error');
+      console.error('Terms load error from S3:', error);
+      console.log('Attempting to load fallback terms...');
+      
+      try {
+        const fallbackResponse = await fetch('/assets/terms-default.txt');
+        if (!fallbackResponse.ok) throw new Error('Falha ao carregar termos padrão');
+
+        this.termsText = await fallbackResponse.text();
+        this.renderTerms();
+        this.showToast('Usando versão padrão dos termos.', 'info');
+      } catch (fallbackError) {
+        console.error('Fallback terms load error:', fallbackError);
+        this.showToast('Erro ao carregar termos. Tente novamente.', 'error');
+        throw fallbackError;
+      }
     }
   }
 
