@@ -86,7 +86,7 @@
 .assign-terms-scroll-hint {
   display: block;
   font-size: 0.85rem;
-  color: var(--text-secondary, #666);
+  color: #000 !important;
   margin-bottom: 0.5rem;
   text-align: center;
 }
