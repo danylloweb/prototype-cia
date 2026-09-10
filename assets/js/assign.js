@@ -15,8 +15,6 @@ class AssignmentFlow {
     this.acceptedTerms = false;
     this.termsVersion = null;
     this.termsText = null;
-    this.strokes = [];
-    this.isDrawing = false;
     this.camera = null;
     this.cameraStream = null;
 
@@ -194,159 +192,189 @@ class AssignmentFlow {
 
   setupSignatureCanvas() {
     const canvas = document.getElementById('assignSignature');
-    if (!canvas) {
-      console.error('Canvas element not found');
-      return;
-    }
-
-    // Ensure canvas element is visible and has a parent
     const wrap = document.getElementById('assignSignWrap');
-    if (!wrap) {
-      console.error('Sign wrap not found');
-      return;
-    }
+    if (!canvas || !wrap) return null;
 
-    // Wait for DOM to be fully rendered
-    setTimeout(() => {
-      // Set canvas resolution to match display size
-      const rect = canvas.getBoundingClientRect();
-      console.log('Canvas rect:', { width: rect.width, height: rect.height });
+    const ctx = canvas.getContext('2d');
+    const strokes = [];
+    let current = null;
+    let drawing = false;
+    const box = { w: 0, h: 0 };
 
-      canvas.width = canvas.offsetWidth || rect.width || 400;
-      canvas.height = canvas.offsetHeight || rect.height || 400;
-
-      console.log('Canvas dimensions set to:', { width: canvas.width, height: canvas.height });
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Failed to get 2D context');
-        return;
-      }
-
-      // Set up context
+    const paint = () => {
+      const ratio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2.2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#000';
-      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#14141a';
 
-      // Fill background
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      console.log('Canvas background filled');
-
-      // Store context reference
-      this.canvasCtx = ctx;
-      this.canvas = canvas;
-
-      // Touch and mouse events
-      canvas.addEventListener('pointerdown', (e) => {
-        console.log('pointerdown');
-        this.startDrawing(e);
+      strokes.forEach(stroke => {
+        if (!stroke.length) return;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
+        if (stroke.length === 1) {
+          ctx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
+        } else {
+          for (let i = 1; i < stroke.length; i++) {
+            ctx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
+          }
+        }
+        ctx.stroke();
       });
-      canvas.addEventListener('pointermove', (e) => this.draw(e));
-      canvas.addEventListener('pointerup', () => this.stopDrawing());
-      canvas.addEventListener('pointerleave', () => this.stopDrawing());
 
-      // Buttons
-      document.getElementById('assignSignSave')?.addEventListener('click', () => this.saveSignature());
-      document.getElementById('assignSignClear')?.addEventListener('click', () => this.clearSignature());
-      document.getElementById('assignSignUndo')?.addEventListener('click', () => this.undoStroke());
+      wrap.classList.toggle('has-ink', strokes.length > 0);
+    };
 
-      console.log('Signature canvas setup complete');
-    }, 100);
-  }
-
-  startDrawing(e) {
-    if (!this.canvas || !this.canvasCtx) return;
-
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    console.log('Start drawing at:', { x, y });
-
-    this.isDrawing = true;
-    this.strokes.push([]);
-
-    this.canvasCtx.beginPath();
-    this.canvasCtx.moveTo(x, y);
-  }
-
-  draw(e) {
-    if (!this.isDrawing || !this.canvas || !this.canvasCtx) return;
-
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    this.canvasCtx.lineTo(x, y);
-    this.canvasCtx.stroke();
-
-    const currentStroke = this.strokes[this.strokes.length - 1];
-    if (currentStroke) {
-      currentStroke.push({ x, y });
-    }
-  }
-
-  stopDrawing() {
-    if (!this.canvasCtx) return;
-
-    this.canvasCtx.closePath();
-    this.isDrawing = false;
-    console.log('Stop drawing, total strokes:', this.strokes.length);
-  }
-
-  undoStroke() {
-    if (this.strokes.length === 0) return;
-
-    this.strokes.pop();
-    this.redrawSignature();
-  }
-
-  clearSignature() {
-    if (!this.canvas || !this.canvasCtx) return;
-
-    this.canvasCtx.fillStyle = '#fff';
-    this.canvasCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.strokes = [];
-    this.signatureData = null;
-    this.updateSignatureStatus();
-  }
-
-  redrawSignature() {
-    if (!this.canvas || !this.canvasCtx) return;
-
-    this.canvasCtx.fillStyle = '#fff';
-    this.canvasCtx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.strokes.forEach(stroke => {
-      if (stroke.length === 0) return;
-
-      this.canvasCtx.beginPath();
-      this.canvasCtx.moveTo(stroke[0].x, stroke[0].y);
-
-      for (let i = 1; i < stroke.length; i++) {
-        this.canvasCtx.lineTo(stroke[i].x, stroke[i].y);
+    const fit = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return false;
+      const ratio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+      const nextW = Math.round(rect.width * ratio);
+      const nextH = Math.round(rect.height * ratio);
+      box.w = rect.width;
+      box.h = rect.height;
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW;
+        canvas.height = nextH;
       }
+      paint();
+      return true;
+    };
 
-      this.canvasCtx.stroke();
-      this.canvasCtx.closePath();
+    const pointFrom = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const src = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+      return {
+        x: Math.min(1, Math.max(0, (src.clientX - rect.left) / (rect.width || 1))),
+        y: Math.min(1, Math.max(0, (src.clientY - rect.top) / (rect.height || 1)))
+      };
+    };
+
+    const start = (ev) => {
+      if (ev.button != null && ev.button !== 0) return;
+      ev.preventDefault();
+      if (!box.w && !fit()) return;
+      drawing = true;
+      current = [pointFrom(ev)];
+      strokes.push(current);
+      wrap.classList.add('is-active');
+      wrap.classList.remove('has-error');
+      paint();
+    };
+
+    const move = (ev) => {
+      if (!drawing || !current) return;
+      ev.preventDefault();
+      current.push(pointFrom(ev));
+      paint();
+    };
+
+    const end = () => {
+      if (!drawing) return;
+      drawing = false;
+      current = null;
+      wrap.classList.remove('is-active');
+      this.updateSignatureStatus(strokes.length > 0 ? 'pending' : null);
+    };
+
+    const exportPng = () => {
+      if (!strokes.length) return '';
+      let minX = 1, minY = 1, maxX = 0, maxY = 0;
+      strokes.forEach(s => {
+        s.forEach(p => {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        });
+      });
+      const pad = 0.04;
+      minX = Math.max(0, minX - pad);
+      minY = Math.max(0, minY - pad);
+      maxX = Math.min(1, maxX + pad);
+      maxY = Math.min(1, maxY + pad);
+
+      const srcW = Math.max(0.08, maxX - minX) * box.w;
+      const srcH = Math.max(0.08, maxY - minY) * box.h;
+
+      const outW = 600;
+      const outH = Math.max(120, Math.min(400, Math.round(outW * (srcH / srcW))));
+      const scale = Math.min(outW / srcW, outH / srcH);
+
+      const out = document.createElement('canvas');
+      out.width = outW;
+      out.height = outH;
+      const octx = out.getContext('2d');
+      octx.translate((outW - srcW * scale) / 2, (outH - srcH * scale) / 2);
+      octx.scale(scale, scale);
+      octx.translate(-minX * box.w, -minY * box.h);
+      octx.lineWidth = 2.2;
+      octx.lineCap = 'round';
+      octx.lineJoin = 'round';
+      octx.strokeStyle = '#14141a';
+
+      strokes.forEach(stroke => {
+        if (!stroke.length) return;
+        octx.beginPath();
+        octx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
+        if (stroke.length === 1) {
+          octx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
+        } else {
+          for (let i = 1; i < stroke.length; i++) {
+            octx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
+          }
+        }
+        octx.stroke();
+      });
+
+      return out.toDataURL('image/png');
+    };
+
+    // Event listeners
+    canvas.addEventListener('pointerdown', start);
+    canvas.addEventListener('pointermove', move);
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointerleave', end);
+
+    // Button handlers
+    document.getElementById('assignSignSave')?.addEventListener('click', () => {
+      if (strokes.length === 0) {
+        this.showValidationError('Assinatura vazia', 'Por favor, assine no quadro antes de continuar.');
+        return;
+      }
+      this.signatureData = exportPng();
+      this.showToast('Assinatura salva com sucesso!', 'success');
+      this.updateSignatureStatus(true);
     });
 
-    this.updateSignatureStatus();
-  }
+    document.getElementById('assignSignClear')?.addEventListener('click', () => {
+      strokes.length = 0;
+      current = null;
+      drawing = false;
+      this.signatureData = null;
+      wrap.classList.remove('has-ink', 'is-active', 'is-saved', 'has-error');
+      paint();
+      this.updateSignatureStatus();
+    });
 
-  saveSignature() {
-    if (this.strokes.length === 0) {
-      this.showValidationError('Assinatura vazia', 'Por favor, assine no quadro antes de continuar.');
-      return;
-    }
+    document.getElementById('assignSignUndo')?.addEventListener('click', () => {
+      if (strokes.length > 0) {
+        strokes.pop();
+        paint();
+        this.updateSignatureStatus(strokes.length > 0 ? 'pending' : null);
+      }
+    });
 
-    if (!this.canvas) return;
+    // Fit canvas on visibility change
+    window.addEventListener('focus', () => {
+      if (!box.w) fit();
+    });
 
-    this.signatureData = this.canvas.toDataURL('image/png');
-    this.showToast('Assinatura salva com sucesso!', 'success');
-    this.updateSignatureStatus(true);
+    // Initial fit
+    setTimeout(() => fit(), 50);
   }
 
   updateSignatureStatus(saved = false) {
