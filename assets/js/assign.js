@@ -421,10 +421,14 @@ class AssignmentFlow {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Redimensiona para 800x600 (4:3 ratio) para economizar espaço
+    const targetWidth = 800;
+    const targetHeight = 600;
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
 
-    ctx.drawImage(video, 0, 0);
+    // Desenha a imagem do vídeo redimensionada
+    ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
 
     document.getElementById('assignCameraContainer').hidden = true;
     document.getElementById('assignPhotoPreview').hidden = false;
@@ -435,11 +439,17 @@ class AssignmentFlow {
     document.getElementById('assignPhotoPreview').hidden = true;
   }
 
+  compressPhoto(canvas, quality = 0.7) {
+    // Converte para JPEG com qualidade reduzida para economizar espaço
+    return canvas.toDataURL('image/jpeg', quality);
+  }
+
   savePhoto() {
     const canvas = document.getElementById('assignPhotoCanvas');
     if (!canvas) return;
 
-    this.photoData = canvas.toDataURL('image/png');
+    // Comprime a foto antes de salvar (JPEG com 70% de qualidade)
+    this.photoData = this.compressPhoto(canvas, 0.7);
     this.showToast('Foto salva com sucesso!', 'success');
     document.getElementById('assignPhotoPreview').hidden = true;
     document.getElementById('assignCameraContainer').hidden = false;
