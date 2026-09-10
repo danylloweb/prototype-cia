@@ -47,7 +47,7 @@ class AssignmentFlow {
     try {
       this.showState('stLoading');
 
-      const response = await fetch(`http://localhost:8005/signature/${this.code}`, {
+      const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
@@ -565,7 +565,7 @@ class AssignmentFlow {
     const blob = await this.dataURLtoBlob(this.photoData);
     formData.append('file', blob, 'face.png');
 
-    const response = await fetch(`http://localhost:8005/signature/${this.code}/photo`, {
+    const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}/photo`, {
       method: 'POST',
       body: formData
     });
@@ -587,7 +587,7 @@ class AssignmentFlow {
       signature: this.signatureData
     };
 
-    const response = await fetch(`http://localhost:8005/signature/${this.code}/finalize`, {
+    const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}/finalize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

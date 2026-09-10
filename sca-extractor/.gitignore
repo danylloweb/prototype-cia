@@ -1,0 +1,36 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Data (sensitive)
+data/
+!data/.gitkeep
+
+# Session state (cookies, auth tokens)
+data/session/
+*.json.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Misc
+.DS_Store
