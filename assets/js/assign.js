@@ -196,17 +196,17 @@ class AssignmentFlow {
     const canvas = document.getElementById('assignSignature');
     if (!canvas) return;
 
-    // Set canvas resolution
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * window.devicePixelRatio;
-    canvas.height = rect.height * window.devicePixelRatio;
+    // Set canvas resolution to match display size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
     const ctx = canvas.getContext('2d');
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Touch and mouse events
     canvas.addEventListener('pointerdown', (e) => this.startDrawing(e, canvas, ctx));
@@ -222,8 +222,8 @@ class AssignmentFlow {
 
   startDrawing(e, canvas, ctx) {
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * window.devicePixelRatio / window.devicePixelRatio;
-    const y = (e.clientY - rect.top) * window.devicePixelRatio / window.devicePixelRatio;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     this.isDrawing = true;
     this.strokes.push([]);
@@ -236,8 +236,8 @@ class AssignmentFlow {
     if (!this.isDrawing) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * window.devicePixelRatio / window.devicePixelRatio;
-    const y = (e.clientY - rect.top) * window.devicePixelRatio / window.devicePixelRatio;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -262,14 +262,16 @@ class AssignmentFlow {
   }
 
   clearSignature(canvas, ctx) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     this.strokes = [];
     this.signatureData = null;
     this.updateSignatureStatus();
   }
 
   redrawSignature(canvas, ctx) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     this.strokes.forEach(stroke => {
       if (stroke.length === 0) return;
@@ -487,7 +489,7 @@ class AssignmentFlow {
     const blob = await this.dataURLtoBlob(this.photoData);
     formData.append('file', blob, 'face.png');
 
-    const response = await fetch(`/signature/${this.code}/photo`, {
+    const response = await fetch(`http://localhost:8005/signature/${this.code}/photo`, {
       method: 'POST',
       body: formData
     });
@@ -509,7 +511,7 @@ class AssignmentFlow {
       signature: this.signatureData
     };
 
-    const response = await fetch(`/signature/${this.code}/finalize`, {
+    const response = await fetch(`http://localhost:8005/signature/${this.code}/finalize`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
