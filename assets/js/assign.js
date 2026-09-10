@@ -389,12 +389,12 @@ class AssignmentFlow {
     }
 
     if (this.currentStep === 3 && !this.signatureData) {
-      this.showError('Assinatura necessária', 'Por favor, assine no quadro e clique em "Salvar assinatura".');
+      this.showValidationError('Assinatura necessária', 'Por favor, assine no quadro e clique em "Salvar assinatura".');
       return;
     }
 
     if (this.currentStep === 4 && !this.photoData) {
-      this.showError('Foto necessária', 'Por favor, tire uma foto e clique em "Usar esta foto".');
+      this.showValidationError('Foto necessária', 'Por favor, tire uma foto e clique em "Usar esta foto".');
       return;
     }
 
@@ -557,6 +557,69 @@ class AssignmentFlow {
     if (errorText) errorText.textContent = message;
 
     this.showState('stError');
+  }
+
+  showValidationError(title, message) {
+    const toastsContainer = document.getElementById('assignToasts');
+    if (!toastsContainer) return;
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      padding: 1.5rem;
+      margin: 0.5rem;
+      border-radius: 0.5rem;
+      background: #dc3545;
+      color: white;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = 'flex: 1;';
+    content.innerHTML = `
+      <strong style="display: block; margin-bottom: 0.25rem;">${title}</strong>
+      <span style="font-size: 0.85rem; opacity: 0.9;">${message}</span>
+    `;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Tentar novamente';
+    button.style.cssText = `
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.25rem;
+      color: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.2s;
+    `;
+
+    button.onmouseover = () => {
+      button.style.background = 'rgba(255, 255, 255, 0.3)';
+    };
+    button.onmouseout = () => {
+      button.style.background = 'rgba(255, 255, 255, 0.2)';
+    };
+
+    button.onclick = () => {
+      toast.remove();
+    };
+
+    toast.appendChild(content);
+    toast.appendChild(button);
+    toastsContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 5000);
   }
 
   showToast(message, type = 'info') {
