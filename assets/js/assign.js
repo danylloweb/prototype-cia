@@ -1,792 +1,791 @@
 /**
- * Assign Page - Digital Signature Flow
- * Handles contract loading, terms acceptance, signature capture, and photo submission
+ * Assinatura digital (assign.html)
+ * Carrega o contrato, exige leitura dos termos, captura assinatura e foto
+ * para reconhecimento facial e envia tudo em duas requisições.
  */
+(function (w, d) {
+  'use strict';
 
-class AssignmentFlow {
-  constructor() {
-    this.currentStep = 1;
-    this.maxSteps = 4;
-    this.code = null;
-    this.contractData = null;
-    this.termsScrolled = false;
-    this.signatureData = null;
-    this.photoData = null;
-    this.acceptedTerms = false;
-    this.termsVersion = null;
-    this.termsText = null;
-    this.camera = null;
-    this.cameraStream = null;
+  var API_BASE = 'https://portalcia.impactadigital.net/signature/';
+  var TERMS_FALLBACK = '/assets/terms-default.txt';
+  var PHOTO_MAX_SIDE = 1024;
+  var PHOTO_QUALITY = 0.82;
 
-    this.init();
+  var TYPE_LABELS = {
+    monthly: 'Mensal', quarterly: 'Trimestral', semiannual: 'Semestral',
+    semester: 'Semestral', annual: 'Anual', yearly: 'Anual'
+  };
+
+  function byId(id) { return d.getElementById(id); }
+  function all(sel, root) { return Array.prototype.slice.call((root || d).querySelectorAll(sel)); }
+  function setText(id, text) { var el = byId(id); if (el) el.textContent = text; }
+
+  /* ------------------------------------------------------------ avisos */
+
+  function toast(message, kind) {
+    var host = byId('assignToasts');
+    if (!host) return;
+    var el = d.createElement('div');
+    el.className = 'an-toast' + (kind ? ' is-' + kind : '');
+    var icon = kind === 'bad'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>';
+    el.innerHTML = icon + '<span></span>';
+    el.lastChild.textContent = message;
+    host.appendChild(el);
+    w.setTimeout(function () {
+      el.classList.add('leaving');
+      w.setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+    }, 3200);
   }
 
-  async init() {
-    this.extractCode();
-    await this.loadContractData();
-    this.setupUI();
-    this.setupSignatureCanvas();
-    this.setupCamera();
+  function setErr(id, message) {
+    var el = byId(id);
+    if (!el) return;
+    if (message) {
+      el.lastElementChild.textContent = message;
+      el.classList.add('show');
+    } else {
+      el.classList.remove('show');
+    }
   }
 
-  extractCode() {
-    const params = new URLSearchParams(window.location.search);
-    this.code = params.get('code');
+  function clearErrors() {
+    all('.an-err.show').forEach(function (e) { e.classList.remove('show'); });
+    var wrap = byId('assignSignWrap');
+    if (wrap) wrap.classList.remove('has-error');
+  }
 
-    if (!this.code) {
-      this.showError('Código de contrato não fornecido', 'O link de assinatura é inválido ou expirou.');
+  /* ------------------------------------------------------------ formato */
+
+  function formatCPF(cpf) {
+    var s = String(cpf || '').replace(/\D/g, '');
+    return s.length === 11 ? s.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : (cpf || '');
+  }
+
+  function formatPhone(phone) {
+    var s = String(phone || '').replace(/\D/g, '');
+    if (s.length === 11) return s.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    return phone || '';
+  }
+
+  function formatMoney(n) {
+    var v = Number(n);
+    if (!isFinite(v)) return null;
+    return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /* ------------------------------------------------------------ estado */
+
+  var state = {
+    step: 1,
+    maxSteps: 4,
+    code: null,
+    contract: null,
+    termsVersion: null,
+    termsRead: false,
+    termsAccepted: false,
+    signature: null,
+    photo: null,
+    photoMirrored: false,
+    stream: null,
+    cameraStarting: false,
+    submitting: false
+  };
+
+  var SCREENS = ['stLoading', 'stError', 'stForm', 'stSubmitting', 'stSuccess'];
+  function showScreen(name) {
+    SCREENS.forEach(function (id) {
+      var el = byId(id);
+      if (el) el.hidden = id !== name;
+    });
+    if (name !== 'stForm') stopCamera();
+  }
+
+  function showLoadError(title, text, canRetry) {
+    setText('assignErrorTitle', title);
+    setText('assignErrorText', text);
+    var retry = byId('assignRetryBtn');
+    if (retry) retry.hidden = !canRetry;
+    showScreen('stError');
+  }
+
+  /* ------------------------------------------------------------ contrato */
+
+  function extractCode() {
+    var params = new URLSearchParams(w.location.search);
+    state.code = (params.get('code') || '').trim() || null;
+    return !!state.code;
+  }
+
+  function loadContract() {
+    if (!state.code) {
+      showLoadError('Link incompleto', 'Este link não tem o código do contrato. Peça um novo link para a unidade.', false);
+      return;
+    }
+    showScreen('stLoading');
+
+    fetch(API_BASE + encodeURIComponent(state.code), { headers: { Accept: 'application/json' } })
+      .then(function (res) {
+        if (res.status === 404 || res.status === 410) {
+          throw Object.assign(new Error('not-found'), { permanent: true });
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (result) {
+        if (!result || !result.success || !result.data) throw new Error('Resposta inválida');
+        state.contract = result.data;
+        state.termsVersion = result.data.termsVersion || null;
+        renderContract();
+        return loadTerms();
+      })
+      .then(function () {
+        showScreen('stForm');
+        goToStep(1);
+      })
+      .catch(function (err) {
+        console.error('Contract load error:', err);
+        if (err && err.permanent) {
+          showLoadError('Link inválido ou expirado', 'Não encontramos um contrato para este link. Fale com a unidade para receber um novo.', false);
+        } else {
+          showLoadError('Não conseguimos carregar', 'Verifique sua conexão e tente de novo. Se continuar, fale com a unidade.', true);
+        }
+      });
+  }
+
+  function renderContract() {
+    var m = state.contract.signatureGymMember || {};
+    var p = state.contract.plan || {};
+
+    setText('assignName', m.name || '—');
+    setText('assignCpf', formatCPF(m.cpf) || '—');
+    setText('assignBirthDate', m.birth_date || '—');
+    setText('assignAge', m.age ? '(' + m.age + ' anos)' : '');
+    setText('assignPhone', formatPhone(m.phone) || '—');
+    setText('assignEmail', m.email || '—');
+    setText('assignUnitName', m.unitName || '—');
+    setText('assignType', TYPE_LABELS[m.type] || m.type || '—');
+    setText('assignStartDate', m.startDate || '—');
+
+    setText('assignPlanName', p.name || '—');
+    setText('assignPlanGroup', p.groupLabel || 'Plano');
+    var price = formatMoney(p.priceFrom);
+    setText('assignPlanPrice', price || '—');
+    var mat = Number(p.matricula);
+    setText('assignPlanMatricula', mat > 0 ? 'R$ ' + formatMoney(mat) : 'Grátis');
+
+    var vnote = byId('assignTermsVersionNote');
+    if (vnote) vnote.textContent = state.termsVersion ? 'Versão ' + state.termsVersion + ' dos termos.' : '';
+  }
+
+  /* ------------------------------------------------------------ termos */
+
+  function loadTerms() {
+    var url = state.contract && state.contract.termsUrl;
+    var primary = url
+      ? fetch(url).then(function (r) { if (!r.ok) throw new Error('terms ' + r.status); return r.text(); })
+      : Promise.reject(new Error('sem termsUrl'));
+
+    return primary
+      .catch(function (err) {
+        console.warn('Termos remotos indisponíveis, usando fallback:', err);
+        return fetch(TERMS_FALLBACK).then(function (r) {
+          if (!r.ok) throw new Error('fallback ' + r.status);
+          return r.text();
+        });
+      })
+      .then(function (text) { renderTerms(text); })
+      .catch(function (err) {
+        console.error('Terms load error:', err);
+        renderTerms('');
+        toast('Não conseguimos carregar os termos. Tente recarregar a página.', 'bad');
+      });
+  }
+
+  function renderTerms(text) {
+    var box = byId('assignTermsContent');
+    if (!box) return;
+    box.textContent = (text || '').trim() || 'Termos indisponíveis no momento.';
+    var foot = byId('assignTermsProgress');
+    if (foot) foot.hidden = false;
+    box.addEventListener('scroll', onTermsScroll, { passive: true });
+    // Termos curtos (sem rolagem) liberam o aceite direto
+    w.requestAnimationFrame(onTermsScroll);
+  }
+
+  function onTermsScroll() {
+    var box = byId('assignTermsContent');
+    if (!box) return;
+    var span = box.scrollHeight - box.clientHeight;
+    var pct = span <= 4 ? 100 : Math.min(100, Math.round((box.scrollTop / span) * 100));
+    var bar = byId('assignTermsScrollBar');
+    if (bar) bar.style.width = pct + '%';
+    if (pct >= 95 && !state.termsRead) {
+      state.termsRead = true;
+      var cb = byId('assignAcceptTerms');
+      if (cb) cb.disabled = false;
+      var wrap = byId('assignTermsBox');
+      if (wrap) wrap.classList.add('is-read');
+      setText('assignTermsHint', 'Leitura concluída. Marque o aceite abaixo.');
+    }
+  }
+
+  function validateTerms() {
+    if (!state.termsRead) {
+      setErr('assignTermsErr', 'Role os termos até o final antes de aceitar.');
+      var box = byId('assignTermsContent');
+      if (box) {
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try { box.focus({ preventScroll: true }); } catch (e) { box.focus(); }
+      }
       return false;
     }
-
+    if (!state.termsAccepted) {
+      setErr('assignTermsErr', 'Marque a caixa de aceite para continuar.');
+      return false;
+    }
     return true;
   }
 
-  async loadContractData() {
-    if (!this.code) return;
+  /* ------------------------------------------------------------ assinatura */
 
-    try {
-      this.showState('stLoading');
+  var sign = null;
 
-      const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}`, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
+  function setupSignature() {
+    var canvas = byId('assignSignature');
+    var wrap = byId('assignSignWrap');
+    var status = byId('assignSignStatus');
+    if (!canvas || !wrap) return;
+
+    var ctx = canvas.getContext('2d');
+    var strokes = [];
+    var current = null;
+    var drawing = false;
+    var box = { w: 0, h: 0 };
+
+    function ratio() { return Math.max(1, Math.min(3, w.devicePixelRatio || 1)); }
+
+    function drawStrokes(c, scaleX, scaleY) {
+      c.lineWidth = 2.2;
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
+      c.strokeStyle = '#14141a';
+      strokes.forEach(function (s) {
+        if (!s.length) return;
+        c.beginPath();
+        c.moveTo(s[0].x * scaleX, s[0].y * scaleY);
+        if (s.length === 1) c.lineTo(s[0].x * scaleX + 0.6, s[0].y * scaleY);
+        for (var i = 1; i < s.length; i++) c.lineTo(s[i].x * scaleX, s[i].y * scaleY);
+        c.stroke();
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error('Falha ao carregar contrato');
-      }
-
-      this.contractData = result.data;
-      this.termsVersion = result.data.termsVersion;
-
-      // Load terms document
-      await this.loadTerms();
-
-      this.displayContractInfo();
-      this.showState('stForm');
-    } catch (error) {
-      console.error('Contract load error:', error);
-      this.showError('Erro ao carregar contrato', error.message);
-    }
-  }
-
-  async loadTerms() {
-    if (!this.contractData?.termsUrl) {
-      throw new Error('URL de termos não fornecida');
     }
 
-    try {
-      const response = await fetch(this.contractData.termsUrl);
-      if (!response.ok) throw new Error('Falha ao carregar termos');
-
-      this.termsText = await response.text();
-      this.renderTerms();
-    } catch (error) {
-      console.error('Terms load error from S3:', error);
-      console.log('Attempting to load fallback terms...');
-      
-      try {
-        const fallbackResponse = await fetch('/assets/terms-default.txt');
-        if (!fallbackResponse.ok) throw new Error('Falha ao carregar termos padrão');
-
-        this.termsText = await fallbackResponse.text();
-        this.renderTerms();
-        this.showToast('Usando versão padrão dos termos.', 'info');
-      } catch (fallbackError) {
-        console.error('Fallback terms load error:', fallbackError);
-        this.showToast('Erro ao carregar termos. Tente novamente.', 'error');
-        throw fallbackError;
-      }
-    }
-  }
-
-  renderTerms() {
-    const termsContent = document.getElementById('assignTermsContent');
-    if (!termsContent) return;
-
-    termsContent.innerHTML = `
-      <div class="assign-terms-text">
-        ${this.escapeHtml(this.termsText).replace(/\n/g, '<br>')}
-      </div>
-    `;
-
-    const progressBar = document.getElementById('assignTermsProgress');
-    if (progressBar) {
-      progressBar.hidden = false;
-    }
-
-    // Add scroll listener
-    termsContent.addEventListener('scroll', () => this.handleTermsScroll());
-  }
-
-  handleTermsScroll() {
-    const termsContent = document.getElementById('assignTermsContent');
-    if (!termsContent) return;
-
-    const scrollPercentage = (termsContent.scrollTop / (termsContent.scrollHeight - termsContent.clientHeight)) * 100;
-    const scrollBar = document.getElementById('assignTermsScrollBar');
-
-    if (scrollBar) {
-      scrollBar.style.width = Math.min(scrollPercentage, 100) + '%';
-    }
-
-    // Enable checkbox when fully scrolled
-    if (scrollPercentage >= 95) {
-      this.termsScrolled = true;
-      const checkbox = document.getElementById('assignAcceptTerms');
-      if (checkbox) {
-        checkbox.disabled = false;
-      }
-    }
-  }
-
-  displayContractInfo() {
-    const data = this.contractData.signatureGymMember;
-    const plan = this.contractData.plan;
-
-    // Member info
-    this.setElementText('assignUnitName', data.unitName || '—');
-    this.setElementText('assignName', data.name || '—');
-    this.setElementText('assignEmail', data.email || '—');
-    this.setElementText('assignCpf', this.formatCPF(data.cpf) || '—');
-    this.setElementText('assignPhone', this.formatPhone(data.phone) || '—');
-    this.setElementText('assignBirthDate', data.birth_date || '—');
-    this.setElementText('assignAge', data.age ? `${data.age} anos` : '—');
-    this.setElementText('assignType', data.type === 'monthly' ? 'Mensal' : data.type || '—');
-    this.setElementText('assignStartDate', data.startDate || '—');
-
-    // Plan info
-    this.setElementText('assignPlanName', plan.name || '—');
-    this.setElementText('assignPlanGroup', plan.groupLabel || '—');
-    this.setElementText('assignPlanPrice', plan.priceFrom ? `R$ ${plan.priceFrom.toFixed(2)}` : '—');
-    this.setElementText('assignPlanMatricula', plan.matricula ? `R$ ${plan.matricula.toFixed(2)}` : 'Grátis');
-  }
-
-  setupUI() {
-    // Navigation
-    document.getElementById('assignNext')?.addEventListener('click', () => this.nextStep());
-    document.getElementById('assignPrev')?.addEventListener('click', () => this.prevStep());
-    document.getElementById('assignSubmit')?.addEventListener('click', (e) => this.handleSubmit(e));
-
-    // Terms checkbox
-    document.getElementById('assignAcceptTerms')?.addEventListener('change', (e) => {
-      this.acceptedTerms = e.target.checked;
-    });
-
-    // Year in footer
-    document.querySelectorAll('[data-year]').forEach(el => {
-      el.textContent = new Date().getFullYear();
-    });
-
-    // Retry button
-    document.getElementById('assignRetryBtn')?.addEventListener('click', () => {
-      this.loadContractData();
-    });
-  }
-
-  setupSignatureCanvas() {
-    const canvas = document.getElementById('assignSignature');
-    const wrap = document.getElementById('assignSignWrap');
-    if (!canvas || !wrap) return null;
-
-    const ctx = canvas.getContext('2d');
-    const strokes = [];
-    let current = null;
-    let drawing = false;
-    const box = { w: 0, h: 0 };
-
-    const paint = () => {
-      const ratio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    function paint() {
+      var r = ratio();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.scale(ratio, ratio);
-      ctx.lineWidth = 2.2;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = '#14141a';
-
-      strokes.forEach(stroke => {
-        if (!stroke.length) return;
-        ctx.beginPath();
-        ctx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
-        if (stroke.length === 1) {
-          ctx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
-        } else {
-          for (let i = 1; i < stroke.length; i++) {
-            ctx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
-          }
-        }
-        ctx.stroke();
-      });
-
+      ctx.scale(r, r);
+      drawStrokes(ctx, box.w, box.h);
       wrap.classList.toggle('has-ink', strokes.length > 0);
-    };
+    }
 
-    const fit = () => {
-      const rect = canvas.getBoundingClientRect();
+    function fit() {
+      var rect = canvas.getBoundingClientRect();
       if (rect.width < 1 || rect.height < 1) return false;
-      const ratio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-      const nextW = Math.round(rect.width * ratio);
-      const nextH = Math.round(rect.height * ratio);
+      var r = ratio();
       box.w = rect.width;
       box.h = rect.height;
-      if (canvas.width !== nextW || canvas.height !== nextH) {
-        canvas.width = nextW;
-        canvas.height = nextH;
-      }
+      var nw = Math.round(rect.width * r), nh = Math.round(rect.height * r);
+      if (canvas.width !== nw || canvas.height !== nh) { canvas.width = nw; canvas.height = nh; }
       paint();
       return true;
-    };
+    }
 
-    const pointFrom = (ev) => {
-      const rect = canvas.getBoundingClientRect();
-      const src = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+    function pointFrom(ev) {
+      var rect = canvas.getBoundingClientRect();
       return {
-        x: Math.min(1, Math.max(0, (src.clientX - rect.left) / (rect.width || 1))),
-        y: Math.min(1, Math.max(0, (src.clientY - rect.top) / (rect.height || 1)))
+        x: Math.min(1, Math.max(0, (ev.clientX - rect.left) / (rect.width || 1))),
+        y: Math.min(1, Math.max(0, (ev.clientY - rect.top) / (rect.height || 1)))
       };
-    };
+    }
 
-    const start = (ev) => {
+    function setStatus(kind) {
+      if (!status) return;
+      status.classList.remove('is-saved', 'is-pending');
+      if (kind === 'saved') {
+        status.textContent = 'Assinatura salva.';
+        status.classList.add('is-saved');
+      } else if (kind === 'pending') {
+        status.textContent = 'Assinatura feita, mas ainda não salva.';
+        status.classList.add('is-pending');
+      } else {
+        status.textContent = 'Nenhuma assinatura salva ainda.';
+      }
+    }
+
+    function invalidate() {
+      if (state.signature) {
+        state.signature = null;
+        wrap.classList.remove('is-saved');
+      }
+    }
+
+    function start(ev) {
       if (ev.button != null && ev.button !== 0) return;
       ev.preventDefault();
       if (!box.w && !fit()) return;
+      try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
+      invalidate();
       drawing = true;
       current = [pointFrom(ev)];
       strokes.push(current);
       wrap.classList.add('is-active');
       wrap.classList.remove('has-error');
+      setErr('assignSignErr', '');
       paint();
-    };
+    }
 
-    const move = (ev) => {
+    function move(ev) {
       if (!drawing || !current) return;
       ev.preventDefault();
       current.push(pointFrom(ev));
       paint();
-    };
+    }
 
-    const end = () => {
+    function end(ev) {
       if (!drawing) return;
       drawing = false;
       current = null;
+      try { if (ev && ev.pointerId != null) canvas.releasePointerCapture(ev.pointerId); } catch (e) { /* ignore */ }
       wrap.classList.remove('is-active');
-      this.updateSignatureStatus(strokes.length > 0 ? 'pending' : null);
-    };
+      setStatus(strokes.length ? 'pending' : null);
+    }
 
-    const exportPng = () => {
+    function exportPng() {
       if (!strokes.length) return '';
-      let minX = 1, minY = 1, maxX = 0, maxY = 0;
-      strokes.forEach(s => {
-        s.forEach(p => {
-          if (p.x < minX) minX = p.x;
-          if (p.x > maxX) maxX = p.x;
-          if (p.y < minY) minY = p.y;
-          if (p.y > maxY) maxY = p.y;
+      var minX = 1, minY = 1, maxX = 0, maxY = 0;
+      strokes.forEach(function (s) {
+        s.forEach(function (p) {
+          if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
         });
       });
-      const pad = 0.04;
-      minX = Math.max(0, minX - pad);
-      minY = Math.max(0, minY - pad);
-      maxX = Math.min(1, maxX + pad);
-      maxY = Math.min(1, maxY + pad);
-
-      const srcW = Math.max(0.08, maxX - minX) * box.w;
-      const srcH = Math.max(0.08, maxY - minY) * box.h;
-
-      const outW = 600;
-      const outH = Math.max(120, Math.min(400, Math.round(outW * (srcH / srcW))));
-      const scale = Math.min(outW / srcW, outH / srcH);
-
-      const out = document.createElement('canvas');
-      out.width = outW;
-      out.height = outH;
-      const octx = out.getContext('2d');
-      octx.translate((outW - srcW * scale) / 2, (outH - srcH * scale) / 2);
-      octx.scale(scale, scale);
-      octx.translate(-minX * box.w, -minY * box.h);
-      octx.lineWidth = 2.2;
-      octx.lineCap = 'round';
-      octx.lineJoin = 'round';
-      octx.strokeStyle = '#14141a';
-
-      strokes.forEach(stroke => {
-        if (!stroke.length) return;
-        octx.beginPath();
-        octx.moveTo(stroke[0].x * box.w, stroke[0].y * box.h);
-        if (stroke.length === 1) {
-          octx.lineTo(stroke[0].x * box.w + 0.6, stroke[0].y * box.h);
-        } else {
-          for (let i = 1; i < stroke.length; i++) {
-            octx.lineTo(stroke[i].x * box.w, stroke[i].y * box.h);
-          }
-        }
-        octx.stroke();
-      });
-
+      var pad = 0.04;
+      minX = Math.max(0, minX - pad); minY = Math.max(0, minY - pad);
+      maxX = Math.min(1, maxX + pad); maxY = Math.min(1, maxY + pad);
+      var srcW = Math.max(0.08, maxX - minX) * box.w;
+      var srcH = Math.max(0.08, maxY - minY) * box.h;
+      var outW = 600;
+      var outH = Math.max(120, Math.min(400, Math.round(outW * (srcH / srcW))));
+      var scale = Math.min(outW / srcW, outH / srcH);
+      var out = d.createElement('canvas');
+      out.width = outW; out.height = outH;
+      var oc = out.getContext('2d');
+      oc.translate((outW - srcW * scale) / 2, (outH - srcH * scale) / 2);
+      oc.scale(scale, scale);
+      oc.translate(-minX * box.w, -minY * box.h);
+      drawStrokes(oc, box.w, box.h);
       return out.toDataURL('image/png');
-    };
+    }
 
-    // Event listeners
-    canvas.addEventListener('pointerdown', start);
-    canvas.addEventListener('pointermove', move);
-    canvas.addEventListener('pointerup', end);
-    canvas.addEventListener('pointerleave', end);
-
-    // Button handlers
-    document.getElementById('assignSignSave')?.addEventListener('click', () => {
-      if (strokes.length === 0) {
-        this.showValidationError('Assinatura vazia', 'Por favor, assine no quadro antes de continuar.');
-        return;
+    function save(silent) {
+      if (!strokes.length) {
+        wrap.classList.add('has-error');
+        setErr('assignSignErr', 'Assine no quadro primeiro.');
+        if (!silent) toast('Assine no quadro primeiro.', 'bad');
+        return false;
       }
-      this.signatureData = exportPng();
-      this.showToast('Assinatura salva com sucesso!', 'success');
-      this.updateSignatureStatus(true);
-    });
+      state.signature = exportPng();
+      wrap.classList.remove('has-error');
+      wrap.classList.add('is-saved');
+      setErr('assignSignErr', '');
+      setStatus('saved');
+      if (!silent) toast('Assinatura salva.', 'good');
+      return true;
+    }
 
-    document.getElementById('assignSignClear')?.addEventListener('click', () => {
+    function clear() {
       strokes.length = 0;
       current = null;
       drawing = false;
-      this.signatureData = null;
+      state.signature = null;
       wrap.classList.remove('has-ink', 'is-active', 'is-saved', 'has-error');
+      setErr('assignSignErr', '');
       paint();
-      this.updateSignatureStatus();
+      setStatus(null);
+    }
+
+    function undo() {
+      if (!strokes.length) return;
+      strokes.pop();
+      invalidate();
+      paint();
+      setStatus(strokes.length ? 'pending' : null);
+    }
+
+    canvas.addEventListener('pointerdown', start);
+    canvas.addEventListener('pointermove', move);
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+    canvas.addEventListener('pointerleave', end);
+
+    byId('assignSignSave').addEventListener('click', function () { save(false); });
+    byId('assignSignClear').addEventListener('click', clear);
+    byId('assignSignUndo').addEventListener('click', undo);
+
+    var resizeTimer = null;
+    w.addEventListener('resize', function () {
+      w.clearTimeout(resizeTimer);
+      resizeTimer = w.setTimeout(fit, 120);
     });
 
-    document.getElementById('assignSignUndo')?.addEventListener('click', () => {
-      if (strokes.length > 0) {
-        strokes.pop();
-        paint();
-        this.updateSignatureStatus(strokes.length > 0 ? 'pending' : null);
+    sign = {
+      fit: fit,
+      save: save,
+      hasInk: function () { return strokes.length > 0; },
+      markError: function () { wrap.classList.add('has-error'); }
+    };
+  }
+
+  /* ------------------------------------------------------------ câmera */
+
+  function camEl() { return byId('assignCam'); }
+  function setCamMode(mode) {
+    var el = camEl();
+    if (el) el.dataset.mode = mode;
+    var live = d.querySelector('[data-cam-live]');
+    var prev = d.querySelector('[data-cam-preview]');
+    var saved = d.querySelector('[data-cam-saved]');
+    if (live) live.hidden = mode !== 'live' && mode !== 'error' && mode !== 'loading';
+    if (prev) prev.hidden = mode !== 'preview';
+    if (saved) saved.hidden = mode !== 'saved';
+    if (live && mode === 'loading') live.hidden = true;
+  }
+
+  function setPhotoStatus(kind) {
+    var el = byId('assignPhotoStatus');
+    if (!el) return;
+    el.classList.remove('is-saved', 'is-pending');
+    if (kind === 'saved') {
+      el.textContent = 'Foto salva. Essa é a foto que vai para a catraca.';
+      el.classList.add('is-saved');
+    } else if (kind === 'pending') {
+      el.textContent = 'Gostou? Toque em "Usar esta foto". Se não, tire outra.';
+      el.classList.add('is-pending');
+    } else {
+      el.textContent = 'Nenhuma foto salva ainda.';
+    }
+  }
+
+  function startCamera() {
+    var video = byId('assignCameraVideo');
+    if (!video || state.stream || state.cameraStarting) {
+      if (state.stream) setCamMode('live');
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showCameraError('Este navegador não permite abrir a câmera.');
+      return;
+    }
+    state.cameraStarting = true;
+    setCamMode('loading');
+
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    }).then(function (stream) {
+      state.stream = stream;
+      video.srcObject = stream;
+      var p = video.play();
+      if (p && p.catch) p.catch(function () { /* autoplay bloqueado: o usuário toca no disparo */ });
+      setCamMode('live');
+    }).catch(function (err) {
+      console.error('Camera access error:', err);
+      var name = err && err.name;
+      var msg = name === 'NotAllowedError' ? 'O acesso à câmera foi negado.'
+        : name === 'NotFoundError' ? 'Nenhuma câmera foi encontrada neste aparelho.'
+        : name === 'NotReadableError' ? 'A câmera está em uso por outro app.'
+        : 'Não conseguimos abrir a câmera.';
+      showCameraError(msg);
+    }).finally(function () {
+      state.cameraStarting = false;
+    });
+  }
+
+  function stopCamera() {
+    if (state.stream) {
+      state.stream.getTracks().forEach(function (t) { t.stop(); });
+      state.stream = null;
+    }
+    var video = byId('assignCameraVideo');
+    if (video) video.srcObject = null;
+  }
+
+  function showCameraError(msg) {
+    setText('assignCamErrorText', msg);
+    setCamMode('error');
+  }
+
+  function fitCanvasTo(canvas, srcW, srcH) {
+    var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(srcW, srcH));
+    canvas.width = Math.round(srcW * scale);
+    canvas.height = Math.round(srcH * scale);
+  }
+
+  function capturePhoto() {
+    var video = byId('assignCameraVideo');
+    var canvas = byId('assignPhotoCanvas');
+    if (!video || !canvas || !video.videoWidth) {
+      toast('A câmera ainda está abrindo. Tente de novo em um segundo.', 'bad');
+      return;
+    }
+    fitCanvasTo(canvas, video.videoWidth, video.videoHeight);
+    // Desenha o quadro real (não espelhado): a foto enviada mantém a orientação
+    // verdadeira. Só a exibição é espelhada, para bater com o que a pessoa viu.
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    state.photoMirrored = true;
+    canvas.classList.add('is-mirrored');
+    flash();
+    afterCapture();
+  }
+
+  function loadPhotoFile(file) {
+    if (!file || !/^image\//.test(file.type)) {
+      toast('Escolha um arquivo de imagem.', 'bad');
+      return;
+    }
+    var canvas = byId('assignPhotoCanvas');
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      fitCanvasTo(canvas, img.naturalWidth, img.naturalHeight);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      state.photoMirrored = false;
+      canvas.classList.remove('is-mirrored');
+      afterCapture();
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      toast('Não conseguimos abrir essa imagem.', 'bad');
+    };
+    img.src = url;
+  }
+
+  function afterCapture() {
+    state.photo = null;
+    setErr('assignPhotoErr', '');
+    setCamMode('preview');
+    setPhotoStatus('pending');
+  }
+
+  function flash() {
+    var el = camEl();
+    if (!el) return;
+    el.classList.remove('is-flash');
+    void el.offsetWidth;
+    el.classList.add('is-flash');
+    w.setTimeout(function () { el.classList.remove('is-flash'); }, 400);
+  }
+
+  function savePhoto() {
+    var canvas = byId('assignPhotoCanvas');
+    if (!canvas || !canvas.width) return;
+    state.photo = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+    setCamMode('saved');
+    setPhotoStatus('saved');
+    setErr('assignPhotoErr', '');
+    stopCamera();
+    toast('Foto salva.', 'good');
+  }
+
+  function retakePhoto() {
+    state.photo = null;
+    setPhotoStatus(null);
+    setErr('assignPhotoErr', '');
+    if (state.stream) setCamMode('live'); else startCamera();
+  }
+
+  function setupCamera() {
+    byId('assignCameraCapture').addEventListener('click', capturePhoto);
+    byId('assignPhotoSave').addEventListener('click', savePhoto);
+    byId('assignPhotoRetake').addEventListener('click', retakePhoto);
+    byId('assignPhotoRetake2').addEventListener('click', retakePhoto);
+    byId('assignCameraRetry').addEventListener('click', function () { stopCamera(); startCamera(); });
+
+    var file = byId('assignPhotoFile');
+    function pick() { file.value = ''; file.click(); }
+    byId('assignPhotoPick').addEventListener('click', pick);
+    byId('assignPhotoPickAlt').addEventListener('click', pick);
+    file.addEventListener('change', function () { loadPhotoFile(file.files && file.files[0]); });
+
+    // A câmera é fechada se a pessoa trocar de aba por muito tempo; ao voltar, reabre.
+    d.addEventListener('visibilitychange', function () {
+      if (d.visibilityState !== 'visible' || state.step !== 4) return;
+      var el = camEl();
+      if (el && el.dataset.mode === 'live' && state.stream && state.stream.getVideoTracks().every(function (t) { return t.readyState === 'ended'; })) {
+        stopCamera();
+        startCamera();
       }
     });
+    w.addEventListener('pagehide', stopCamera);
+  }
 
-    // Fit canvas on visibility change
-    window.addEventListener('focus', () => {
-      if (!box.w) fit();
+  /* ------------------------------------------------------------ passos */
+
+  function goToStep(n) {
+    var leaving = state.step;
+    state.step = n;
+    clearErrors();
+
+    all('.an-step').forEach(function (item) {
+      var k = parseInt(item.dataset.step, 10);
+      item.classList.toggle('is-current', k === n);
+      item.classList.toggle('is-done', k < n);
+    });
+    all('.an-block').forEach(function (block) {
+      block.hidden = parseInt(block.dataset.block, 10) !== n;
     });
 
-    // Initial fit
-    setTimeout(() => fit(), 50);
-  }
+    byId('assignPrev').hidden = n === 1;
+    byId('assignNext').hidden = n === state.maxSteps;
+    byId('assignSubmit').hidden = n !== state.maxSteps;
 
-  updateSignatureStatus(saved = false) {
-    const status = document.getElementById('assignSignStatus');
-    if (!status) return;
+    if (n === 3 && sign) w.requestAnimationFrame(sign.fit);
+    if (n === 4) {
+      if (!state.photo) startCamera();
+    } else if (leaving === 4 && !state.photo) {
+      stopCamera();
+    }
 
-    if (saved) {
-      status.textContent = '✓ Assinatura salva';
-      status.style.color = 'var(--success-color, #28a745)';
-    } else {
-      status.textContent = this.strokes.length > 0 ? 'Assinatura não salva' : 'Nenhuma assinatura salva ainda.';
-      status.style.color = '';
+    if (leaving !== n) {
+      var panel = byId('assignPanel');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  async setupCamera() {
-    const video = document.getElementById('assignCameraVideo');
-    if (!video) return;
-
-    try {
-      this.cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'user',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      });
-
-      video.srcObject = this.cameraStream;
-      video.play();
-
-      document.getElementById('assignCameraCapture')?.addEventListener('click', () => this.capturePhoto(video));
-      document.getElementById('assignPhotoRetake')?.addEventListener('click', () => this.retakePhoto());
-      document.getElementById('assignPhotoSave')?.addEventListener('click', () => this.savePhoto());
-    } catch (error) {
-      console.error('Camera access error:', error);
-      this.showCameraError();
+  function nextStep() {
+    if (state.step === 2 && !validateTerms()) return;
+    if (state.step === 3) {
+      // Continuar com tinta no quadro salva a assinatura automaticamente
+      if (!state.signature && !(sign && sign.hasInk() && sign.save(true))) {
+        if (sign) sign.markError();
+        setErr('assignSignErr', 'Assine no quadro para continuar.');
+        toast('Falta a sua assinatura.', 'bad');
+        return;
+      }
     }
+    if (state.step < state.maxSteps) goToStep(state.step + 1);
   }
 
-  capturePhoto(video) {
-    const canvas = document.getElementById('assignPhotoCanvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    // Redimensiona para 800x600 (4:3 ratio) para economizar espaço
-    const targetWidth = 800;
-    const targetHeight = 600;
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-
-    // Desenha a imagem do vídeo redimensionada
-    ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-
-    document.getElementById('assignCameraContainer').hidden = true;
-    document.getElementById('assignPhotoPreview').hidden = false;
+  function prevStep() {
+    if (state.step > 1) goToStep(state.step - 1);
   }
 
-  retakePhoto() {
-    document.getElementById('assignCameraContainer').hidden = false;
-    document.getElementById('assignPhotoPreview').hidden = true;
+  /* ------------------------------------------------------------ envio */
+
+  function dataURLtoBlob(dataUrl) {
+    return fetch(dataUrl).then(function (r) { return r.blob(); });
   }
 
-  compressPhoto(canvas, quality = 0.7) {
-    // Converte para JPEG com qualidade reduzida para economizar espaço
-    return canvas.toDataURL('image/jpeg', quality);
+  function setProgress(id, status) {
+    var el = byId(id);
+    if (!el) return;
+    el.classList.remove('is-active', 'is-done');
+    if (status) el.classList.add('is-' + status);
   }
 
-  savePhoto() {
-    const canvas = document.getElementById('assignPhotoCanvas');
-    if (!canvas) return;
-
-    // Comprime a foto antes de salvar (JPEG com 70% de qualidade)
-    this.photoData = this.compressPhoto(canvas, 0.7);
-    this.showToast('Foto salva com sucesso!', 'success');
-    document.getElementById('assignPhotoPreview').hidden = true;
-    document.getElementById('assignCameraContainer').hidden = false;
-  }
-
-  showCameraError() {
-    const container = document.getElementById('assignCameraContainer');
-    if (!container) return;
-
-    container.innerHTML = `
-      <div style="text-align: center; padding: 2rem;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; margin: 0 auto 1rem; color: #dc3545;">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v5M12 16h.01"/>
-        </svg>
-        <p style="color: #666; margin-bottom: 1rem;">Não conseguimos acessar a câmera.</p>
-        <p style="font-size: 0.9rem; color: #999;">Verifique se permitiu acesso à câmera neste navegador.</p>
-      </div>
-    `;
-  }
-
-  nextStep() {
-    if (this.currentStep === 2 && !this.validateTerms()) {
-      return;
-    }
-
-    if (this.currentStep === 3 && !this.signatureData) {
-      this.showValidationError('Assinatura necessária', 'Por favor, assine no quadro e clique em "Salvar assinatura".');
-      return;
-    }
-
-    if (this.currentStep === 4 && !this.photoData) {
-      this.showValidationError('Foto necessária', 'Por favor, tire uma foto e clique em "Usar esta foto".');
-      return;
-    }
-
-    if (this.currentStep < this.maxSteps) {
-      this.currentStep++;
-      this.updateStepUI();
-    }
-  }
-
-  prevStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-      this.updateStepUI();
-    }
-  }
-
-  updateStepUI() {
-    // Update step indicators
-    document.querySelectorAll('.an-step').forEach(step => {
-      const stepNum = parseInt(step.dataset.step);
-      step.classList.toggle('is-current', stepNum === this.currentStep);
-      step.classList.toggle('is-completed', stepNum < this.currentStep);
+  function uploadPhoto() {
+    setProgress('assignProgressPhoto', 'active');
+    return dataURLtoBlob(state.photo).then(function (blob) {
+      var fd = new FormData();
+      fd.append('file', blob, 'face.jpg');
+      return fetch(API_BASE + encodeURIComponent(state.code) + '/photo', { method: 'POST', body: fd });
+    }).then(function (res) {
+      if (!res.ok) throw new Error('Não conseguimos enviar a foto (erro ' + res.status + ').');
+      setProgress('assignProgressPhoto', 'done');
     });
-
-    // Update blocks
-    document.querySelectorAll('.an-block').forEach(block => {
-      const blockNum = parseInt(block.dataset.block);
-      block.hidden = blockNum !== this.currentStep;
-    });
-
-    // Update buttons
-    const prevBtn = document.getElementById('assignPrev');
-    const nextBtn = document.getElementById('assignNext');
-    const submitBtn = document.getElementById('assignSubmit');
-
-    if (prevBtn) prevBtn.hidden = this.currentStep === 1;
-    if (nextBtn) nextBtn.hidden = this.currentStep === this.maxSteps;
-    if (submitBtn) submitBtn.hidden = this.currentStep !== this.maxSteps;
-
-    // Scroll to top
-    document.querySelector('.an-panel')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  validateTerms() {
-    if (!this.acceptedTerms) {
-      this.showError('Termos não aceitos', 'Por favor, aceite os termos para continuar.');
-      return false;
-    }
-
-    if (!this.termsScrolled) {
-      this.showError('Leia os termos', 'Por favor, role até o final dos termos antes de aceitar.');
-      return false;
-    }
-
-    return true;
-  }
-
-  async handleSubmit(e) {
-    e.preventDefault();
-
-    if (!this.signatureData || !this.photoData) {
-      this.showError('Dados incompletos', 'Por favor, complete todos os campos obrigatórios.');
-      return;
-    }
-
-    this.showState('stSubmitting');
-    const acceptedAt = new Date().toISOString();
-
-    try {
-      // Step 1: Upload photo
-      await this.uploadPhoto();
-
-      // Step 2: Finalize signature
-      await this.finalizeSignature(acceptedAt);
-
-      // Success
-      this.showState('stSuccess');
-      this.cleanupCamera();
-    } catch (error) {
-      console.error('Submission error:', error);
-      this.showState('stForm');
-      this.showError('Erro ao enviar dados', error.message);
-    }
-  }
-
-  async uploadPhoto() {
-    this.updateProgressStep('assignProgressPhoto', 'active');
-
-    const formData = new FormData();
-    const blob = await this.dataURLtoBlob(this.photoData);
-    formData.append('file', blob, 'face.png');
-
-    const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}/photo`, {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro ao enviar foto: HTTP ${response.status}`);
-    }
-
-    this.updateProgressStep('assignProgressPhoto', 'done');
-  }
-
-  async finalizeSignature(acceptedAt) {
-    this.updateProgressStep('assignProgressSign', 'active');
-
-    const payload = {
+  function finalizeSignature(acceptedAt) {
+    setProgress('assignProgressSign', 'active');
+    var payload = {
       accepted_terms: true,
-      terms_version: this.termsVersion,
+      terms_version: state.termsVersion,
       accepted_at: acceptedAt,
-      signature: this.signatureData
+      signature: state.signature
     };
-
-    const response = await fetch(`https://portalcia.impactadigital.net/signature/${this.code}/finalize`, {
+    return fetch(API_BASE + encodeURIComponent(state.code) + '/finalize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro ao finalizar: HTTP ${response.status}`);
-    }
-
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Erro desconhecido');
-    }
-
-    this.updateProgressStep('assignProgressSign', 'done');
-  }
-
-  updateProgressStep(elementId, status) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    element.classList.remove('is-active', 'is-done');
-    if (status !== 'pending') {
-      element.classList.add(`is-${status}`);
-    }
-  }
-
-  cleanupCamera() {
-    if (this.cameraStream) {
-      this.cameraStream.getTracks().forEach(track => track.stop());
-    }
-  }
-
-  showState(stateId) {
-    document.querySelectorAll('[id^="st"]').forEach(section => {
-      section.hidden = section.id !== stateId;
+    }).then(function (res) {
+      if (!res.ok) throw new Error('Não conseguimos registrar a assinatura (erro ' + res.status + ').');
+      return res.json().catch(function () { return { success: true }; });
+    }).then(function (result) {
+      if (result && result.success === false) throw new Error(result.error || result.message || 'Erro ao finalizar.');
+      setProgress('assignProgressSign', 'done');
     });
   }
 
-  showError(title, message) {
-    const errorTitle = document.getElementById('assignErrorTitle');
-    const errorText = document.getElementById('assignErrorText');
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    if (state.submitting) return;
+    setErr('assignSubmitErr', '');
 
-    if (errorTitle) errorTitle.textContent = title;
-    if (errorText) errorText.textContent = message;
-
-    this.showState('stError');
-  }
-
-  showValidationError(title, message) {
-    const toastsContainer = document.getElementById('assignToasts');
-    if (!toastsContainer) return;
-
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-      padding: 1.5rem;
-      margin: 0.5rem;
-      border-radius: 0.5rem;
-      background: #dc3545;
-      color: white;
-      font-size: 0.9rem;
-      animation: slideIn 0.3s ease-out;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    `;
-
-    const content = document.createElement('div');
-    content.style.cssText = 'flex: 1;';
-    content.innerHTML = `
-      <strong style="display: block; margin-bottom: 0.25rem;">${title}</strong>
-      <span style="font-size: 0.85rem; opacity: 0.9;">${message}</span>
-    `;
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = 'Tentar novamente';
-    button.style.cssText = `
-      padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 0.25rem;
-      color: white;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
-      white-space: nowrap;
-      transition: background 0.2s;
-    `;
-
-    button.onmouseover = () => {
-      button.style.background = 'rgba(255, 255, 255, 0.3)';
-    };
-    button.onmouseout = () => {
-      button.style.background = 'rgba(255, 255, 255, 0.2)';
-    };
-
-    button.onclick = () => {
-      toast.remove();
-    };
-
-    toast.appendChild(content);
-    toast.appendChild(button);
-    toastsContainer.appendChild(toast);
-
-    setTimeout(() => {
-      toast.remove();
-    }, 5000);
-  }
-
-  showToast(message, type = 'info') {
-    const toastsContainer = document.getElementById('assignToasts');
-    if (!toastsContainer) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    toast.style.cssText = `
-      padding: 1rem;
-      margin: 0.5rem;
-      border-radius: 0.5rem;
-      background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff'};
-      color: white;
-      font-size: 0.9rem;
-      animation: slideIn 0.3s ease-out;
-    `;
-
-    toastsContainer.appendChild(toast);
-
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
-  }
-
-  // Utility methods
-  async dataURLtoBlob(dataUrl) {
-    const response = await fetch(dataUrl);
-    return response.blob();
-  }
-
-  escapeHtml(text) {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, m => map[m]);
-  }
-
-  setElementText(id, text) {
-    const element = document.getElementById(id);
-    if (element) element.textContent = text;
-  }
-
-  formatCPF(cpf) {
-    if (!cpf) return '';
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  }
-
-  formatPhone(phone) {
-    if (!phone) return '';
-    if (phone.length === 11) {
-      return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    if (!state.signature) { goToStep(3); setErr('assignSignErr', 'Assine no quadro para continuar.'); return; }
+    if (!state.photo) {
+      setErr('assignPhotoErr', 'Tire a foto e toque em "Usar esta foto".');
+      toast('Falta a sua foto.', 'bad');
+      return;
     }
-    return phone;
-  }
-}
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  new AssignmentFlow();
-});
+    state.submitting = true;
+    setProgress('assignProgressPhoto', null);
+    setProgress('assignProgressSign', null);
+    showScreen('stSubmitting');
+    var acceptedAt = new Date().toISOString();
 
-// Add animation keyframes
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideIn {
-    from {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    uploadPhoto()
+      .then(function () { return finalizeSignature(acceptedAt); })
+      .then(function () {
+        showScreen('stSuccess');
+        var panel = byId('assignPanel');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+      .catch(function (err) {
+        console.error('Submission error:', err);
+        showScreen('stForm');
+        goToStep(4);
+        setErr('assignSubmitErr', (err && err.message ? err.message : 'Não conseguimos enviar agora.') + ' Verifique a conexão e tente de novo.');
+        toast('Não conseguimos enviar agora. Tente de novo.', 'bad');
+      })
+      .finally(function () { state.submitting = false; });
   }
-`;
-document.head.appendChild(style);
+
+  /* ------------------------------------------------------------ init */
+
+  function setupUI() {
+    byId('assignNext').addEventListener('click', nextStep);
+    byId('assignPrev').addEventListener('click', prevStep);
+    byId('assignForm').addEventListener('submit', handleSubmit);
+    byId('assignRetryBtn').addEventListener('click', loadContract);
+
+    byId('assignAcceptTerms').addEventListener('change', function (e) {
+      state.termsAccepted = e.target.checked;
+      if (state.termsAccepted) setErr('assignTermsErr', '');
+    });
+
+    all('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+  }
+
+  d.addEventListener('DOMContentLoaded', function () {
+    setupUI();
+    setupSignature();
+    setupCamera();
+    extractCode();
+    loadContract();
+  });
+})(window, document);

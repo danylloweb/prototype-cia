@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/styles.css?v=20260801">
 <link rel="stylesheet" href="/assets/css/anamnese.css?v=20260815">
-<link rel="stylesheet" href="/assets/css/assign.css?v=20260910">
+<link rel="stylesheet" href="/assets/css/assign.css?v=20260911">
 </head>
 <body class="an-body">
 <a class="skip-link" href="#assignPanel">Pular para assinatura</a>
@@ -32,7 +32,7 @@
     <div>
       <span class="eyebrow">Assinatura digital</span>
       <h1>Assine seu contrato</h1>
-      <p>Finalize seu cadastro com assinatura digital e foto. São apenas 4 etapas rápidas.</p>
+      <p>Confira seus dados, aceite os termos, assine e tire a foto da catraca. Leva menos de dois minutos.</p>
     </div>
   </div>
 </section>
@@ -94,88 +94,56 @@
           <div class="an-block" data-block="1">
             <fieldset class="an-fieldset">
               <legend class="an-legend">Seus dados e plano</legend>
-              <p class="an-legend-sub">Confirme as informações do seu contrato.</p>
+              <p class="an-legend-sub">Confira se está tudo certo antes de assinar.</p>
 
-              <div class="assign-info-grid">
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Unidade</span>
-                  <span class="assign-info-value" id="assignUnitName">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Nome</span>
-                  <span class="assign-info-value" id="assignName">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Email</span>
-                  <span class="assign-info-value" id="assignEmail">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">CPF</span>
-                  <span class="assign-info-value" id="assignCpf">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Telefone</span>
-                  <span class="assign-info-value" id="assignPhone">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Data de nascimento</span>
-                  <span class="assign-info-value" id="assignBirthDate">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Idade</span>
-                  <span class="assign-info-value" id="assignAge">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Tipo de assinatura</span>
-                  <span class="assign-info-value" id="assignType">—</span>
-                </div>
-                <div class="assign-info-item">
-                  <span class="assign-info-label">Data de início</span>
-                  <span class="assign-info-value" id="assignStartDate">—</span>
-                </div>
+              <div class="assign-cards">
+                <section class="assign-card">
+                  <header class="assign-card-head">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    <h3>Aluno</h3>
+                  </header>
+                  <dl class="assign-info">
+                    <div class="assign-info-item assign-info-wide"><dt>Nome</dt><dd id="assignName">—</dd></div>
+                    <div class="assign-info-item"><dt>CPF</dt><dd id="assignCpf">—</dd></div>
+                    <div class="assign-info-item"><dt>Nascimento</dt><dd><span id="assignBirthDate">—</span> <small id="assignAge"></small></dd></div>
+                    <div class="assign-info-item"><dt>Telefone</dt><dd id="assignPhone">—</dd></div>
+                    <div class="assign-info-item"><dt>E-mail</dt><dd id="assignEmail">—</dd></div>
+                  </dl>
+                </section>
+
+                <section class="assign-card assign-card-plan">
+                  <header class="assign-card-head">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 4h12l2 5-8 11L4 9z"/><path d="M4 9h16M9 4l3 5 3-5"/></svg>
+                    <h3>Plano</h3>
+                    <span class="assign-chip" id="assignPlanGroup">—</span>
+                  </header>
+                  <div class="assign-plan-name" id="assignPlanName">—</div>
+                  <div class="assign-plan-price"><span class="assign-plan-cur">R$</span><span id="assignPlanPrice">—</span><span class="assign-plan-per">/mês</span></div>
+                  <dl class="assign-info">
+                    <div class="assign-info-item"><dt>Unidade</dt><dd id="assignUnitName">—</dd></div>
+                    <div class="assign-info-item"><dt>Cobrança</dt><dd id="assignType">—</dd></div>
+                    <div class="assign-info-item"><dt>Início</dt><dd id="assignStartDate">—</dd></div>
+                    <div class="assign-info-item"><dt>Matrícula</dt><dd id="assignPlanMatricula">—</dd></div>
+                  </dl>
+                </section>
               </div>
-
-              <fieldset class="an-fieldset" style="margin-top: 1.5rem;">
-                <legend class="an-legend">Seu plano</legend>
-                <div class="assign-info-grid">
-                  <div class="assign-info-item">
-                    <span class="assign-info-label">Nome do plano</span>
-                    <span class="assign-info-value" id="assignPlanName">—</span>
-                  </div>
-                  <div class="assign-info-item">
-                    <span class="assign-info-label">Grupo</span>
-                    <span class="assign-info-value" id="assignPlanGroup">—</span>
-                  </div>
-                  <div class="assign-info-item">
-                    <span class="assign-info-label">Valor mensal</span>
-                    <span class="assign-info-value" id="assignPlanPrice">—</span>
-                  </div>
-                  <div class="assign-info-item">
-                    <span class="assign-info-label">Matrícula</span>
-                    <span class="assign-info-value" id="assignPlanMatricula">—</span>
-                  </div>
-                </div>
-              </fieldset>
+              <p class="assign-note">Algum dado errado? <a id="assignFixLink" href="/contato" target="_blank" rel="noopener">Fale com a unidade</a> antes de assinar.</p>
             </fieldset>
           </div>
 
           <!-- ETAPA 2: TERMOS -->
           <div class="an-block" data-block="2" hidden>
             <fieldset class="an-fieldset">
-              <legend class="an-legend">Termos e condições</legend>
-              <p class="an-legend-sub">Leia e aceite os termos para continuar.</p>
+              <legend class="an-legend">Termos do contrato</legend>
+              <p class="an-legend-sub">Leia até o final para liberar o aceite.</p>
 
-              <div class="assign-terms-container">
-                <div class="assign-terms-content" id="assignTermsContent">
-                  <p class="an-loading-note" style="text-align: center; margin: 2rem 0;">
-                    <span class="an-spin"></span> Carregando termos...
-                  </p>
+              <div class="assign-terms" id="assignTermsBox">
+                <div class="assign-terms-content" id="assignTermsContent" tabindex="0">
+                  <p class="an-loading-note"><span class="an-spin"></span> Carregando termos...</p>
                 </div>
-                <div class="assign-terms-progress" id="assignTermsProgress" hidden>
-                  <span class="assign-terms-scroll-hint">Role até o final para aceitar</span>
-                  <div class="assign-terms-bar">
-                    <div class="assign-terms-fill" id="assignTermsScrollBar"></div>
-                  </div>
+                <div class="assign-terms-foot" id="assignTermsProgress" hidden>
+                  <span class="assign-terms-hint" id="assignTermsHint">Role até o final para aceitar</span>
+                  <div class="assign-terms-bar"><div class="assign-terms-fill" id="assignTermsScrollBar"></div></div>
                 </div>
               </div>
 
@@ -183,7 +151,8 @@
                 <input type="checkbox" id="assignAcceptTerms" name="acceptTerms" disabled>
                 <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
                 <span class="txt">
-                  Li e concordo com os termos de assinatura. <span class="req">*</span>
+                  Li e concordo com os termos do contrato. <span class="req">*</span>
+                  <small id="assignTermsVersionNote"></small>
                 </span>
               </label>
               <span class="an-err" id="assignTermsErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
@@ -197,12 +166,13 @@
               <p class="an-legend-sub">Assine no quadro abaixo usando o dedo, o mouse ou a caneta.</p>
 
               <div class="an-sign-wrap" id="assignSignWrap">
-                <canvas id="assignSignature" aria-label="Quadro de assinatura" role="img" touch-action="none" style="touch-action: none; cursor: crosshair; display: block; width: 100%; height: 100%;"></canvas>
+                <canvas id="assignSignature" aria-label="Quadro de assinatura" role="img"></canvas>
                 <div class="an-sign-line"></div>
                 <div class="an-sign-ph">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 19c3.5 0 3.5-12 7-12s3.5 12 7 12c1.5 0 2.5-1 3-2"/></svg>
                   <span>Assine aqui</span>
                 </div>
+                <span class="assign-sign-badge" id="assignSignBadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Salva</span>
               </div>
 
               <div class="an-sign-bar">
@@ -218,29 +188,68 @@
           <!-- ETAPA 4: FOTO -->
           <div class="an-block" data-block="4" hidden>
             <fieldset class="an-fieldset">
-              <legend class="an-legend">Foto para reconhecimento facial</legend>
-              <p class="an-legend-sub">Tire uma foto clara do seu rosto para validação de identidade.</p>
+              <legend class="an-legend">Foto para a catraca</legend>
+              <p class="an-legend-sub">Essa foto libera sua entrada por reconhecimento facial. Rosto centralizado, sem óculos escuros ou boné, num lugar iluminado.</p>
 
-              <div class="assign-camera-container" id="assignCameraContainer">
-                <video id="assignCameraVideo" class="assign-camera-video" playsinline autoplay muted></video>
-                <div class="assign-camera-frame"></div>
-                <button type="button" class="btn btn-primary assign-camera-btn" id="assignCameraCapture">Fotografar</button>
+              <div class="assign-cam" id="assignCam" data-mode="loading">
+                <!-- vídeo ao vivo -->
+                <video id="assignCameraVideo" class="assign-cam-video" playsinline autoplay muted></video>
+                <!-- foto capturada -->
+                <canvas id="assignPhotoCanvas" class="assign-cam-photo"></canvas>
+
+                <div class="assign-cam-guide" aria-hidden="true"><span></span></div>
+
+                <div class="assign-cam-msg assign-cam-loading">
+                  <span class="an-spin"></span>
+                  <p>Abrindo a câmera...</p>
+                </div>
+
+                <div class="assign-cam-msg assign-cam-error">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3l18 18"/><path d="M9.5 5H15l2 3h3a2 2 0 0 1 2 2v8M4 7.8A2 2 0 0 0 3 10v8a2 2 0 0 0 2 2h13"/><path d="M9.4 9.4a4 4 0 0 0 5.2 5.2"/></svg>
+                  <p id="assignCamErrorText">Não conseguimos abrir a câmera.</p>
+                  <small>Libere o acesso à câmera nas permissões do navegador ou envie uma foto da galeria.</small>
+                  <div class="assign-cam-error-actions">
+                    <button type="button" class="btn btn-primary" id="assignCameraRetry">Tentar de novo</button>
+                    <button type="button" class="btn btn-ghost" id="assignPhotoPick">Enviar da galeria</button>
+                  </div>
+                </div>
+
+                <span class="assign-cam-badge" id="assignPhotoBadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Foto salva</span>
+
+                <button type="button" class="assign-shutter" id="assignCameraCapture" aria-label="Tirar foto"><span></span></button>
               </div>
 
-              <div class="assign-preview" id="assignPhotoPreview" hidden>
-                <div class="assign-preview-header">
-                  <h3>Sua foto</h3>
-                  <button type="button" class="assign-preview-close" id="assignPhotoRetake" title="Tirar outra foto">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              <input type="file" id="assignPhotoFile" accept="image/*" capture="user" hidden>
+
+              <div class="assign-cam-bar">
+                <div class="assign-cam-bar-live" data-cam-live>
+                  <button type="button" class="btn btn-ghost" id="assignPhotoPickAlt">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg>
+                    Enviar da galeria
                   </button>
                 </div>
-                <canvas id="assignPhotoCanvas" class="assign-photo-canvas"></canvas>
-                <button type="button" class="btn btn-primary" id="assignPhotoSave">Usar esta foto</button>
+                <div class="assign-cam-bar-preview" data-cam-preview hidden>
+                  <button type="button" class="btn btn-primary" id="assignPhotoSave">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                    Usar esta foto
+                  </button>
+                  <button type="button" class="btn btn-ghost" id="assignPhotoRetake">Tirar outra</button>
+                </div>
+                <div class="assign-cam-bar-saved" data-cam-saved hidden>
+                  <button type="button" class="btn btn-ghost" id="assignPhotoRetake2">Tirar outra foto</button>
+                </div>
               </div>
-
+              <p class="an-sign-status" id="assignPhotoStatus">Nenhuma foto salva ainda.</p>
+              <ul class="assign-cam-tips">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Lugar bem iluminado</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="9" r="4"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>Rosto de frente, sem boné ou óculos escuros</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 3v4M16 3v4"/></svg>Só você no enquadramento</li>
+              </ul>
               <span class="an-err" id="assignPhotoErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
             </fieldset>
           </div>
+
+          <span class="an-err assign-submit-err" id="assignSubmitErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
 
           <div class="an-actions">
             <button type="button" class="btn btn-ghost" id="assignPrev" hidden>Voltar</button>
@@ -259,27 +268,19 @@
 
       <!-- Enviando -->
       <section id="stSubmitting" class="an-state" hidden>
-        <div class="assign-submitting-animation">
-          <div class="assign-dot"></div>
-          <div class="assign-dot"></div>
-          <div class="assign-dot"></div>
-        </div>
+        <div class="assign-sending" aria-hidden="true"><span></span><span></span><span></span></div>
         <h2>Finalizando seu cadastro</h2>
-        <p id="assignSubmittingMsg">Processando sua foto e assinatura...</p>
-        <div class="assign-progress-steps">
-          <div class="assign-progress-item" id="assignProgressPhoto">
-            <span class="assign-progress-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-            </span>
-            <span class="assign-progress-label">Enviando foto</span>
-          </div>
-          <div class="assign-progress-item" id="assignProgressSign">
-            <span class="assign-progress-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-            </span>
-            <span class="assign-progress-label">Salvando assinatura</span>
-          </div>
-        </div>
+        <p id="assignSubmittingMsg">Só um instante, estamos guardando sua foto e assinatura.</p>
+        <ol class="assign-progress">
+          <li class="assign-progress-item" id="assignProgressPhoto">
+            <span class="assign-progress-ic"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span>Enviando foto</span>
+          </li>
+          <li class="assign-progress-item" id="assignProgressSign">
+            <span class="assign-progress-ic"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span>Registrando assinatura</span>
+          </li>
+        </ol>
       </section>
 
       <!-- Sucesso -->
@@ -288,10 +289,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.6 2.6L16 9.7"/></svg>
         </div>
         <h2>Tudo pronto!</h2>
-        <p>Sua assinatura foi registrada com sucesso.</p>
-        <p>Bem-vindo à Cia do Corpo! Você já pode Treinar a vontade.</p>
+        <p>Contrato assinado e foto registrada. Bem-vindo à Cia do Corpo: é só chegar na unidade e treinar.</p>
         <div class="an-state-actions">
-          <a class="btn btn-primary btn-lg" href="https://cianet.impactadigital.net/">Pagina Inicial</a>
+          <a class="btn btn-primary btn-lg" href="https://cianet.impactadigital.net/">Ir para o app</a>
         </div>
       </section>
 
@@ -311,6 +311,6 @@
 <script src="/assets/js/config.js?v=20260825"></script>
 <script src="/assets/js/data-service.js?v=20260825"></script>
 <script src="/assets/js/telemetry.js?v=20260826"></script>
-<script src="/assets/js/assign.js?v=20260910"></script>
+<script src="/assets/js/assign.js?v=20260911"></script>
 </body>
 </html>

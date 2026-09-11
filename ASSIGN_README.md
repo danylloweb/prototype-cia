@@ -44,10 +44,10 @@ Implementação completa de um fluxo de assinatura digital seguindo o tema visua
 4. Validação de assinatura não vazia
 
 ### Etapa 4: Foto para Reconhecimento Facial
-1. Acessa câmera do dispositivo via MediaDevices API
+1. Acessa a câmera só ao entrar na etapa 4 (MediaDevices API), com fallback de upload da galeria
 2. Preview e captura de foto
 3. Permite recapturar
-4. Armazena foto como base64 PNG
+4. Armazena foto como JPEG (lado maior até 1024px, qualidade 0.82), sem espelhamento — só a prévia na tela é espelhada
 
 ### Submissão Final
 1. Mostra tela de loading com animações
@@ -88,7 +88,7 @@ Implementação completa de um fluxo de assinatura digital seguindo o tema visua
 ```
 
 ### POST /signature/{code}/photo
-**Payload:** Multipart form com file: `file`  
+**Payload:** Multipart form com campo `file` (`face.jpg`, image/jpeg)  
 **Response esperado:**
 ```json
 {
