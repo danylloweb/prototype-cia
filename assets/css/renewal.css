@@ -1,0 +1,15 @@
+.an-body .field input[readonly] {
+  background: var(--surface-3);
+  color: var(--text-soft);
+}
+
+#rnParq .field textarea {
+  min-height: 80px;
+}
+
+.rn-plan-empty {
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  margin-top: 8px;
+}
+

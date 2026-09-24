@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renovação de Plano | Cia do Corpo</title>
+<meta name="description" content="Finalize sua renovação de plano: escolha unidade, plano e assine sua anamnese.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/styles.css?v=20260825">
+<link rel="stylesheet" href="/assets/css/anamnese.css?v=20260815">
+<link rel="stylesheet" href="/assets/css/renewal.css?v=20260924">
+</head>
+<body class="an-body">
+<a class="skip-link" href="#rnPanel">Pular para o formulário</a>
+
+<header class="an-header">
+  <div class="container an-header-in">
+    <a class="brand-logo" href="/"><img class="brand-img" src="/assets/img/LOGO-HORI-BRA.png" alt="Cia do Corpo"></a>
+    <a class="an-help" id="rnHelpLink" href="/contato" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg>
+      <span>Preciso de ajuda</span>
+    </a>
+  </div>
+</header>
+
+<section class="an-hero">
+  <div class="container an-hero-in">
+    <div>
+      <span class="eyebrow">Renovação de plano</span>
+      <h1>Finalize sua<br>renovação</h1>
+      <p>Escolha sua unidade, selecione o plano e assine a anamnese para concluir.</p>
+    </div>
+    <span class="an-code" id="rnCode" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 7h3a5 5 0 0 1 0 10h-3m-6 0H6A5 5 0 0 1 6 7h3"/><path d="M8 12h8"/></svg>
+      <span id="rnCodeText"></span>
+    </span>
+  </div>
+</section>
+
+<main class="an-main">
+  <div class="container">
+    <div class="an-panel" id="rnPanel">
+      <section id="stLoading" aria-live="polite">
+        <div class="an-skel">
+          <span class="short"></span>
+          <span></span><span></span>
+          <span class="tall"></span>
+        </div>
+        <p class="an-loading-note"><span class="an-spin"></span> Carregando sua renovação...</p>
+      </section>
+
+      <section id="stError" class="an-state" hidden>
+        <div class="an-state-ic bad">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+        </div>
+        <h2 id="rnErrorTitle">Link inválido ou expirado</h2>
+        <p id="rnErrorText">Não conseguimos localizar sua renovação. Fale com a nossa equipe para receber um novo link.</p>
+        <div class="an-state-actions">
+          <button type="button" class="btn btn-ghost" id="rnRetryBtn" hidden>Tentar novamente</button>
+          <a class="btn btn-whats" id="rnErrorContact" href="/contato">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg>
+            Falar com a academia
+          </a>
+        </div>
+      </section>
+
+      <section id="stForm" hidden>
+        <ol class="an-steps" id="rnSteps">
+          <li class="an-step is-current" data-step="1"><span class="an-step-dot"><i>1</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span class="an-step-label">Unidade</span></li>
+          <li class="an-step" data-step="2"><span class="an-step-dot"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span class="an-step-label">Plano e saúde</span></li>
+          <li class="an-step" data-step="3"><span class="an-step-dot"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span class="an-step-label">Assinatura</span></li>
+        </ol>
+
+        <form id="rnForm" novalidate autocomplete="on">
+          <div class="an-block" data-block="1">
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Dados do aluno</legend>
+              <p class="an-legend-sub">Esses dados vêm do cadastro atual e não podem ser alterados aqui.</p>
+              <div class="an-grid">
+                <div class="field col-6"><label for="rName">Nome</label><input id="rName" readonly></div>
+                <div class="field col-6"><label for="rPhone">WhatsApp</label><input id="rPhone" readonly></div>
+                <div class="field col-6"><label for="rEmail">E-mail</label><input id="rEmail" readonly></div>
+                <div class="field col-3 m-8"><label for="rCpf">CPF</label><input id="rCpf" readonly></div>
+                <div class="field col-3 m-4"><label for="rBirth">Nascimento</label><input id="rBirth" readonly></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Escolha sua unidade</legend>
+              <p class="an-legend-sub">Selecione a unidade onde você vai treinar.</p>
+              <div class="an-grid">
+                <div class="field col-12">
+                  <label for="rUnit">Unidade <span class="req">*</span></label>
+                  <select id="rUnit" name="unit">
+                    <option value="">Selecione</option>
+                  </select>
+                  <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="an-block" data-block="2" hidden>
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Escolha seu plano</legend>
+              <p class="an-legend-sub">Os planos são filtrados de acordo com a unidade escolhida.</p>
+              <div class="an-grid">
+                <div class="field col-12">
+                  <label for="rPlan">Plano <span class="req">*</span></label>
+                  <select id="rPlan" name="plan">
+                    <option value="">Selecione a unidade primeiro</option>
+                  </select>
+                  <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Objetivo e rotina</legend>
+              <div class="an-grid">
+                <div class="field col-6">
+                  <label for="rGoal">Objetivo <span class="req">*</span></label>
+                  <select id="rGoal" name="goal">
+                    <option value="">Selecione</option>
+                    <option>Emagrecimento</option>
+                    <option>Hipertrofia</option>
+                    <option>Condicionamento</option>
+                    <option>Saúde</option>
+                    <option>Performance</option>
+                    <option>Reabilitação</option>
+                    <option>Ganho de Massa</option>
+                  </select>
+                  <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+                </div>
+                <div class="field col-3 m-6">
+                  <label for="rDays">Dias por semana <span class="req">*</span></label>
+                  <select id="rDays" name="trainingDays">
+                    <option value="">Selecione</option>
+                    <option value="2">2 dias</option>
+                    <option value="3">3 dias</option>
+                    <option value="4">4 dias</option>
+                    <option value="5">5 dias</option>
+                    <option value="6">6 dias</option>
+                    <option value="7">7 dias</option>
+                  </select>
+                  <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+                </div>
+                <div class="field col-3 m-6">
+                  <label for="rShift">Turno <span class="req">*</span></label>
+                  <select id="rShift" name="trainingShift">
+                    <option value="">Selecione</option>
+                    <option>Manhã</option>
+                    <option>Tarde</option>
+                    <option>Noite</option>
+                    <option>Flexível</option>
+                  </select>
+                  <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">PAR-Q</legend>
+              <p class="an-legend-sub">Responda para liberar sua renovação com segurança.</p>
+              <div class="an-alert" id="rnMedicalAlert" role="status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                <div>
+                  <b>Recomendamos avaliação médica</b>
+                  <p>Você pode continuar normalmente, mas sugerimos avaliação antes de iniciar o treino.</p>
+                </div>
+              </div>
+              <div id="rnParq"></div>
+            </fieldset>
+          </div>
+
+          <div class="an-block" data-block="3" hidden>
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Consentimentos</legend>
+              <p class="an-legend-sub">Para concluir, aceite os termos e assine abaixo.</p>
+
+              <div class="an-terms" id="rnTerms" tabindex="0" role="region" aria-label="Termo de responsabilidade"></div>
+
+              <label class="an-check" for="rTerms">
+                <input type="checkbox" id="rTerms" name="acceptedTerms">
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="txt">Li e concordo com o termo de responsabilidade. <span class="req">*</span></span>
+              </label>
+              <span class="an-err" id="rnTermsErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+
+              <label class="an-check" for="rConsent">
+                <input type="checkbox" id="rConsent" name="healthConsent">
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M20 6L9 17l-5-5"/></svg></span>
+                <span class="txt">Autorizo o uso de dados de saúde para prescrição do treino. <span class="req">*</span></span>
+              </label>
+              <span class="an-err" id="rnConsentErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+            </fieldset>
+
+            <fieldset class="an-fieldset">
+              <legend class="an-legend">Assinatura</legend>
+              <div class="an-sign-wrap" id="rnSignWrap">
+                <canvas id="rnSignature" aria-label="Quadro de assinatura" role="img"></canvas>
+                <div class="an-sign-line"></div>
+                <div class="an-sign-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 19c3.5 0 3.5-12 7-12s3.5 12 7 12c1.5 0 2.5-1 3-2"/></svg><span>Assine aqui</span></div>
+              </div>
+              <div class="an-sign-bar">
+                <button type="button" class="btn btn-primary" id="rnSignSave">Salvar assinatura</button>
+                <button type="button" class="btn btn-ghost" id="rnSignUndo">Desfazer</button>
+                <button type="button" class="btn btn-ghost" id="rnSignClear">Limpar</button>
+              </div>
+              <p class="an-sign-status" id="rnSignStatus">Nenhuma assinatura salva ainda.</p>
+              <span class="an-err" id="rnSignErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
+            </fieldset>
+          </div>
+
+          <div class="an-actions">
+            <button type="button" class="btn btn-ghost" id="rnPrev" hidden>Voltar</button>
+            <button type="button" class="btn btn-primary an-next" id="rnNext"><span class="an-btn-label">Continuar</span></button>
+            <button type="submit" class="btn btn-primary an-next" id="rnSubmit" hidden><span class="an-btn-label">Finalizar renovação</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section id="stDone" class="an-state" hidden>
+        <div class="an-state-ic good">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.6 2.6L16 9.7"/></svg>
+        </div>
+        <h2>Renovação enviada!</h2>
+        <p>Recebemos sua renovação. Nossa equipe vai seguir com a confirmação do seu plano.</p>
+        <div class="an-state-actions">
+          <a class="btn btn-primary btn-lg" href="/">Voltar ao site</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="an-footer">
+  <div class="container">© <span data-year>2026</span> Cia do Corpo Gym — Recife &amp; Olinda, PE.</div>
+</footer>
+
+<div class="an-toasts" id="rnToasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="/assets/js/config.js?v=20260825"></script>
+<script src="/assets/js/data-service.js?v=20260825"></script>
+<script src="/assets/js/telemetry.js?v=20260826"></script>
+<script src="/assets/js/renewal.js?v=20260924"></script>
+</body>
+</html>
