@@ -1,7 +1,7 @@
 (function (w, d) {
   "use strict";
 
-  var API_BASE = "https://cianet.impactadigital.net/renewal";
+  var API_BASE = "https://portalcia.impactadigital.net/renewal";
   var REQUEST_TIMEOUT = 15000;
   var TERMS_TEXT = "Declaro que estou em plenas condições de saúde e autorizado por meu médico a realizar atividades físicas. Assumo total responsabilidade pelo meu estado de saúde, isentando a Academia e seus colaboradores sobre qualquer acontecimento dentro de suas dependências. Declaro que todas as informações fornecidas são verdadeiras e exatas.";
 
