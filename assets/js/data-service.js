@@ -9,7 +9,7 @@
 
 (function (w) {
   var LS_KEY = "cdc_site_config_v4";
-  var REMOTE_URL = w.CDC_REMOTE_CONFIG_URL || "https://msadmin.s3.amazonaws.com/config.json";
+  var REMOTE_URL = w.CDC_REMOTE_CONFIG_URL || "https://portalcia.impactadigital.net/public-config";
   /* O bucket S3 não responde com Access-Control-Allow-Origin, então o
      navegador bloqueia a leitura do config publicado. O painel serve o
      mesmo conteúdo com CORS liberado — usado quando o S3 falha. */
