@@ -22,6 +22,7 @@
     gymMember: null,
     units: [],
     plans: [],
+    offer: null,
     signature: "",
     sending: false
   };
@@ -180,6 +181,7 @@
         state.gymMember = data.gym_member || null;
         state.units = Array.isArray(data.units) ? data.units : [];
         state.plans = Array.isArray(data.plans) ? data.plans : [];
+        state.offer = normalizeOffer(data.offer);
         renderData();
         showScreen("stForm");
         goToStep(1);
@@ -229,24 +231,108 @@
     return grouped.length ? grouped : plans;
   }
 
-  function renderPlans() {
-    var unit = getSelectedUnit();
-    var select = byId("rPlan");
-    var plans = plansForUnit(unit);
-    var options = ['<option value="">Selecione</option>'];
-    plans.forEach(function (p) {
-      var price = money(p.priceFrom);
-      var priceText = price ? " — R$ " + price : "";
-      options.push('<option value="' + String(p.id) + '">' + (p.name || "Plano") + priceText + "</option>");
+  /* Oferta montada pela equipe no painel: até 3 planos e um em destaque.
+     Planos que saíram de vigência já vêm filtrados pela API. */
+  function normalizeOffer(raw) {
+    if (!raw || !Array.isArray(raw.plan_ids)) return null;
+    var ids = raw.plan_ids.map(Number).filter(function (id) {
+      return state.plans.some(function (p) { return Number(p.id) === id && p.status !== false; });
     });
-    select.innerHTML = options.join("");
+    if (!ids.length) return null;
+    var featured = Number(raw.featured_plan_id);
+    if (ids.indexOf(featured) === -1) featured = ids[0];
+    return { ids: ids.slice(0, 3), featured: featured };
+  }
 
-    var currentPlan = state.gymMember && state.gymMember.plan_id;
-    if (currentPlan && plans.some(function (p) { return String(p.id) === String(currentPlan); })) {
-      select.value = String(currentPlan);
+  function planById(id) {
+    return state.plans.filter(function (p) { return Number(p.id) === Number(id); })[0] || null;
+  }
+
+  // Com 3 planos o destaque fica no meio; com 2, vem primeiro.
+  function offerPlans() {
+    var o = state.offer;
+    var others = o.ids.filter(function (id) { return id !== o.featured; });
+    var order = o.ids.length === 3 ? [others[0], o.featured, others[1]] : [o.featured].concat(others);
+    return order.map(planById).filter(Boolean);
+  }
+
+  function esc(v) {
+    return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  function planCardMarkup(p, opts) {
+    var price = money(p.priceFrom) || "0,00";
+    var recurring = p.recurring === true;
+    var period = String(p.periodicityLabel || "").toLowerCase();
+    var unit = getSelectedUnit();
+    var isCurrent = state.gymMember && String(state.gymMember.plan_id) === String(p.id);
+    var badges = [];
+    if (isCurrent) badges.push('<span class="plan-badge pb-blue">Seu plano atual</span>');
+    if (recurring) badges.push('<span class="plan-badge pb-green">Não compromete o limite</span>');
+
+    var features = [];
+    if (recurring) features.push("Cobrança mensal recorrente");
+    if (Number(p.periodicity) > 1) features.push("Duração de " + Number(p.periodicity) + " meses");
+    features.push(Number(p.matricula) > 0 ? "Matrícula de R$ " + money(p.matricula) : "Sem taxa de matrícula");
+    if (unit && unit.name) features.push("Treinos na unidade " + unit.name);
+
+    return '<div class="plan rn-plan' + (opts.featured ? " featured" : "") + '" role="radio" tabindex="0" aria-checked="false" data-plan-id="' + esc(p.id) + '">' +
+      (opts.featured ? '<span class="ribbon">Recomendado</span>' : "") +
+      "<h3>" + esc(p.name || "Plano") + "</h3>" +
+      '<div class="plan-price">R$ ' + price + "<small>" + (recurring ? "/mês" : (period ? " " + esc(period) : "")) + "</small></div>" +
+      (badges.length ? '<div class="plan-badges">' + badges.join("") + "</div>" : "") +
+      "<ul>" + features.map(function (f) { return "<li>" + CHECK_SVG + "<span>" + esc(f) + "</span></li>"; }).join("") + "</ul>" +
+      '<span class="btn ' + (opts.featured ? "btn-primary" : "btn-ghost") + ' btn-block rn-plan-cta"><span class="rn-cta-idle">Quero este plano</span><span class="rn-cta-on">' + CHECK_SVG + " Plano escolhido</span></span>" +
+      "</div>";
+  }
+
+  function selectPlan(id) {
+    var input = byId("rPlan");
+    input.value = id ? String(id) : "";
+    clearFieldError(input);
+    all(".rn-plan", byId("rnPlans")).forEach(function (card) {
+      var on = card.getAttribute("data-plan-id") === input.value;
+      card.classList.toggle("is-selected", on);
+      card.setAttribute("aria-checked", on ? "true" : "false");
+    });
+  }
+
+  function renderPlans() {
+    var host = byId("rnPlans");
+    var sub = byId("rnPlansSub");
+    var previous = byId("rPlan").value;
+    var plans, featuredId = null;
+
+    if (state.offer) {
+      plans = offerPlans();
+      featuredId = state.offer.featured;
+      sub.textContent = "Separamos estas opções para a sua renovação. Toque no plano que preferir.";
     } else {
-      select.value = "";
+      plans = plansForUnit(getSelectedUnit());
+      sub.textContent = "Os planos são filtrados de acordo com a unidade escolhida.";
     }
+
+    host.className = "rn-plans" + (state.offer ? " is-offer is-" + plans.length : " is-list");
+    if (!plans.length) {
+      host.innerHTML = '<p class="rn-plan-empty">Nenhum plano disponível para esta unidade. Fale com a nossa equipe.</p>';
+      selectPlan("");
+      return;
+    }
+    host.innerHTML = plans.map(function (p) {
+      return planCardMarkup(p, { featured: featuredId !== null && Number(p.id) === featuredId });
+    }).join("");
+
+    // Mantém a escolha anterior. Com oferta, já começa no destaque escolhido
+    // pela equipe; sem oferta, no plano atual do aluno.
+    var ids = plans.map(function (p) { return String(p.id); });
+    var currentPlan = state.gymMember && state.gymMember.plan_id;
+    var pick = [previous, state.offer ? featuredId : currentPlan].map(function (v) { return v == null ? "" : String(v); })
+      .filter(function (v) { return v && ids.indexOf(v) !== -1; })[0] || "";
+    selectPlan(pick);
   }
 
   function getSelectedUnit() {
@@ -418,7 +504,11 @@
 
   function validateStep2() {
     var ok = true;
-    ok = requireValue("rPlan", "Selecione um plano.") && ok;
+    if (!requireValue("rPlan", "Selecione um plano.")) {
+      ok = false;
+      var host = byId("rnPlans");
+      if (host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
     var objectiveRequired = [
       { id: "rGoal", message: "Selecione um objetivo." },
       { id: "rDays", message: "Selecione os dias por semana." },
@@ -735,7 +825,16 @@
       clearFieldError(this);
       renderPlans();
     });
-    byId("rPlan").addEventListener("change", function () { clearFieldError(this); });
+    byId("rnPlans").addEventListener("click", function (ev) {
+      var card = ev.target.closest && ev.target.closest(".rn-plan");
+      if (card) selectPlan(card.getAttribute("data-plan-id"));
+    });
+    byId("rnPlans").addEventListener("keydown", function (ev) {
+      var card = ev.target.closest && ev.target.closest(".rn-plan");
+      if (!card || (ev.key !== "Enter" && ev.key !== " ")) return;
+      ev.preventDefault();
+      selectPlan(card.getAttribute("data-plan-id"));
+    });
     ["rGoal", "rDays", "rShift"].forEach(function (id) {
       var el = byId(id);
       el.addEventListener("change", function () { clearFieldError(el); });
