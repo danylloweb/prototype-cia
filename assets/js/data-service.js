@@ -14,7 +14,7 @@
      navegador bloqueia a leitura do config publicado. O painel serve o
      mesmo conteúdo com CORS liberado — usado quando o S3 falha. */
   var REMOTE_FALLBACK_URL = w.CDC_REMOTE_CONFIG_FALLBACK || "https://portalcia.impactadigital.net/public-config";
-  var REMOTE_KEY = "cdc_remote_config_v1";
+  var REMOTE_KEY = "cdc_remote_config_v2"; // v2: descarta overlay de planos salvo com a regra antiga
 
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
 
@@ -44,8 +44,21 @@
      não tiver group) e escolhe o card assim: key/plan explícito se bater com
      um item; senão recurring=true vai no Basic+ (recorrência) e o restante no
      card destacado (Anual VIP). Linhas com status=false são ignoradas.
+     Cada card recebe só a PRIMEIRA linha que casar (menor id): o painel
+     também publica o catálogo completo de planos (renovação etc.) no mesmo
+     grupo, e deixar a última linha vencer punha valores como R$ 0,01 e
+     1.210,00 nos cards. É a mesma regra do planRowIdFor (experience.js).
      priceFrom numérico substitui só o valor dentro do formato do card
      ("12x de R$ 109,90" mantém o "12x de"). */
+  function sortRowsById(rows) {
+    return rows.slice().sort(function (a, b) {
+      var ia = Number(a && a.id), ib = Number(b && b.id);
+      if (isNaN(ia)) return isNaN(ib) ? 0 : 1;
+      if (isNaN(ib)) return -1;
+      return ia - ib;
+    });
+  }
+
   function plansFromRows(rows, units) {
     var seedPlans = (w.CDC_DEFAULT_CONFIG || {}).plans;
     if (!seedPlans || !seedPlans.byUnit) return null;
@@ -57,6 +70,7 @@
     var applied = false;
     Object.keys(plans.byUnit).forEach(function (unitId) {
       var items = plans.byUnit[unitId].items || [];
+      var filled = {};
       rows.forEach(function (row) {
         if (!row || typeof row !== "object") return;
         if (row.status === false) return;
@@ -75,7 +89,8 @@
         var item = items.filter(function (i) { return i.key === key; })[0];
         if (!item && row.recurring === true) item = items.filter(function (i) { return i.key === "basic"; })[0];
         if (!item) item = items.filter(function (i) { return i.featured; })[0];
-        if (!item) return;
+        if (!item || filled[item.key]) return;
+        filled[item.key] = true;
         if (typeof row.priceFrom === "number" && row.priceFrom > 0) {
           item.price = /R\$\s?[\d.,]+/.test(item.price)
             ? item.price.replace(/R\$\s?[\d.,]+/, moneyBR(row.priceFrom))
@@ -115,10 +130,11 @@
     if (b.plans && b.plans.byUnit) {
       out.plans = b.plans;
     } else if (Array.isArray(b.plans) && b.plans.length) {
-      var converted = plansFromRows(b.plans, b.units);
+      var rows = sortRowsById(b.plans);
+      var converted = plansFromRows(rows, b.units);
       if (converted) out.plans = converted;
       // Linhas cruas ficam disponíveis para o envio de leads (plan_id do painel)
-      out.planRows = b.plans;
+      out.planRows = rows;
     }
     return out;
   }
