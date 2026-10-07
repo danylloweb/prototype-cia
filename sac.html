@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Atendimento ao Cliente | Cia do Corpo</title>
+  <meta name="description" content="Registre sua solicitação de atendimento com a Cia do Corpo. Nossa equipe retornará em breve.">
+  <meta name="theme-color" content="#0a0a0b">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="atendimento-cliente/style.css">
+</head>
+<body class="cs-body">
+  <a class="skip-link" href="#incidentForm">Pular para o formulário</a>
+
+  <header class="cs-header">
+    <div class="container cs-header-in">
+      <a class="brand-logo" href="index.html" aria-label="Voltar para o site da Cia do Corpo">
+        <img class="brand-img" src="assets/img/LOGO-HORI-BRA.png" alt="Cia do Corpo">
+      </a>
+      <a class="cs-help" href="contato.html">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 6.32 17.75L22 22l-2.25-3.68A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm-1-5h2v2h-2v-2Zm1-8a3 3 0 0 1 3 3c0 1.45-.86 2.21-1.55 2.82-.63.55-.95.86-.95 1.68v.5h-2v-.7c0-1.57.8-2.45 1.48-3.04.61-.54 1.02-.89 1.02-1.46a1 1 0 0 0-2 0H9a3 3 0 0 1 3-3Z"/></svg>
+        <span>Preciso de ajuda</span>
+      </a>
+    </div>
+  </header>
+
+  <section class="cs-hero">
+    <div class="container cs-hero-in">
+      <div class="cs-hero-copy">
+        <span class="eyebrow">Atendimento Cia do Corpo</span>
+        <h1>Central de Atendimento ao Cliente</h1>
+        <p>Nossa equipe analisará sua solicitação com atenção e retornará em breve pelos canais informados.</p>
+        <div class="cs-hero-badges" aria-label="Diferenciais do atendimento">
+          <span>Retorno humanizado</span>
+          <span>Envio seguro</span>
+          <span>Preenchimento rápido</span>
+        </div>
+      </div>
+      <div class="cs-hero-card" aria-hidden="true">
+        <div class="cs-hero-card-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg>
+        </div>
+        <strong>Atendimento organizado</strong>
+        <p>Selecione o tipo da sua ocorrência, informe seus dados e envie sua solicitação em poucos passos.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="cs-main">
+    <div class="container">
+      <div class="cs-shell">
+        <aside class="cs-sidebar" aria-label="Informações de apoio">
+          <section class="cs-side-card">
+            <h2>Como funciona</h2>
+            <ol class="cs-step-list">
+              <li>Preencha seus dados e escolha o tipo de atendimento.</li>
+              <li>Se quiser, informe sua unidade, plano e mais detalhes.</li>
+              <li>Envie a solicitação e aguarde nosso retorno.</li>
+            </ol>
+          </section>
+
+          <section class="cs-side-card cs-side-highlight">
+            <h2>Antes de enviar</h2>
+            <ul class="cs-check-list">
+              <li>Campos com <span class="req">*</span> são obrigatórios.</li>
+              <li>Telefone e CPF serão enviados apenas com números.</li>
+              <li>Você receberá feedback imediato em caso de inconsistências.</li>
+            </ul>
+          </section>
+        </aside>
+
+        <section class="form-card cs-form-card" aria-labelledby="formTitle">
+          <div class="cs-form-head">
+            <div>
+              <span class="cs-kicker">Solicitação de atendimento</span>
+              <h2 id="formTitle">Conte para a gente o que aconteceu</h2>
+            </div>
+            <p>Preencha os campos abaixo. Se precisar, você pode detalhar a ocorrência na descrição.</p>
+          </div>
+
+          <form id="incidentForm" class="cs-form" novalidate>
+            <div class="cs-grid">
+              <div class="field cs-field cs-span-6">
+                <label for="type">Tipo <span class="req">*</span></label>
+                <select id="type" name="type" required aria-describedby="typeError">
+                  <option value="">Selecione</option>
+                  <option value="cancelamento">Cancelamento</option>
+                  <option value="trancamento">Trancamento</option>
+                  <option value="transferencia">Transferência</option>
+                  <option value="duvidas_financeiras">Dúvidas financeiras</option>
+                  <option value="outros">Outros</option>
+                </select>
+                <span class="cs-error" id="typeError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="name">Nome completo <span class="req">*</span></label>
+                <input id="name" name="name" type="text" autocomplete="name" required aria-describedby="nameError">
+                <span class="cs-error" id="nameError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="phone">Telefone <span class="req">*</span></label>
+                <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(81) 99999-9999" required aria-describedby="phoneHelp phoneError">
+                <span class="cs-help-text" id="phoneHelp">Use o número com DDD.</span>
+                <span class="cs-error" id="phoneError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="cpf">CPF <span class="req">*</span></label>
+                <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" required aria-describedby="cpfError">
+                <span class="cs-error" id="cpfError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com" aria-describedby="emailError">
+                <span class="cs-error" id="emailError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="unit_id">Unidade</label>
+                <select id="unit_id" name="unit_id" aria-describedby="unitHelp unit_idError">
+                  <option value="">Carregando unidades...</option>
+                </select>
+                <span class="cs-help-text" id="unitHelp">Opcional. Escolha a unidade relacionada à ocorrência.</span>
+                <span class="cs-error" id="unit_idError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-6">
+                <label for="plan_id">Plano</label>
+                <select id="plan_id" name="plan_id" aria-describedby="planHelp plan_idError">
+                  <option value="">Carregando planos...</option>
+                </select>
+                <span class="cs-help-text" id="planHelp">Opcional. Os planos podem ser filtrados conforme a unidade.</span>
+                <span class="cs-error" id="plan_idError"></span>
+              </div>
+
+              <div class="field cs-field cs-span-12">
+                <label for="description">Descrição</label>
+                <textarea id="description" name="description" rows="5" maxlength="1000" placeholder="Se desejar, descreva com mais detalhes a sua solicitação." aria-describedby="descriptionHelp descriptionError"></textarea>
+                <div class="cs-field-meta">
+                  <span class="cs-help-text" id="descriptionHelp">Opcional. Quanto mais contexto, melhor conseguimos ajudar.</span>
+                  <span class="cs-counter" id="descriptionCounter">0/1000</span>
+                </div>
+                <span class="cs-error" id="descriptionError"></span>
+              </div>
+            </div>
+
+            <div class="cs-form-footer">
+              <p class="cs-required-note">Os campos marcados com <span class="req">*</span> são obrigatórios.</p>
+              <button type="submit" class="btn btn-primary btn-lg cs-submit" id="submitButton">
+                <span class="cs-submit-label">Enviar solicitação</span>
+                <span class="cs-submit-spinner" aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="cs-footer">
+    <div class="container cs-footer-in">
+      <p>© <span data-year></span> Cia do Corpo. Solicitações enviadas por esta central são analisadas pela nossa equipe de atendimento.</p>
+    </div>
+  </footer>
+
+  <div class="cs-toasts" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+  <script src="assets/js/config.js?v=20260825"></script>
+  <script src="assets/js/data-service.js?v=20260825"></script>
+  <script src="assets/js/telemetry.js?v=20260826"></script>
+  <script src="app.js"></script>
+</body>
+</html>
