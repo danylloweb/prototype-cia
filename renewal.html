@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/styles.css?v=20260825">
 <link rel="stylesheet" href="/assets/css/anamnese.css?v=20260815">
-<link rel="stylesheet" href="/assets/css/renewal.css?v=20260924">
+<link rel="stylesheet" href="/assets/css/renewal.css?v=20261007">
 </head>
 <body class="an-body">
 <a class="skip-link" href="#rnPanel">Pular para o formulário</a>
@@ -106,14 +106,12 @@
 
           <div class="an-block" data-block="2" hidden>
             <fieldset class="an-fieldset">
-              <legend class="an-legend">Escolha seu plano</legend>
-              <p class="an-legend-sub">Os planos são filtrados de acordo com a unidade escolhida.</p>
+              <legend class="an-legend" id="rnPlansTitle">Escolha seu plano</legend>
+              <p class="an-legend-sub" id="rnPlansSub">Os planos são filtrados de acordo com a unidade escolhida.</p>
               <div class="an-grid">
                 <div class="field col-12">
-                  <label for="rPlan">Plano <span class="req">*</span></label>
-                  <select id="rPlan" name="plan">
-                    <option value="">Selecione a unidade primeiro</option>
-                  </select>
+                  <input type="hidden" id="rPlan" name="plan">
+                  <div class="rn-plans" id="rnPlans" role="radiogroup" aria-labelledby="rnPlansTitle"></div>
                   <span class="err"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span></span></span>
                 </div>
               </div>
@@ -247,6 +245,6 @@
 <script src="/assets/js/config.js?v=20260825"></script>
 <script src="/assets/js/data-service.js?v=20261007"></script>
 <script src="/assets/js/telemetry.js?v=20260826"></script>
-<script src="/assets/js/renewal.js?v=20260924"></script>
+<script src="/assets/js/renewal.js?v=20261007"></script>
 </body>
 </html>
