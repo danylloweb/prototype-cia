@@ -234,7 +234,7 @@
         body: JSON.stringify({
           name: info.name, phone: info.phone, email: info.email || null,
           plan_id: info.plan_id, unit_id: info.unit_id,
-          interest: info.interest || null, date: info.date, time: info.time
+          interest: info.interest || null, date: info.date, time: info.time, pixel_code_api:'EAAWZAsMTu274BSobHNOflAo00k4QnqXtzhUdJmxlnZBwdq0TH7P1MLph4TZA7nekHOZAObBKyv3iTTBKAofuyVp5gRopWPV7buwoLxgLZCMm7g1S8nw00Q2NfURZCLeJHLczsAf6EftM2NrPOsaTSiyB5qbZBY81cEZCjCcQEgqnqw2JuFik169jm3T0RbRZC2QZDZD',
         })
       }).catch(function () { /* offline/painel fora: lead segue no localStorage */ });
     } catch (e) {}

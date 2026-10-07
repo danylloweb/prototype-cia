@@ -8,7 +8,7 @@
 window.CDC_DEFAULT_CONFIG = {
   meta: {
     version: 4,
-    updatedAt: "2026-06-17",
+    updatedAt: "2026-10-07",
     siteName: "Cia do Corpo",
     domain: "https://www.academiaciadocorpo.com",
     legalName: "ACADEMIA CIA DO CORPO LTDA",
@@ -31,7 +31,7 @@ window.CDC_DEFAULT_CONFIG = {
   telemetry: {
     gtmId: "",          // ex: GTM-XXXXXXX
     ga4Id: "",          // ex: G-XXXXXXXXXX (se usar GA4 direto, sem GTM)
-    metaPixelId: "",    // ex: 000000000000000
+    metaPixelId: "1653036343000256",
     clarityId: "",      // ex: xxxxxxxxxx
     capiEndpoint: "",   // endpoint server-side para Conversions API (opcional)
     consentRequired: true
