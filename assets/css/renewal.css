@@ -68,3 +68,11 @@
   .rn-plans.is-offer.is-3 .rn-plan.featured:hover { transform: none; }
   .rn-plan .plan-price { font-size: 1.7rem; }
 }
+
+/* ---------- Assinatura ----------
+   O anamnese.css só estiliza #anSignature. Sem largura em CSS, o canvas da
+   renovação ficava com a largura do atributo, que o fit() multiplica pelo
+   devicePixelRatio: no celular ele dobrava de largura e estourava a tela. */
+#rnSignature { display: block; width: 100%; height: 210px; touch-action: none; cursor: crosshair; }
+@media (max-width: 560px) { #rnSignature { height: 170px; } }
+#rnForm .an-fieldset { min-width: 0; }
