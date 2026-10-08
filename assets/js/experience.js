@@ -23,7 +23,7 @@
     return (cfg.meta && cfg.meta.saleWhatsapp) || "";
   }
   function waHref(unit, text) {
-    unit = unit || myUnit();
+    // unit = unit || myUnit();
     return "https://wa.me/" + saleWhatsapp() + (text ? "?text=" + encodeURIComponent(text) : "");
   }
 
