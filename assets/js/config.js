@@ -122,7 +122,7 @@ window.CDC_DEFAULT_CONFIG = {
       id: "agua-fria", name: "Água Fria", tier: "exclusive", active: true,
       city: "Recife", neighborhood: "Beberibe",
       address: "Av. Beberibe, 2600 - Beberibe, Recife - PE, 52130-035",
-      phone: "(81) 98943-2074", whatsapp: "5581989432074",
+      phone: "(81) 98235-3800", whatsapp: "5581982353800",
       group: 2, priceFrom: "12x de R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
       neighborhoodsServed: ["Água Fria", "Beberibe", "Fundão", "Cajueiro"],
       maps: "https://maps.app.goo.gl/67mnmfj3dFcoeNuq6", lat: -8.0086, lng: -34.8919,
@@ -139,7 +139,7 @@ window.CDC_DEFAULT_CONFIG = {
       image: "https://static.wixstatic.com/media/837beb_2c803543c9ed44bca7967e30d6a6b7e4~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/BOMBA.png"
     },
     {
-      id: "areias", name: "Areias", tier: "standard", active: true,
+      id: "areias", name: "Areias", tier: "exclusive", active: true,
       city: "Recife", neighborhood: "Areias - Estância",
       address: "R. Tucunaré, 55 - Areias, Recife - PE, 50771-510",
       phone: "(81) 98734-8391", whatsapp: "5581987348391",
@@ -303,7 +303,7 @@ window.CDC_DEFAULT_CONFIG.plans = (function () {
       "avenida-norte":      grp("Premium Standard", PREMIUM_INC, PREMIUM),
       "ouro-preto":         grp("Premium Standard", PREMIUM_INC, PREMIUM),
       "peixinhos":          grp("Premium Standard", PREMIUM_INC, PREMIUM),
-      "areias":             grp("Premium Standard", PREMIUM_INC, PREMIUM),
+      "areias":             grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
       "afogados":           grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
       "agua-fria":          grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
       "bomba-do-hemeterio": grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE)
