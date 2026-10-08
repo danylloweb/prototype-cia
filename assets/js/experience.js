@@ -500,7 +500,7 @@
           }).catch(function () { /* painel fora: fica no localStorage */ });
         } catch (e) {}
       })();
-      var central = (cfg.meta && cfg.meta.partnerCentralWhatsapp) || "";
+      var central = (cfg.meta && (cfg.meta.saleWhatsapp || cfg.meta.partnerCentralWhatsapp)) || "";
       var lines = ["*QUERO SER PARTE DO CLUBE DA PARCERIA*", "",
         "*Empresa:* " + data.empresa, "*Responsável:* " + data.nome, "*Categoria:* " + data.categoria,
         "*WhatsApp:* " + data.telefone, (data.instagram ? "*Instagram:* " + data.instagram : ""),
