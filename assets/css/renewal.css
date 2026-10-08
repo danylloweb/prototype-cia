@@ -13,3 +13,66 @@
   margin-top: 8px;
 }
 
+
+/* ---------- Cards de plano (oferta de renovação) ---------- */
+.rn-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 6px;
+}
+.rn-plans.is-offer.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 14px; }
+.rn-plans.is-offer.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rn-plans.is-offer.is-1 { grid-template-columns: minmax(0, 360px); justify-content: center; }
+
+.rn-plan {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 24px 20px 20px;
+  cursor: pointer;
+  font: inherit;
+  outline: none;
+}
+.rn-plan h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.rn-plan.featured h3 { padding-right: 0; margin-top: 26px; }
+.rn-plan .ribbon { top: 14px; right: 14px; }
+.rn-plan .plan-price { font-size: 1.9rem; line-height: 1.1; }
+.rn-plan .plan-badges { margin-top: 12px; }
+.rn-plan ul { margin: 16px 0 18px; gap: 9px; }
+.rn-plan li { font-size: .88rem; }
+.rn-plan:focus-visible { box-shadow: 0 0 0 3px var(--brand-glow); }
+
+/* Destaque: fica mais alto que os vizinhos no desktop */
+.rn-plans.is-offer.is-3 .rn-plan.featured { transform: translateY(-14px); }
+.rn-plans.is-offer.is-3 .rn-plan.featured:hover { transform: translateY(-18px); }
+
+/* Selecionado */
+.rn-plan.is-selected { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand), var(--shadow); }
+.rn-plan-cta { pointer-events: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.rn-plan-cta svg { width: 16px; height: 16px; }
+.rn-plan .rn-cta-on { display: none; align-items: center; gap: 8px; }
+.rn-plan.is-selected .rn-cta-idle { display: none; }
+.rn-plan.is-selected .rn-cta-on { display: inline-flex; }
+.rn-plan.is-selected:not(.featured) .rn-plan-cta { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+.field.has-error .rn-plans .rn-plan:not(.featured) { border-color: #e5484d; }
+
+@media (max-width: 760px) {
+  .rn-plans.is-offer.is-3,
+  .rn-plans.is-offer.is-2 { grid-template-columns: 1fr; padding-top: 0; }
+  /* No celular o destaque vem primeiro */
+  .rn-plans.is-offer .rn-plan.featured { order: -1; }
+  .rn-plans.is-offer.is-3 .rn-plan.featured,
+  .rn-plans.is-offer.is-3 .rn-plan.featured:hover { transform: none; }
+  .rn-plan .plan-price { font-size: 1.7rem; }
+}
+
+/* ---------- Assinatura ----------
+   O anamnese.css só estiliza #anSignature. Sem largura em CSS, o canvas da
+   renovação ficava com a largura do atributo, que o fit() multiplica pelo
+   devicePixelRatio: no celular ele dobrava de largura e estourava a tela. */
+#rnSignature { display: block; width: 100%; height: 210px; touch-action: none; cursor: crosshair; }
+@media (max-width: 560px) { #rnSignature { height: 170px; } }
+#rnForm .an-fieldset { min-width: 0; }
