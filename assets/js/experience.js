@@ -18,9 +18,13 @@
     if (T) T.event("unit_selected", { unit: id });
     applyUnit(); renderChips();
   }
+  function saleWhatsapp() {
+    var cfg = DATA.get();
+    return (cfg.meta && cfg.meta.saleWhatsapp) || "";
+  }
   function waHref(unit, text) {
     unit = unit || myUnit();
-    return "https://wa.me/" + (unit ? unit.whatsapp : "") + (text ? "?text=" + encodeURIComponent(text) : "");
+    return "https://wa.me/" + saleWhatsapp() + (text ? "?text=" + encodeURIComponent(text) : "");
   }
 
   /* Reaponta todos os CTAs padrão para a unidade escolhida */
@@ -332,7 +336,7 @@
         lines.push("", "Pode me ajudar a agendar?");
         var msg = encodeURIComponent(lines.join("\n"));
         if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select", tipo_lead: "aluno" });
-        w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
+        w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
         close();
       };
     }
@@ -440,7 +444,7 @@
           );
           var msg = encodeURIComponent(lines.join("\n"));
           if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz", tipo_lead: "aluno" });
-          w.open("https://wa.me/" + (un ? un.whatsapp : "") + "?text=" + msg, "_blank");
+          w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
           close();
         };
       }
@@ -500,7 +504,7 @@
           }).catch(function () { /* painel fora: fica no localStorage */ });
         } catch (e) {}
       })();
-      var central = (cfg.meta && (cfg.meta.saleWhatsapp || cfg.meta.partnerCentralWhatsapp)) || "";
+      var central = (cfg.meta && cfg.meta.saleWhatsapp) || "";
       var lines = ["*QUERO SER PARTE DO CLUBE DA PARCERIA*", "",
         "*Empresa:* " + data.empresa, "*Responsável:* " + data.nome, "*Categoria:* " + data.categoria,
         "*WhatsApp:* " + data.telefone, (data.instagram ? "*Instagram:* " + data.instagram : ""),
