@@ -15,7 +15,7 @@ window.CDC_DEFAULT_CONFIG = {
     cnpj: "19.248.919/0001-27",
     email: "academiaciadocorpo2@gmail.com",
     partnerCentralWhatsapp: "558186049894", // central que recebe "Quero ser parceiro"
-    saleWhatsapp: "5581982564409", // central que recebe "Quero ser parceiro"
+    saleWhatsapp: "5581987552089", // central que recebe "Quero ser parceiro"
     instagram: "https://www.instagram.com/academiaciadocorpo/",
     facebook: "https://www.facebook.com/ciadocorpope",
     yearsActive: 13,
