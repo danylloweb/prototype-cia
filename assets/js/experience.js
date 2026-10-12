@@ -219,6 +219,26 @@
     })[0];
     return (match && match.id != null) ? match.id : null;
   }
+  function showLeadSuccess(url) {
+    if (!url) return;
+    var existing = d.querySelector('.cdc-sheet[data-sheet="lead-success"]');
+    if (existing) existing.remove();
+    var sheet = h('<div class="cdc-sheet" data-sheet="lead-success"><div class="cdc-sheet-card" style="text-align:center"><div style="font-size:3rem;margin-bottom:6px">🎉</div>' +
+      '<h3>Agendamento realizado com sucesso! 🎉</h3>' +
+      '<p>Agora só falta um passo: preencha nosso formulário rapidinho para que possamos conhecer melhor você e tornar sua aula experimental ainda mais especial.</p>' +
+      '<p>É rápido e fácil! Estamos ansiosos para receber você! 🧡</p>' +
+    '</div></div>');
+    d.body.appendChild(sheet); requestAnimationFrame(function () { sheet.classList.add("show"); });
+    var close = bindModalA11y(sheet, function () {
+      sheet.classList.remove("show");
+      setTimeout(function () { if (sheet.parentNode) sheet.remove(); }, 250);
+    }, "Agendamento realizado com sucesso");
+    setTimeout(function () {
+      if (!sheet.parentNode) return;
+      close();
+      w.location.href = url;
+    }, 2400);
+  }
   function submitLead(info) {
     try {
       var arr = JSON.parse(localStorage.getItem("cdc_leads") || "[]");
@@ -229,9 +249,8 @@
     if (T) T.event("lead_submit", { unit: info.unit_slug || "", plano: info.plan_key || "", tipo_lead: "aluno" });
     var meta = DATA.get().meta || {};
     var base = String(meta.apiBase || "").replace(/\/+$/, "");
-    if (!base || !meta.landingToken || !w.fetch) return;
-    try {
-      fetch(base + "/landing/register-trial", {
+    if (!base || !meta.landingToken || !w.fetch) return Promise.resolve(false);
+    return fetch(base + "/landing/register-trial", {
         method: "POST",
         keepalive: true,
         headers: { "Content-Type": "application/json", "X-Landing-Token": meta.landingToken },
@@ -240,8 +259,19 @@
           plan_id: info.plan_id, unit_id: info.unit_id,
           interest: info.interest || null, date: info.date, time: info.time, pixel_code_api:'EAAWZAsMTu274BSobHNOflAo00k4QnqXtzhUdJmxlnZBwdq0TH7P1MLph4TZA7nekHOZAObBKyv3iTTBKAofuyVp5gRopWPV7buwoLxgLZCMm7g1S8nw00Q2NfURZCLeJHLczsAf6EftM2NrPOsaTSiyB5qbZBY81cEZCjCcQEgqnqw2JuFik169jm3T0RbRZC2QZDZD',
         })
-      }).catch(function () { /* offline/painel fora: lead segue no localStorage */ });
-    } catch (e) {}
+      }).then(function (resp) {
+        if (!resp || !resp.ok) return false;
+        return resp.json().then(function (payload) {
+          var url = payload && payload.error === false && payload.data && payload.data.url;
+          if (url) {
+            showLeadSuccess(url);
+            return true;
+          }
+          return false;
+        });
+      }).catch(function () {
+        return false;
+      });
   }
 
   function openQuiz(opts) {
@@ -321,23 +351,25 @@
           unit_slug: un ? un.id : "", plan_key: preKey,
           interest: "Site — plano escolhido: " + planName + "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
           date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
+        }).then(function (sent) {
+          if (sent) { close(); return; }
+          var feats = (it && it.features) || [];
+          var lines = [
+            "Olá! Sou " + lead.name + " — escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
+            "",
+            "*Plano selecionado:* " + planName,
+            "*Condição (a partir de):* " + (priceText(it) || "a confirmar no atendimento"),
+            "*Unidade:* " + (un ? un.name : "-"),
+            "*Melhor dia:* " + diaLabel,
+            "*Período:* " + perLabel
+          ];
+          if (feats.length) lines.push("*Inclui:* " + feats.join(" · "));
+          lines.push("", "Pode me ajudar a agendar?");
+          var msg = encodeURIComponent(lines.join("\n"));
+          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select", tipo_lead: "aluno" });
+          w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
+          close();
         });
-        var feats = (it && it.features) || [];
-        var lines = [
-          "Olá! Sou " + lead.name + " — escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
-          "",
-          "*Plano selecionado:* " + planName,
-          "*Condição (a partir de):* " + (priceText(it) || "a confirmar no atendimento"),
-          "*Unidade:* " + (un ? un.name : "-"),
-          "*Melhor dia:* " + diaLabel,
-          "*Período:* " + perLabel
-        ];
-        if (feats.length) lines.push("*Inclui:* " + feats.join(" · "));
-        lines.push("", "Pode me ajudar a agendar?");
-        var msg = encodeURIComponent(lines.join("\n"));
-        if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select", tipo_lead: "aluno" });
-        w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
-        close();
       };
     }
     function render() {
@@ -424,28 +456,30 @@
               "; interesse: " + (ans.modalidade_label || "-") + "; plano: " + planoNome +
               "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
             date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
+          }).then(function (sent) {
+            if (sent) { close(); return; }
+            var lines = [
+              "Olá! Sou " + lead.name + " — montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
+              "",
+              "*Objetivo:* " + (ans.objetivo_label || "-"),
+              "*Momento:* " + (ans.momento_label || "-")
+            ];
+            if (ans.origem_label) lines.push("*Já treinou:* " + ans.origem_label);
+            lines.push(
+              "*Interesse:* " + (ans.modalidade_label || "-"),
+              "*Plano recomendado:* " + planoNome,
+              "*Condição (a partir de):* " + priceFor(un),
+              "*Unidade:* " + (un ? un.name : "-"),
+              "*Melhor dia:* " + diaLabel,
+              "*Período:* " + perLabel,
+              "",
+              "Pode me ajudar a agendar?"
+            );
+            var msg = encodeURIComponent(lines.join("\n"));
+            if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz", tipo_lead: "aluno" });
+            w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
+            close();
           });
-          var lines = [
-            "Olá! Sou " + lead.name + " — montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
-            "",
-            "*Objetivo:* " + (ans.objetivo_label || "-"),
-            "*Momento:* " + (ans.momento_label || "-")
-          ];
-          if (ans.origem_label) lines.push("*Já treinou:* " + ans.origem_label);
-          lines.push(
-            "*Interesse:* " + (ans.modalidade_label || "-"),
-            "*Plano recomendado:* " + planoNome,
-            "*Condição (a partir de):* " + priceFor(un),
-            "*Unidade:* " + (un ? un.name : "-"),
-            "*Melhor dia:* " + diaLabel,
-            "*Período:* " + perLabel,
-            "",
-            "Pode me ajudar a agendar?"
-          );
-          var msg = encodeURIComponent(lines.join("\n"));
-          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz", tipo_lead: "aluno" });
-          w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
-          close();
         };
       }
     }
