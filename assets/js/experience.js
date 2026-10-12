@@ -219,6 +219,27 @@
     })[0];
     return (match && match.id != null) ? match.id : null;
   }
+  function ensureLeadMotionStyles() {
+    if (d.getElementById("cdc-lead-motion-style")) return;
+    var style = d.createElement("style");
+    style.id = "cdc-lead-motion-style";
+    style.textContent = "@keyframes cdcLeadSpin{to{transform:rotate(360deg)}}@keyframes cdcLeadPulse{0%,100%{opacity:.55}50%{opacity:1}}.cdc-lead-spinner{width:44px;height:44px;margin:0 auto 16px;border:4px solid rgba(255,255,255,.18);border-top-color:var(--brand,#ff5a00);border-radius:50%;animation:cdcLeadSpin .8s linear infinite}.cdc-lead-loading-text{animation:cdcLeadPulse 1.2s ease-in-out infinite}";
+    d.head.appendChild(style);
+  }
+  function showLeadLoading() {
+    ensureLeadMotionStyles();
+    var existing = d.querySelector('.cdc-sheet[data-sheet="lead-loading"]');
+    if (existing) existing.remove();
+    var sheet = h('<div class="cdc-sheet" data-sheet="lead-loading"><div class="cdc-sheet-card" style="text-align:center"><div class="cdc-lead-spinner" aria-hidden="true"></div><h3 class="cdc-lead-loading-text">Enviando seus dados...</h3><p>Aguarde só um instante.</p></div></div>');
+    d.body.appendChild(sheet); requestAnimationFrame(function () { sheet.classList.add("show"); });
+    return {
+      close: function () {
+        if (!sheet.parentNode) return;
+        sheet.classList.remove("show");
+        setTimeout(function () { if (sheet.parentNode) sheet.remove(); }, 250);
+      }
+    };
+  }
   function showLeadSuccess(url) {
     if (!url) return;
     var existing = d.querySelector('.cdc-sheet[data-sheet="lead-success"]');
@@ -250,6 +271,7 @@
     var meta = DATA.get().meta || {};
     var base = String(meta.apiBase || "").replace(/\/+$/, "");
     if (!base || !meta.landingToken || !w.fetch) return Promise.resolve(false);
+    var loading = showLeadLoading();
     return fetch(base + "/landing/register-trial", {
         method: "POST",
         keepalive: true,
@@ -264,6 +286,7 @@
         return resp.json().then(function (payload) {
           var url = payload && payload.error === false && payload.data && payload.data.url;
           if (url) {
+            loading.close();
             showLeadSuccess(url);
             return true;
           }
@@ -271,6 +294,9 @@
         });
       }).catch(function () {
         return false;
+      }).then(function (ok) {
+        if (!ok) loading.close();
+        return ok;
       });
   }
 
