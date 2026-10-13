@@ -177,6 +177,33 @@
     if (!wa) return "";
     return "https://wa.me/" + wa + "?text=" + encodeURIComponent(buildWhatsappMessage(lead));
   }
+  function ensureRedirectModalStyles() {
+    if (byId("anRedirectModalStyle")) return;
+    var style = d.createElement("style");
+    style.id = "anRedirectModalStyle";
+    style.textContent = ".an-redirect-modal{position:fixed;inset:0;z-index:400;display:grid;place-items:center;background:rgba(0,0,0,.52);padding:20px}.an-redirect-modal-card{width:min(560px,100%);background:#fff;border-radius:18px;padding:24px 22px;text-align:center;box-shadow:0 28px 70px rgba(0,0,0,.28)}.an-redirect-modal-card h3{margin:0 0 10px;font-size:1.35rem}.an-redirect-modal-card p{margin:0;color:#5a5a67}.an-redirect-modal-card .an-spin{margin:14px auto 0;width:20px;height:20px}";
+    d.head.appendChild(style);
+  }
+  function showRedirectSuccessModal() {
+    ensureRedirectModalStyles();
+    var existing = byId("anRedirectModal");
+    if (existing) existing.remove();
+    var modal = d.createElement("div");
+    modal.id = "anRedirectModal";
+    modal.className = "an-redirect-modal";
+    modal.innerHTML = '<div class="an-redirect-modal-card">' +
+      '<h3>Agendamento realizado com sucesso! 🎉</h3>' +
+      '<p>Estamos te redirecionando para o WhatsApp...</p>' +
+      '<span class="an-spin" aria-hidden="true"></span>' +
+    '</div>';
+    d.body.appendChild(modal);
+    return new Promise(function (resolve) {
+      w.setTimeout(function () {
+        if (modal.parentNode) modal.parentNode.removeChild(modal);
+        resolve();
+      }, 2000);
+    });
+  }
 
   function apiUrl() {
     return state.apiBase + "/" + encodeURIComponent(state.code);
@@ -1053,7 +1080,9 @@
       var done = byId("anDoneLink");
       if (done && waHref) done.href = waHref;
       if (waHref) {
-        w.location.href = waHref;
+        showRedirectSuccessModal().then(function () {
+          w.location.href = waHref;
+        });
         return;
       }
       showScreen("stDone");
