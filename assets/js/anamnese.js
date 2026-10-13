@@ -63,6 +63,122 @@
     var wa = cfg && cfg.meta ? digits(cfg.meta.partnerCentralWhatsapp) : "";
     return wa ? ("https://wa.me/" + wa + "?text=" + encodeURIComponent("Olá! Preciso de ajuda com a minha ficha de anamnese.")) : "contato.html";
   }
+  function saleWhatsapp() {
+    var cfg = config();
+    return cfg && cfg.meta ? digits(cfg.meta.saleWhatsapp) : "";
+  }
+
+  function norm(v) {
+    var s = String(v == null ? "" : v).toLowerCase();
+    if (s.normalize) s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return s.replace(/\s+/g, " ").trim();
+  }
+
+  function parseLeadSummary(interest) {
+    var src = String(interest || "");
+    function pick(re) {
+      var m = src.match(re);
+      return m && m[1] ? trim(m[1]) : "";
+    }
+    var plan = pick(/(?:plano selecionado|plano escolhido|plano)\s*:\s*([^;]+)/i);
+    var unit = pick(/unidade\s*:\s*([^;]+)/i);
+    var dayRaw = pick(/dia\s*:\s*([^;]+)/i);
+    var day = dayRaw;
+    var period = "";
+    if (dayRaw) {
+      var parts = dayRaw.split(/\s*,\s*/);
+      day = trim(parts.shift() || "");
+      period = trim(parts.join(", "));
+    }
+    return { plan: plan, unit: unit, day: day, period: period };
+  }
+
+  function unitByLead(lead, parsed) {
+    var cfg = config();
+    var units = cfg && Array.isArray(cfg.units) ? cfg.units : [];
+    var leadUnitId = lead && lead.unit_id != null ? String(lead.unit_id) : "";
+    var byId = leadUnitId ? units.filter(function (u) {
+      return String(u.dbId) === leadUnitId || String(u.unit_id) === leadUnitId || String(u.id) === leadUnitId;
+    })[0] : null;
+    if (byId) return byId;
+    var want = norm(parsed && parsed.unit);
+    if (!want) return null;
+    return units.filter(function (u) { return norm(u.name) === want || norm(u.id) === want; })[0] || null;
+  }
+
+  function planKeyFromName(name) {
+    var s = norm(name);
+    if (!s) return "";
+    if (s.indexOf("basic") !== -1) return "basic";
+    if (s.indexOf("vip") !== -1) return "vip";
+    if (s.indexOf("mensal") !== -1) return "mensal";
+    return "";
+  }
+
+  function planDetailsFor(lead, parsed, unit) {
+    var cfg = config() || {};
+    var byUnit = cfg.plans && cfg.plans.byUnit ? cfg.plans.byUnit : null;
+    var rows = Array.isArray(cfg.planRows) ? cfg.planRows : [];
+    var plan = parsed && parsed.plan ? parsed.plan : "";
+    var key = planKeyFromName(plan);
+    var planId = lead && lead.plan_id != null ? String(lead.plan_id) : "";
+
+    if (!key && planId && rows.length) {
+      var row = rows.filter(function (r) { return String(r && r.id) === planId; })[0];
+      if (row) key = String(row.key || row.planKey || row.plan || "").toLowerCase();
+    }
+
+    var unitId = unit && unit.id ? String(unit.id) : "";
+    var group = unit && byUnit && byUnit[unitId];
+    var items = group && Array.isArray(group.items) ? group.items : [];
+    var item = null;
+    if (items.length) {
+      if (key) item = items.filter(function (it) { return it.key === key; })[0] || null;
+      if (!item && plan) item = items.filter(function (it) { return norm(it.name) === norm(plan); })[0] || null;
+      if (!item && planId && rows.length) {
+        var matched = rows.filter(function (r) { return String(r && r.id) === planId; })[0];
+        if (matched && matched.recurring === true) item = items.filter(function (it) { return it.key === "basic"; })[0] || null;
+        else if (matched) item = items.filter(function (it) { return it.featured; })[0] || null;
+      }
+    }
+
+    if (!plan && item && item.name) plan = item.name;
+    var condition = "";
+    if (item) condition = (item.price || "") + (item.unit || "") + (item.note ? (" " + item.note) : "");
+    if (!condition && unit && unit.priceFrom) {
+      condition = unit.priceFrom + (unit.matricula ? (" + matrícula " + unit.matricula) : "");
+    }
+    return { plan: plan || "", condition: trim(condition) || "a confirmar no atendimento" };
+  }
+
+  function buildWhatsappMessage(lead) {
+    var parsed = parseLeadSummary(lead && lead.interest);
+    var unit = unitByLead(lead, parsed);
+    var plan = planDetailsFor(lead, parsed, unit);
+    var unitName = parsed.unit || (unit && unit.name) || "-";
+    var day = parsed.day || "-";
+    var period = parsed.period || "-";
+
+    return [
+      "Esta tudo pronto agora! 🎉",
+      "",
+      "Seu plano foi selecionado com sucesso! Agora, vamos continuar pelo WhatsApp para que nossa equipe possa tirar suas dúvidas e ajudar você a dar o próximo passo rumo aos seus objetivos. 💪",
+      "",
+      "Confira os detalhes da sua escolha:",
+      "",
+      "Plano selecionado: " + (plan.plan || "-"),
+      "Condição (a partir de): " + (plan.condition || "a confirmar no atendimento"),
+      "Unidade: " + unitName,
+      "Melhor dia: " + day,
+      "Período: " + period
+    ].join("\n");
+  }
+
+  function whatsappLeadHref(lead) {
+    var wa = saleWhatsapp();
+    if (!wa) return "";
+    return "https://wa.me/" + wa + "?text=" + encodeURIComponent(buildWhatsappMessage(lead));
+  }
 
   function apiUrl() {
     return state.apiBase + "/" + encodeURIComponent(state.code);
@@ -931,9 +1047,17 @@
       }
       state.submitted = true;
       state.dirty = false;
+      if (res.json && res.json.data && res.json.data.lead) state.lead = res.json.data.lead;
       /* Ficha concluida = CompleteRegistration no Pixel da Meta. */
       if (w.CDC && w.CDC.track) w.CDC.track.event("anamnese_submit", { location_page: "anamnese" });
       dropDraft();
+      var waHref = whatsappLeadHref(state.lead);
+      var done = byId("anDoneLink");
+      if (done && waHref) done.href = waHref;
+      if (waHref) {
+        w.location.href = waHref;
+        return;
+      }
       showScreen("stDone");
       w.scrollTo({ top: 0, behavior: "smooth" });
     }).catch(function (err) {
@@ -1096,6 +1220,9 @@
       var el = byId(id);
       if (el) el.href = href;
     });
+
+    var done = byId("anDoneLink");
+    if (done) done.href = href;
 
     all("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
   }
