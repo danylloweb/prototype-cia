@@ -160,9 +160,7 @@
     var period = parsed.period || "-";
 
     return [
-      "Esta tudo pronto agora! 🎉",
-      "",
-      "Seu plano foi selecionado com sucesso! Agora, vamos continuar pelo WhatsApp para que nossa equipe possa tirar suas dúvidas e ajudar você a dar o próximo passo rumo aos seus objetivos. 💪",
+      "Olá! Sou " + lead.name + " — escolhi meu plano no site da Cia do Corpo e já agendei meus 3 dias grátis.",
       "",
       "Confira os detalhes da sua escolha:",
       "",
