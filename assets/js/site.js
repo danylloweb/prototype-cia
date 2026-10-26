@@ -262,20 +262,23 @@
   function renderPlans() {
     var host = d.querySelector('[data-cdc="plans-grid"]');
     if (!host) return;
+    host.textContent = "Carregando planos...";
+    DATA.refreshExamplePlans().then(function () {
+      renderPlansFromConfig(host);
+    }).catch(function (error) {
+      console.error("Não foi possível carregar os planos do config-exemplo.json.", error);
+      host.textContent = "Não foi possível carregar os planos. Tente novamente mais tarde.";
+    });
+  }
+  function renderPlansFromConfig(host) {
     var cfg = DATA.get();
     var plansCfg = cfg.plans || {};
     var byUnit = plansCfg.byUnit || {};
     var units = DATA.activeUnits().filter(function (u) { return byUnit[u.id]; });
-    // Fallback: uma config salva no localStorage de versão antiga (ex.: ids de unidade
-    // diferentes) deixaria a seção de planos vazia. Nesse caso, renderiza a partir do
-    // seed (config.js) para a seção nunca sumir.
-    if (!units.length && DATA.seed) {
-      var seed = DATA.seed();
-      plansCfg = (seed && seed.plans) || {};
-      byUnit = plansCfg.byUnit || {};
-      units = ((seed && seed.units) || []).filter(function (u) { return u.active !== false && byUnit[u.id]; });
+    if (!units.length) {
+      host.textContent = "Não há planos disponíveis para as unidades ativas.";
+      return;
     }
-    if (!units.length) return;
     var selWrap = d.querySelector('[data-cdc="plan-unit-select"]');
     var titleEl = d.querySelector('[data-cdc="plan-unit-title"]');
     var incEl = d.querySelector('[data-cdc="plan-unit-included"]');

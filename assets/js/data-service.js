@@ -1,7 +1,8 @@
 /* ============================================================
    CIA DO CORPO — Data Service (client-side)
    Resolve a configuração ativa e persiste edições do admin.
-   Hierarquia: localStorage (edições do admin) > backend (S3) > seed (config.js).
+   Hierarquia geral: localStorage (edições do admin) > backend (S3) > seed (config.js).
+   Exceção: `plans` sempre vem de docs/config-exemplo.json.
    O backend publica em REMOTE_URL um JSON no formato { bundle: {...} };
    as seções presentes no bundle sobrepõem a seed e as ausentes caem
    no fallback da seed.
@@ -15,6 +16,9 @@
      mesmo conteúdo com CORS liberado — usado quando o S3 falha. */
   var REMOTE_FALLBACK_URL = w.CDC_REMOTE_CONFIG_FALLBACK || "https://portalcia.impactadigital.net/public-config";
   var REMOTE_KEY = "cdc_remote_config_v2"; // v2: descarta overlay de planos salvo com a regra antiga
+  var EXAMPLE_CONFIG_URL = "/docs/config-exemplo.json";
+  var examplePlans = null;
+  var examplePlansRequest = null;
 
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
 
@@ -158,7 +162,31 @@
         var saved = localStorage.getItem(LS_KEY);
         if (saved) cfg = deepMerge(cfg, JSON.parse(saved));
       } catch (e) { /* ignore */ }
+      if (examplePlans) cfg.plans = deepClone(examplePlans);
       return cfg;
+    },
+
+    /* Os cards de planos sempre usam a seção plans do config de exemplo. */
+    refreshExamplePlans: function () {
+      if (examplePlans) return Promise.resolve(deepClone(examplePlans));
+      if (examplePlansRequest) return examplePlansRequest;
+      if (!w.fetch) return Promise.reject(new Error("Fetch indisponível para carregar os planos."));
+      examplePlansRequest = fetch(EXAMPLE_CONFIG_URL, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("Não foi possível carregar os planos (HTTP " + r.status + ").");
+        return r.json();
+      }).then(function (raw) {
+        var plans = raw && raw.bundle && raw.bundle.plans;
+        if (!plans || !plans.byUnit || typeof plans.byUnit !== "object") {
+          throw new Error("A seção bundle.plans.byUnit está ausente em docs/config-exemplo.json.");
+        }
+        examplePlans = deepClone(plans);
+        w.dispatchEvent(new CustomEvent("cdc:example-plans-updated"));
+        return deepClone(examplePlans);
+      }).catch(function (error) {
+        examplePlansRequest = null;
+        throw error;
+      });
+      return examplePlansRequest;
     },
 
     /* Busca a configuração publicada pelo backend e atualiza o cache local.

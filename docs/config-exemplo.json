@@ -761,21 +761,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 160,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a TODAS as 7 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -841,21 +852,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 160,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a TODAS as 7 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -921,21 +943,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 160,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a TODAS as 7 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -1001,21 +1034,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 160,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a TODAS as 7 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -1076,21 +1120,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 150,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a 4 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -1151,21 +1206,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 150,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a 4 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]
@@ -1226,21 +1292,32 @@
               ]
             },
             {
-              "key": "mensal",
-              "name": "Mensal",
-              "desc": "Máxima flexibilidade",
-              "price": "R$ 150,00",
-              "unit": "/mês",
-              "old": "",
+              "key": "anual-plus",
+              "name": "Anual VIP +",
+              "desc": "Plano anual com melhor custo-benefício",
+              "price": "12x de R$ 129,99",
+              "unit": "",
+              "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Mensal",
-              "badges": [],
+              "cta": "Quero o Anual VIP +",
+              "badges": [
+                {
+                  "t": "Compromete limite do cartão",
+                  "c": "amber"
+                },
+                {
+                  "t": "120 dias de carência",
+                  "c": "blue"
+                }
+              ],
               "features": [
                 "Musculação livre",
                 "Aulas coletivas",
                 "Artes marciais",
-                "Acesso a 4 unidades"
+                "Acesso a 4 unidades",
+                "Cadeira de massagem",
+                "Benefício de convidar um amigo por semana:"
               ]
             }
           ]

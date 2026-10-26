@@ -33,6 +33,9 @@ navegador bloqueia o fetch e nada do painel chega aos visitantes:
   publicar a lista completa de cada seção.
 - Ordem de prioridade no site: edições locais do admin-protótipo (só no
   navegador de quem editou) > `config.json` (S3) > seed.
+- Exceção: os cards da seção de planos sempre carregam `bundle.plans` de
+  [`config-exemplo.json`](config-exemplo.json), ignorando planos vindos do
+  cache local, do `config.json` publicado e da seed.
 - `meta.version` deve ser incrementado a cada publicação (o site usa para
   controle de atualização/cache).
 
