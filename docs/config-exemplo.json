@@ -242,7 +242,7 @@
       {
         "id": "areias",
         "name": "Areias",
-        "tier": "standard",
+        "tier": "exclusive",
         "active": true,
         "city": "Recife",
         "neighborhood": "Areias - Estância",
