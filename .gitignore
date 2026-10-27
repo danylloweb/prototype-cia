@@ -14,3 +14,5 @@ __t.tmp
 
 # Config local do Claude Code (ambiente de desenvolvimento)
 .claude/
+config.bat
+node_modules
