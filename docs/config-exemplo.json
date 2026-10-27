@@ -696,12 +696,12 @@
     ],
     "plans": {
       "groupsOrder": [
-        "Premium Standard",
+        "Premium",
         "Exclusive"
       ],
       "byUnit": {
         "avenida-norte": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -792,7 +792,7 @@
           ]
         },
         "ouro-preto": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -883,7 +883,7 @@
           ]
         },
         "peixinhos": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -974,7 +974,7 @@
           ]
         },
         "areias": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {

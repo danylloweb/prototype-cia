@@ -44,7 +44,7 @@
     // Tier Standard
     if (grouped.standard.length) {
       html += '<div class="units-tab-group">';
-      html += '<h4 class="tab-group-label">Premium Standard</h4>';
+      html += '<h4 class="tab-group-label">Premium</h4>';
       html += '<div class="units-tab-buttons">';
       grouped.standard.forEach(function (u) {
         var active = u.id === selected ? " active" : "";

@@ -299,12 +299,12 @@ window.CDC_DEFAULT_CONFIG.plans = (function () {
   var PREMIUM_INC = "Av. Norte, Ouro Preto, Peixinhos, Areias";
   var EXCLUSIVE_INC = "Afogados, Água Fria, Bomba do Hemetério";
   return {
-    groupsOrder: ["Premium Standard", "Exclusive"],
+    groupsOrder: ["Premium", "Exclusive"],
     byUnit: {
-      "avenida-norte":      grp("Premium Standard", PREMIUM_INC, PREMIUM),
-      "ouro-preto":         grp("Premium Standard", PREMIUM_INC, PREMIUM),
-      "peixinhos":          grp("Premium Standard", PREMIUM_INC, PREMIUM),
-      "areias":             grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
+      "avenida-norte":      grp("Premium", PREMIUM_INC, PREMIUM),
+      "ouro-preto":         grp("Premium", PREMIUM_INC, PREMIUM),
+      "peixinhos":          grp("Premium", PREMIUM_INC, PREMIUM),
+      "areias":             grp("Premium", PREMIUM_INC, PREMIUM),
       "afogados":           grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
       "agua-fria":          grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE),
       "bomba-do-hemeterio": grp("Exclusive", EXCLUSIVE_INC, EXCLUSIVE)
