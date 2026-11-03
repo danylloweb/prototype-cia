@@ -242,7 +242,7 @@
       {
         "id": "areias",
         "name": "Areias",
-        "tier": "standard",
+        "tier": "exclusive",
         "active": true,
         "city": "Recife",
         "neighborhood": "Areias - Estância",
@@ -696,12 +696,12 @@
     ],
     "plans": {
       "groupsOrder": [
-        "Premium Standard",
+        "Premium",
         "Exclusive"
       ],
       "byUnit": {
         "avenida-norte": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -762,14 +762,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -792,7 +792,7 @@
           ]
         },
         "ouro-preto": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -853,14 +853,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -883,7 +883,7 @@
           ]
         },
         "peixinhos": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Premium",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -944,14 +944,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -974,7 +974,7 @@
           ]
         },
         "areias": {
-          "tierLabel": "Premium Standard",
+          "tierLabel": "Exclusive",
           "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
           "items": [
             {
@@ -1035,14 +1035,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1121,14 +1121,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1207,14 +1207,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1293,14 +1293,14 @@
             },
             {
               "key": "anual-plus",
-              "name": "Anual VIP +",
+              "name": "Anual VIP Plus",
               "desc": "Plano anual com melhor custo-benefício",
               "price": "12x de R$ 129,99",
               "unit": "",
               "old": "R$ 1.620,00",
               "note": "+ R$ 50,00",
               "featured": false,
-              "cta": "Quero o Anual VIP +",
+              "cta": "Quero o Anual VIP Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",

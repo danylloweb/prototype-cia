@@ -100,10 +100,10 @@ unidade:
 
 ```json
 "plans": {
-  "groupsOrder": ["Premium Standard", "Exclusive"],
+  "groupsOrder": ["Premium", "Exclusive"],
   "byUnit": {
     "avenida-norte": {
-      "tierLabel": "Premium Standard",
+      "tierLabel": "Premium",
       "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
       "items": [
         {
