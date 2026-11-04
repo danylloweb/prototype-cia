@@ -31,9 +31,14 @@ const fields = FIELD_NAMES.reduce((acc, name) => {
 
 const stripNonDigits = (value) => String(value || "").replace(/\D+/g, "");
 const trim = (value) => String(value == null ? "" : value).trim();
+const normalizePhoneDigits = (value) => {
+  const digits = stripNonDigits(value);
+  return /^55\d{10,11}$/.test(digits) ? digits.slice(2) : digits;
+};
+const normalizeEmail = (value) => trim(value).toLowerCase();
 
 const maskPhone = (value) => {
-  const digits = stripNonDigits(value).slice(0, 11);
+  const digits = normalizePhoneDigits(value).slice(0, 11);
 
   if (digits.length <= 2) return digits ? `(${digits}` : "";
   if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
@@ -111,7 +116,7 @@ const getValidationMessage = (fieldName) => {
       if (value.length < 3) return "Digite um nome com pelo menos 3 caracteres.";
       return "";
     case "phone": {
-      const digits = stripNonDigits(value);
+      const digits = normalizePhoneDigits(value);
       if (!digits) return "Informe seu telefone com DDD.";
       if (digits.length < 10 || digits.length > 11) return "Digite um telefone válido com 10 ou 11 números.";
       return "";
@@ -122,7 +127,7 @@ const getValidationMessage = (fieldName) => {
       return "";
     case "email":
       if (!value) return "";
-      return isValidEmail(value) ? "" : "Digite um e-mail válido ou deixe o campo em branco.";
+      return isValidEmail(normalizeEmail(value)) ? "" : "Digite um e-mail válido ou deixe o campo em branco.";
     case "description":
       return value.length > 1000 ? "A descrição deve ter no máximo 1000 caracteres." : "";
     default:
@@ -238,14 +243,14 @@ const loadCatalog = async () => {
 };
 
 const buildPayload = () => {
-  const email = trim(fields.email.value);
+  const email = normalizeEmail(fields.email.value);
   const description = trim(fields.description.value);
   const unitId = fields.unit_id.value ? Number(fields.unit_id.value) : null;
 
   return {
     type: fields.type.value,
     name: trim(fields.name.value),
-    phone: stripNonDigits(fields.phone.value),
+    phone: normalizePhoneDigits(fields.phone.value),
     cpf: stripNonDigits(fields.cpf.value),
     email: email || null,
     unit_id: Number.isFinite(unitId) ? unitId : null,
@@ -393,6 +398,9 @@ const handleSubmit = async (event) => {
     return;
   }
 
+  fields.phone.value = maskPhone(fields.phone.value);
+  fields.email.value = normalizeEmail(fields.email.value);
+
   if (!validateForm()) {
     showToast("Revise os campos obrigatórios destacados antes de enviar.", "error", "Campos inválidos");
     return;
@@ -437,6 +445,10 @@ const handleFieldInput = (event) => {
     event.target.value = maskPhone(event.target.value);
   }
 
+  if (name === "email") {
+    event.target.value = normalizeEmail(event.target.value);
+  }
+
   if (name === "cpf") {
     event.target.value = maskCpf(event.target.value);
   }
@@ -454,6 +466,14 @@ const handleFieldBlur = (event) => {
   const { name } = event.target;
   if (!FIELD_NAMES.includes(name)) {
     return;
+  }
+
+  if (name === "phone") {
+    event.target.value = maskPhone(event.target.value);
+  }
+
+  if (name === "email") {
+    event.target.value = normalizeEmail(event.target.value);
   }
 
   state.touched.add(name);
