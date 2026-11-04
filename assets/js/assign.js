@@ -6,7 +6,7 @@
 (function (w, d) {
   'use strict';
 
-  var API_BASE = 'https://portalcia.impactadigital.net/signature/';
+  var API_BASE = 'https://portalvendas.academiaciadocorpo.com/signature/';
   var TERMS_FALLBACK = '/assets/terms-default.txt';
   var PHOTO_MAX_SIDE = 1024;
   var PHOTO_QUALITY = 0.82;

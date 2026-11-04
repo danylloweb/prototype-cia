@@ -10,20 +10,10 @@ const MOCK_UNITS = [
   { id: 4, name: "Ouro Preto", city: "Olinda", state: "PE", group: 3, tier: "standard" }
 ];
 
-const MOCK_PLANS = [
-  { id: 1, name: "Plano Fit", unitIds: [1, 2, 3, 4] },
-  { id: 2, name: "Plano Premium", unitIds: [1, 3] },
-  { id: 3, name: "Plano Família", unitIds: [2, 4] },
-  { id: 4, name: "Plano Flex", unitIds: [1, 2, 3, 4] }
-];
-
-const FIELD_NAMES = ["type", "name", "phone", "cpf", "email", "unit_id", "plan_id", "description"];
+const FIELD_NAMES = ["type", "name", "phone", "cpf", "email", "unit_id", "description"];
 
 const state = {
   units: [],
-  plans: [],
-  plansByUnit: null,
-  planSource: "mock",
   touched: new Set(),
   submitting: false
 };
@@ -33,7 +23,6 @@ const submitButton = document.getElementById("submitButton");
 const toastContainer = document.getElementById("toastContainer");
 const descriptionCounter = document.getElementById("descriptionCounter");
 const unitSelect = document.getElementById("unit_id");
-const planSelect = document.getElementById("plan_id");
 
 const fields = FIELD_NAMES.reduce((acc, name) => {
   acc[name] = form.elements.namedItem(name);
@@ -105,7 +94,7 @@ const setFieldError = (fieldName, message = "") => {
   wrapper.classList.toggle("has-error", hasError);
   wrapper.classList.toggle(
     "is-valid",
-    !hasError && state.touched.has(fieldName) && fieldName !== "unit_id" && fieldName !== "plan_id" && fieldName !== "description"
+    !hasError && state.touched.has(fieldName) && fieldName !== "unit_id" && fieldName !== "description"
   );
   field.setAttribute("aria-invalid", String(hasError));
   errorElement.textContent = message;
@@ -164,14 +153,6 @@ const renderDescriptionCounter = () => {
   descriptionCounter.textContent = `${fields.description.value.length}/1000`;
 };
 
-const money = (value) => {
-  const number = Number(value);
-  if (!Number.isFinite(number) || number <= 0) {
-    return "";
-  }
-  return number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-};
-
 const escapeHtml = (value) => String(value)
   .replace(/&/g, "&amp;")
   .replace(/</g, "&lt;")
@@ -202,30 +183,6 @@ const normalizeRemoteUnits = (units) => {
   }).filter(Boolean);
 };
 
-const normalizePlanRows = (rows) => {
-  if (!Array.isArray(rows)) {
-    return [];
-  }
-
-  return rows.map((row) => {
-    const numericId = Number(row?.id);
-    if (!Number.isFinite(numericId) || numericId <= 0 || row.status === false) {
-      return null;
-    }
-
-    return {
-      id: numericId,
-      group: row.group != null ? Number(row.group) : null,
-      groupLabel: trim(row.groupLabel).toLowerCase(),
-      recurring: row.recurring === true,
-      name: trim(row.name || row.planName || row.plan || row.key) || (row.recurring === true ? "Basic+" : "Anual VIP"),
-      priceText: typeof row.priceFrom === "string" && trim(row.priceFrom)
-        ? trim(row.priceFrom)
-        : money(row.priceFrom)
-    };
-  }).filter(Boolean);
-};
-
 const getCatalogConfig = () => {
   if (window.CDC?.data?.landingCatalog) {
     return window.CDC.data.landingCatalog();
@@ -235,13 +192,11 @@ const getCatalogConfig = () => {
     const config = window.CDC.data.get();
     return {
       meta: config?.meta || {},
-      units: Array.isArray(config?.units) ? config.units : [],
-      plans: Array.isArray(config?.planRows) ? config.planRows : [],
-      plansByUnit: config?.plans?.byUnit || null
+      units: Array.isArray(config?.units) ? config.units : []
     };
   }
 
-  return { meta: {}, units: [], plans: [], plansByUnit: null };
+  return { meta: {}, units: [] };
 };
 
 const fetchCatalogConfig = async () => {
@@ -250,69 +205,6 @@ const fetchCatalogConfig = async () => {
   }
   return getCatalogConfig();
 };
-
-const planRowsForUnit = (unit) => {
-  if (!unit) {
-    return state.plans;
-  }
-
-  const grouped = state.plans.filter((plan) => {
-    if (unit.tier && plan.groupLabel) {
-      return plan.groupLabel === unit.tier;
-    }
-    if (unit.group != null && plan.group != null) {
-      return Number(unit.group) === Number(plan.group);
-    }
-    return true;
-  });
-
-  return grouped.length ? grouped : state.plans;
-};
-
-const normalizePlansByUnit = (plansByUnit) => {
-  if (!plansByUnit || typeof plansByUnit !== "object") {
-    return null;
-  }
-
-  const normalized = {};
-
-  Object.keys(plansByUnit).forEach((unitSlug) => {
-    const entry = plansByUnit[unitSlug];
-    const items = Array.isArray(entry?.items) ? entry.items : [];
-    if (!items.length) {
-      return;
-    }
-
-    normalized[unitSlug] = items.map((item, index) => ({
-      id: Number.isFinite(Number(item?.id)) ? Number(item.id) : null,
-      key: trim(item?.key) || `plan-${index + 1}`,
-      name: trim(item?.name) || `Plano ${index + 1}`,
-      priceText: trim(item?.price),
-      recurring: item?.key === "basic"
-    }));
-  });
-
-  return Object.keys(normalized).length ? normalized : null;
-};
-
-const plansByUnitFor = (unit) => {
-  if (!state.plansByUnit) {
-    return [];
-  }
-
-  if (unit?.slug && Array.isArray(state.plansByUnit[unit.slug])) {
-    return state.plansByUnit[unit.slug];
-  }
-
-  if (!unit) {
-    const firstUnitKey = Object.keys(state.plansByUnit)[0];
-    return firstUnitKey ? state.plansByUnit[firstUnitKey] : [];
-  }
-
-  return [];
-};
-
-const getSelectedUnit = () => state.units.find((unit) => String(unit.id) === String(unitSelect.value)) || null;
 
 const renderUnitOptions = (units) => {
   const currentValue = unitSelect.value;
@@ -326,62 +218,11 @@ const renderUnitOptions = (units) => {
   }
 };
 
-const renderMockPlanOptions = (selectedUnitId = "") => {
-  const normalizedUnitId = selectedUnitId ? Number(selectedUnitId) : null;
-  const filteredPlans = normalizedUnitId
-    ? state.plans.filter((plan) => plan.unitIds.includes(normalizedUnitId))
-    : state.plans;
-  const currentValue = planSelect.value;
-  const options = ['<option value="">Selecione um plano</option>']
-    .concat(filteredPlans.map((plan) => `<option value="${plan.id}">${escapeHtml(plan.name)}</option>`));
-
-  planSelect.innerHTML = options.join("");
-
-  if (filteredPlans.some((plan) => String(plan.id) === currentValue)) {
-    planSelect.value = currentValue;
-  }
-};
-
-const renderRemotePlanOptions = (selectedUnitId = "") => {
-  const currentValue = planSelect.value;
-  const unit = state.units.find((item) => String(item.id) === String(selectedUnitId)) || null;
-  const filteredPlans = state.plans.length ? planRowsForUnit(unit) : plansByUnitFor(unit);
-  const options = ['<option value="">Selecione um plano</option>'];
-
-  filteredPlans.forEach((plan) => {
-    const suffix = plan.priceText ? ` • ${escapeHtml(plan.priceText)}` : "";
-    const optionValue = plan.id != null ? String(plan.id) : `key:${plan.key || "plan"}`;
-    options.push(`<option value="${optionValue}" data-plan-key="${escapeHtml(plan.key || "")}">${escapeHtml(plan.name)}${suffix}</option>`);
-  });
-
-  planSelect.innerHTML = options.join("");
-
-  if (filteredPlans.some((plan) => (plan.id != null ? String(plan.id) : `key:${plan.key || "plan"}`) === currentValue)) {
-    planSelect.value = currentValue;
-  }
-};
-
-const renderPlanOptions = (selectedUnitId = "") => {
-  if (state.planSource === "remote") {
-    renderRemotePlanOptions(selectedUnitId);
-    return;
-  }
-
-  renderMockPlanOptions(selectedUnitId);
-};
-
 const applyCatalog = (catalog) => {
   const remoteUnits = normalizeRemoteUnits(catalog.units);
-  const remotePlans = normalizePlanRows(catalog.plans);
-  const remotePlansByUnit = normalizePlansByUnit(catalog.plansByUnit);
 
   state.units = remoteUnits.length ? remoteUnits : MOCK_UNITS.slice();
-  state.plans = remoteUnits.length && remotePlans.length ? remotePlans : MOCK_PLANS.slice();
-  state.plansByUnit = remoteUnits.length && remotePlansByUnit ? remotePlansByUnit : null;
-  state.planSource = remoteUnits.length && (remotePlans.length || remotePlansByUnit) ? "remote" : "mock";
-
   renderUnitOptions(state.units);
-  renderPlanOptions(unitSelect.value);
 };
 
 const loadCatalogFromCurrentConfig = () => {
@@ -399,7 +240,6 @@ const loadCatalog = async () => {
 const buildPayload = () => {
   const email = trim(fields.email.value);
   const description = trim(fields.description.value);
-  // const planId = fields.plan_id.value ? Number(fields.plan_id.value) : null;
   const unitId = fields.unit_id.value ? Number(fields.unit_id.value) : null;
 
   return {
@@ -408,7 +248,6 @@ const buildPayload = () => {
     phone: stripNonDigits(fields.phone.value),
     cpf: stripNonDigits(fields.cpf.value),
     email: email || null,
-    // plan_id: Number.isFinite(planId) ? planId : null,
     unit_id: Number.isFinite(unitId) ? unitId : null,
     description: description || null
   };
@@ -442,10 +281,8 @@ const applyApiErrors = (errors) => {
     cpf: "cpf",
     email: "email",
     unit_id: "unit_id",
-    plan_id: "plan_id",
     description: "description",
-    unitId: "unit_id",
-    planId: "plan_id"
+    unitId: "unit_id"
   };
 
   Object.entries(errors).forEach(([key, value]) => {
@@ -511,7 +348,6 @@ const resetFormState = () => {
 
   fields.phone.value = "";
   fields.cpf.value = "";
-  renderPlanOptions();
   renderDescriptionCounter();
 };
 
@@ -625,13 +461,8 @@ const handleFieldBlur = (event) => {
 };
 
 const handleUnitChange = () => {
-  renderPlanOptions(unitSelect.value);
-
   if (state.touched.has("unit_id")) {
     validateField("unit_id");
-  }
-  if (state.touched.has("plan_id")) {
-    validateField("plan_id");
   }
 };
 
