@@ -207,7 +207,8 @@
       }
       function buscar(url) {
         url += (url.indexOf("?") === -1 ? "?" : "&") + "page=" + encodeURIComponent(paginaAtual());
-        return fetch(url, { cache: "no-store" }).then(function (r) {
+        // Sem "cache: no-store": ele envia Cache-Control/Pragma e força um preflight CORS (OPTIONS) extra
+        return fetch(url).then(function (r) {
           if (!r.ok) throw new Error("HTTP " + r.status);
           return r.json();
         });
