@@ -195,7 +195,18 @@
     refreshRemote: function () {
       var self = this;
       if (!w.fetch || !REMOTE_URL) return;
+      function paginaAtual() {
+        var nome = (w.location.pathname.split("/").pop() || "").replace(/\.html$/i, "");
+        if (!nome || nome === "index") return "inicial";
+        if (nome === "unidade") {
+          var u = "";
+          try { u = new URLSearchParams(w.location.search).get("u") || ""; } catch (e) {}
+          return u || nome;
+        }
+        return nome;
+      }
       function buscar(url) {
+        url += (url.indexOf("?") === -1 ? "?" : "&") + "page=" + encodeURIComponent(paginaAtual());
         return fetch(url, { cache: "no-store" }).then(function (r) {
           if (!r.ok) throw new Error("HTTP " + r.status);
           return r.json();
