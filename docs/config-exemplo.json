@@ -37,8 +37,7 @@
       "ga4Id": "",
       "metaPixelId": "1653036343000256",
       "clarityId": "",
-      "capiEndpoint": "",
-      "consentRequired": true
+      "capiEndpoint": ""
     },
     "offer": {
       "enabled": true,

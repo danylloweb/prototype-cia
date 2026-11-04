@@ -3,8 +3,8 @@
    v2 · 25/08/2026
 
    O que este arquivo faz
-   - Consentimento granular: essenciais (sempre), análise e marketing.
-     Recusar é tão fácil quanto aceitar — um clique — como manda a LGPD.
+   - Preferências granulares: essenciais (sempre), análise e marketing.
+     Podem ser alteradas pelo painel de privacidade no rodapé.
    - Google Consent Mode v2 em "denied" antes de qualquer tag subir.
    - Sob "análise": GA4 direto e Microsoft Clarity.
      Sob "marketing": Pixel da Meta.
@@ -42,8 +42,7 @@
       gtmId: validId(raw.gtmId, /^GTM-[A-Z0-9]{4,}$/i),
       ga4Id: validId(raw.ga4Id, /^G-[A-Z0-9]{4,}$/i),
       metaPixelId: validId(raw.metaPixelId, /^\d{5,20}$/),
-      clarityId: validId(raw.clarityId, /^(?=.*\d)[a-z0-9]{6,20}$/i),
-      consentRequired: raw.consentRequired !== false
+      clarityId: validId(raw.clarityId, /^(?=.*\d)[a-z0-9]{6,20}$/i)
     };
   }
 
@@ -275,7 +274,7 @@
     var el = d.querySelector(".consent");
     if (el) el.remove();
 
-    var atual = getStored() || { analytics: false, marketing: false };
+    var atual = getStored() || current || { analytics: true, marketing: true };
 
     el = d.createElement("div");
     el.className = "consent";
@@ -284,10 +283,9 @@
     el.setAttribute("aria-label", "Preferências de privacidade");
     el.innerHTML =
       '<h4>Sua privacidade importa 🍪</h4>' +
-      '<p>Usamos cookies essenciais para o site funcionar. Com a sua autorização, ' +
-      'usamos também cookies de <strong>análise</strong>, para entender como o site é usado, ' +
-      'e de <strong>marketing</strong>, para medir e personalizar nossos anúncios. ' +
-      'A escolha é sua e pode ser mudada quando quiser em ' +
+      '<p>Usamos cookies essenciais para o site funcionar e cookies de <strong>análise</strong>, ' +
+      'para entender como o site é usado, e de <strong>marketing</strong>, para medir e ' +
+      'personalizar nossos anúncios. Você pode alterar essas preferências quando quiser em ' +
       '<a href="#" data-cdc="privacy">Preferências de privacidade</a>.</p>' +
 
       '<div class="consent-prefs"' + (openPrefs ? "" : " hidden") + '>' +
@@ -349,11 +347,9 @@
   }
 
   function initConsent() {
-    if (!tel.consentRequired) { applyConsent({ analytics: true, marketing: true }); return; }
     var stored = getStored();
     if (stored) { applyConsent(stored); return; }
-    applyConsent({ analytics: false, marketing: false }); // registra o "denied" explícito
-    showBanner(false);
+    applyConsent({ analytics: true, marketing: true });
   }
 
   /* Reabrir as preferências (link "Preferências de privacidade" no rodapé).
@@ -369,8 +365,7 @@
   w.addEventListener("cdc:config-updated", function () {
     var next = readTelemetry();
     var mudou = next.gtmId !== tel.gtmId || next.ga4Id !== tel.ga4Id ||
-                next.metaPixelId !== tel.metaPixelId || next.clarityId !== tel.clarityId ||
-                next.consentRequired !== tel.consentRequired;
+                next.metaPixelId !== tel.metaPixelId || next.clarityId !== tel.clarityId;
     if (!mudou) return;
     tel = next;
     if (current) applyConsent(current); // sobe o que ainda não tinha subido

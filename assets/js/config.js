@@ -34,8 +34,7 @@ window.CDC_DEFAULT_CONFIG = {
     ga4Id: "",          // ex: G-XXXXXXXXXX (se usar GA4 direto, sem GTM)
     metaPixelId: "1653036343000256",
     clarityId: "",      // ex: xxxxxxxxxx
-    capiEndpoint: "",   // endpoint server-side para Conversions API (opcional)
-    consentRequired: true
+    capiEndpoint: ""    // endpoint server-side para Conversions API (opcional)
   },
 
   /* Integrações / conexões de dados (editáveis no admin > Integrações).
