@@ -399,7 +399,7 @@ const loadCatalog = async () => {
 const buildPayload = () => {
   const email = trim(fields.email.value);
   const description = trim(fields.description.value);
-  const planId = fields.plan_id.value ? Number(fields.plan_id.value) : null;
+  // const planId = fields.plan_id.value ? Number(fields.plan_id.value) : null;
   const unitId = fields.unit_id.value ? Number(fields.unit_id.value) : null;
 
   return {
@@ -408,7 +408,7 @@ const buildPayload = () => {
     phone: stripNonDigits(fields.phone.value),
     cpf: stripNonDigits(fields.cpf.value),
     email: email || null,
-    plan_id: Number.isFinite(planId) ? planId : null,
+    // plan_id: Number.isFinite(planId) ? planId : null,
     unit_id: Number.isFinite(unitId) ? unitId : null,
     description: description || null
   };
