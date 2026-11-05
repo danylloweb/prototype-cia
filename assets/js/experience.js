@@ -22,17 +22,10 @@
     var cfg = DATA.get();
     return (cfg.meta && cfg.meta.saleWhatsapp) || "";
   }
-  function waHref(unit, text) {
-    // unit = unit || myUnit();
-    return "https://wa.me/" + saleWhatsapp() + (text ? "?text=" + encodeURIComponent(text) : "");
-  }
-
   /* Reaponta todos os CTAs padrão para a unidade escolhida */
   function applyUnit() {
     var u = myUnit(); if (!u) return;
-    var msg = "Olá! Vim pelo site da Cia do Corpo e quero fazer minha matrícula na unidade " + u.name + ".";
     d.querySelectorAll('[data-cdc="wa-default"]').forEach(function (a) {
-      a.href = waHref(u, msg); a.target = "_blank"; a.rel = "noopener";
       a.setAttribute("data-cta", "whatsapp_click"); a.setAttribute("data-unit", u.id); a.setAttribute("data-unit-name", u.name);
     });
     d.querySelectorAll('[data-cdc="my-unit-name"]').forEach(function (e) { e.textContent = u.name; });
@@ -107,7 +100,7 @@
       '<div class="sticky-txt"><b>Comece com 3 dias grátis</b><span data-cdc="my-unit-name">sua unidade</span></div>' +
       '<div class="sticky-actions">' +
         '<button class="btn-sticky ghost" data-quiz>Montar meu plano</button>' +
-        '<a class="btn-sticky wa" data-cdc="wa-default" href="#">' + WA + ' Agendar no WhatsApp</a>' +
+        '<a class="btn-sticky wa" data-cdc="wa-default" href="#">Agendar agora</a>' +
       '</div></div></div>');
     d.body.appendChild(bar);
     var hero = d.querySelector(".hero, .page-hero");

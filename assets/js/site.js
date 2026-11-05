@@ -13,7 +13,6 @@
   };
 
   function el(html) { var t = d.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
-  function waLink(num, text) { return "https://wa.me/" + num + (text ? "?text=" + encodeURIComponent(text) : ""); }
   function telLink(phone) { return "tel:+55" + phone.replace(/\D/g, ""); }
   function currentPage() {
     var p = location.pathname.split("/").pop().replace(".html", "");
@@ -22,7 +21,6 @@
 
   /* ---------- Render unit cards ---------- */
   function unitCard(u) {
-    var msg = "Olá! Vim pelo site e quero agendar minha aula experimental na unidade " + u.name + ".";
     var tierLabel = u.tier === "exclusive" ? '<span class="unit-chip exclusive">Exclusive</span>' : '<span class="unit-chip">' + u.city + '</span>';
     return el(
       '<article class="unit-card reveal">' +
@@ -34,7 +32,7 @@
           '<div class="unit-addr">' + ICON.pin + '<span>' + u.address + '</span></div>' +
           '<a href="unidade.html?u=' + u.id + '" class="unit-link">Ver página da unidade →</a>' +
           '<div class="unit-actions">' +
-            '<a class="btn btn-whats" target="_blank" rel="noopener" href="' + waLink(u.whatsapp, msg) + '" ' +
+            '<a class="btn btn-whats" href="#" ' +
               'data-cta="whatsapp_click" data-unit="' + u.id + '" data-unit-name="' + u.name + '">' + ICON.whats + ' Agendar aula</a>' +
             '<a class="icon-btn" href="' + telLink(u.phone) + '" aria-label="Ligar para ' + u.name + '" ' +
               'data-cta="call_click" data-unit="' + u.id + '" data-unit-name="' + u.name + '">' + ICON.phone + '</a>' +
@@ -66,10 +64,7 @@
     d.querySelectorAll('[data-cdc="years"]').forEach(function (e) { e.textContent = (cfg.meta.yearsActive || 13) + ""; });
     var du = DATA.defaultUnit();
     if (du) {
-      var msg = "Olá! Vim pelo site da Cia do Corpo e quero agendar minha aula experimental gratuita.";
       d.querySelectorAll('[data-cdc="wa-default"]').forEach(function (a) {
-        a.setAttribute("href", waLink(du.whatsapp, msg));
-        a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener");
         a.setAttribute("data-cta", "whatsapp_click"); a.setAttribute("data-unit", du.id);
       });
     }

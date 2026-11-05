@@ -142,9 +142,7 @@
     '<span class="pillinfo">'+phn+esc(u.phone)+'</span>'+
     '<span class="pillinfo">'+clk+'Seg-Sex 5h-23h</span>';
 
-  var waMsg = "Olá! Vim pela página da unidade "+u.name+" e quero fazer minha matrícula.";
-  var waHref = "https://wa.me/"+u.whatsapp+"?text="+encodeURIComponent(waMsg);
-  ["u-wa","u-wa2"].forEach(function(idd){ var a=document.getElementById(idd); a.href=waHref; a.setAttribute("data-cta","whatsapp_click"); a.setAttribute("data-unit",u.id); a.setAttribute("data-unit-name",u.name); });
+  ["u-wa","u-wa2"].forEach(function(idd){ var a=document.getElementById(idd); a.href="#"; a.removeAttribute("target"); a.removeAttribute("rel"); a.setAttribute("data-cta","whatsapp_click"); a.setAttribute("data-unit",u.id); a.setAttribute("data-unit-name",u.name); });
   var call=document.getElementById("u-call"); call.href="tel:+55"+u.phone.replace(/\D/g,""); call.setAttribute("data-cta","call_click"); call.setAttribute("data-unit",u.id);
 
   document.getElementById("u-map").src = "https://www.google.com/maps?q="+encodeURIComponent(u.address)+"&output=embed";

@@ -197,7 +197,7 @@ section { position: relative; }
   display: inline-flex; align-items: center; gap: 10px; background: rgba(255,90,0,.14);
   border: 1px solid rgba(255,138,0,.4); color: var(--brand-2); padding: 8px 16px;
   border-radius: 999px; font-weight: 700; font-size: .82rem; margin-bottom: 26px;
-  text-transform: uppercase; letter-spacing: .08em;
+  font-family: inherit; text-align: left; text-transform: uppercase; letter-spacing: .08em; cursor: pointer;
 }
 .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-2); box-shadow: 0 0 0 0 var(--brand-glow); animation: pulse 2s infinite; }
 @keyframes pulse { 0%{box-shadow:0 0 0 0 var(--brand-glow);} 70%{box-shadow:0 0 0 12px rgba(255,90,0,0);} 100%{box-shadow:0 0 0 0 rgba(255,90,0,0);} }
