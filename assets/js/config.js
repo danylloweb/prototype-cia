@@ -32,7 +32,7 @@ window.CDC_DEFAULT_CONFIG = {
   telemetry: {
     gtmId: "",          // ex: GTM-XXXXXXX
     ga4Id: "",          // ex: G-XXXXXXXXXX (se usar GA4 direto, sem GTM)
-    metaPixelId: "1605053174394126",
+    metaPixelId: "1653036343000256",
     clarityId: "",      // ex: xxxxxxxxxx
     capiEndpoint: ""    // endpoint server-side para Conversions API (opcional)
   },
