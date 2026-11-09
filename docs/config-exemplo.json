@@ -46,51 +46,7 @@
       "subtitle": "Sem compromisso. Escolha sua unidade e agende pelo WhatsApp."
     },
     "units": [
-      {
-        "id": "concept-casa-caiada",
-        "name": "Cia Concept Casa Caiada",
-        "tier": "concept",
-        "active": false,
-        "premium": true,
-        "city": "Olinda",
-        "neighborhood": "Casa Caiada",
-        "address": "Rua Caetano Ribeiro, 151 - Casa Caiada, Olinda - PE, 53130-440",
-        "phone": "(81) 98604-9761",
-        "whatsapp": "558186049894",
-        "group": 1,
-        "priceFrom": "12x de R$ 249,90",
-        "matricula": "R$ 100,00",
-        "experimentalDays": 1,
-        "hours": [
-          {
-            "d": "Segunda a Quinta",
-            "h": "5h às 23h"
-          },
-          {
-            "d": "Sexta-feira",
-            "h": "5h às 22h"
-          },
-          {
-            "d": "Sábado",
-            "h": "8h às 16h"
-          },
-          {
-            "d": "Domingo",
-            "h": "8h às 13h"
-          }
-        ],
-        "neighborhoodsServed": [
-          "Casa Caiada",
-          "Bairro Novo",
-          "Jardim Atlântico",
-          "Rio Doce"
-        ],
-        "maps": "https://www.google.com/maps/search/?api=1&query=Rua+Caetano+Ribeiro+151+Casa+Caiada+Olinda",
-        "lat": -8.0089,
-        "lng": -34.8389,
-        "image": "https://static.wixstatic.com/media/837beb_e7ad92872603473f9464213607d84fe9~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/kv.png"
-      },
-      {
+     {
         "id": "avenida-norte",
         "name": "Avenida Norte",
         "tier": "standard",
