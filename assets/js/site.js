@@ -270,8 +270,19 @@
     var plansCfg = cfg.plans || {};
     var byUnit = plansCfg.byUnit || {};
     var units = DATA.activeUnits().filter(function (u) { return byUnit[u.id]; });
+    var page = (w.location.pathname.split("/").pop() || "").replace(/\.html$/i, "");
+    var isUnitPage = page === "unidade";
+    var requestedUnitId = isUnitPage ? new URLSearchParams(w.location.search).get("u") : "";
+    if (isUnitPage && !requestedUnitId) {
+      host.textContent = "Não há planos disponíveis para esta unidade.";
+      return;
+    }
     if (!units.length) {
       host.textContent = "Não há planos disponíveis para as unidades ativas.";
+      return;
+    }
+    if (isUnitPage && !units.some(function (u) { return u.id === requestedUnitId; })) {
+      host.textContent = "Não há planos disponíveis para esta unidade.";
       return;
     }
     var selWrap = d.querySelector('[data-cdc="plan-unit-select"]');
@@ -303,8 +314,8 @@
     if (selWrap) selWrap.querySelectorAll("[data-unit-btn]").forEach(function (b) {
       b.addEventListener("click", function () { select(b.getAttribute("data-unit-btn")); });
     });
-    var def = DATA.defaultUnit();
-    select(def && byUnit[def.id] ? def.id : units[0].id);
+    var def = isUnitPage ? null : DATA.defaultUnit();
+    select(isUnitPage ? requestedUnitId : (def && byUnit[def.id] ? def.id : units[0].id));
   }
 
   function init() {
