@@ -657,7 +657,7 @@
       "byUnit": {
         "avenida-norte": {
           "tierLabel": "Premium",
-          "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
+          "includedText": "Av. Norte, Ouro Preto, Peixinhos",
           "items": [
             {
               "key": "basic",
@@ -697,7 +697,7 @@
               "old": "R$ 1.318,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -727,7 +727,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -752,7 +752,7 @@
         },
         "ouro-preto": {
           "tierLabel": "Premium",
-          "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
+          "includedText": "Av. Norte, Ouro Preto, Peixinhos",
           "items": [
             {
               "key": "basic",
@@ -792,7 +792,7 @@
               "old": "R$ 1.318,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -822,7 +822,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -847,7 +847,7 @@
         },
         "peixinhos": {
           "tierLabel": "Premium",
-          "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
+          "includedText": "Av. Norte, Ouro Preto, Peixinhos",
           "items": [
             {
               "key": "basic",
@@ -887,7 +887,7 @@
               "old": "R$ 1.318,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -917,7 +917,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -942,7 +942,7 @@
         },
         "areias": {
           "tierLabel": "Exclusive",
-          "includedText": "Av. Norte, Ouro Preto, Peixinhos, Areias",
+          "includedText": "Av. Norte, Ouro Preto, Peixinhos",
           "items": [
             {
               "key": "basic",
@@ -982,7 +982,7 @@
               "old": "R$ 1.318,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1012,7 +1012,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1073,7 +1073,7 @@
               "old": "R$ 1.198,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1102,7 +1102,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1163,7 +1163,7 @@
               "old": "R$ 1.198,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1192,7 +1192,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1253,7 +1253,7 @@
               "old": "R$ 1.198,80",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": true,
-              "cta": "Quero o Anual VIP",
+              "cta": "Quero o Anual VIP Black",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
@@ -1282,7 +1282,7 @@
               "old": "R$ 1.620,00",
               "note": "ZERO Taxa de Matrícula • 1ª mensalidade R$19,99",
               "featured": false,
-              "cta": "Quero o Anual VIP Plus",
+              "cta": "Quero o Anual VIP Black Plus",
               "badges": [
                 {
                   "t": "Compromete limite do cartão",
