@@ -230,7 +230,7 @@ body.has-bf-campaign { padding-top: var(--bf-strip-height); }
 @keyframes pulse { 0%{box-shadow:0 0 0 0 var(--brand-glow);} 70%{box-shadow:0 0 0 12px rgba(255,90,0,0);} 100%{box-shadow:0 0 0 0 rgba(255,90,0,0);} }
 
 /* ---------- Marquee ---------- */
-.marquee { background: var(--brand); color: #fff; overflow: hidden; padding: 14px 0; }
+.marquee { background: #000; color: #fff; overflow: hidden; padding: 14px 0; }
 .marquee-track { display: flex; gap: 48px; white-space: nowrap; width: max-content; animation: scroll 28s linear infinite; }
 .marquee-track span { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 1.05rem; display: inline-flex; gap: 48px; align-items: center; }
 .marquee-track span::after { content: "✦"; opacity: .7; }

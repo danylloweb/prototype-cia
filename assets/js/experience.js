@@ -100,7 +100,7 @@
       '<div class="sticky-txt"><b>Comece com 3 dias grátis</b><span data-cdc="my-unit-name">sua unidade</span></div>' +
       '<div class="sticky-actions">' +
         '<button class="btn-sticky ghost" data-quiz>Montar meu plano</button>' +
-        '<a class="btn-sticky wa" data-cdc="wa-default" href="#">Agendar agora</a>' +
+        '<a class="btn-sticky wa" data-cdc="wa-default" href="#">Vem para a nossa Black</a>' +
       '</div></div></div>');
     d.body.appendChild(bar);
     var hero = d.querySelector(".hero, .page-hero");
