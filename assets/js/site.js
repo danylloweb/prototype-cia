@@ -233,6 +233,23 @@
     });
   }
 
+  function renderBlackFridayBar() {
+    var header = d.querySelector(".site-header");
+    if (!header || d.querySelector(".bf-strip")) return;
+
+    var bar = d.createElement("aside");
+    bar.className = "bf-strip";
+    bar.setAttribute("aria-label", "Oferta Black Friday");
+    bar.innerHTML =
+      '<div class="bf-strip-inner">' +
+        '<span class="bf-strip-label">BLACK FRIDAY</span>' +
+        '<span class="bf-strip-copy">Matrícula R$ 0,00 · 1ª mensalidade R$ 19,00 · Pague 12 meses e ganhe 13 meses</span>' +
+        '<a class="bf-strip-cta" href="planos.html#planos" data-cta="black_friday_click">Ver planos <span aria-hidden="true">→</span></a>' +
+      '</div>';
+    d.body.classList.add("has-bf-campaign");
+    d.body.insertBefore(bar, header);
+  }
+
   /* ---------- Planos por unidade (seletor + cards) ---------- */
   var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
   function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
@@ -241,12 +258,19 @@
     var feats = (item.features || []).map(function (f) { return '<li>' + CHK + ' ' + esc(f) + '</li>'; }).join("");
     var priceOld = item.old ? '<span class="old">' + esc(item.old) + '</span>' : '';
     var priceSmall = item.unit ? '<small>' + esc(item.unit) + '</small>' : '';
+    var note = item.note ? esc(item.note).replace(" • ", " •<br>") : '';
+    var isBlackFriday = item.key === "vip" || item.key === "anual-plus";
+    var installmentPrice = isBlackFriday && String(item.price || "").match(/^(.*?)\s*R\$\s*([\d.,]+)$/);
+    var price = installmentPrice
+      ? '<span class="plan-price-main"><span class="plan-price-prefix">' + esc(installmentPrice[1]) + '</span><span class="plan-price-amount">R$' + esc(installmentPrice[2]) + '</span></span>'
+      : esc(item.price);
     return el(
-      '<article class="plan' + (item.featured ? ' featured' : '') + ' reveal">' +
+      '<article class="plan' + (item.featured ? ' featured' : '') + (isBlackFriday ? ' bf-plan' : '') + ' reveal">' +
         (item.featured ? '<span class="ribbon">Mais escolhido</span>' : '') +
+        (isBlackFriday ? '<span class="bf-plan-tag">Black Friday</span>' : '') +
         '<h3>' + esc(item.name) + '</h3><p class="plan-desc">' + esc(item.desc) + '</p>' +
-        '<div class="plan-price">' + esc(item.price) + priceSmall + priceOld + '</div>' +
-        (item.note ? '<div class="plan-note">' + esc(item.note) + '</div>' : '') +
+        '<div class="plan-price' + (installmentPrice ? ' has-installment' : '') + '">' + price + priceSmall + priceOld + '</div>' +
+        (note ? '<div class="plan-note">' + note + '</div>' : '') +
         (badges ? '<div class="plan-badges">' + badges + '</div>' : '') +
         '<ul>' + feats + '</ul>' +
         '<button type="button" class="btn ' + (item.featured ? 'btn-primary' : 'btn-ghost') + ' btn-block" ' +
@@ -319,7 +343,7 @@
   }
 
   function init() {
-    renderBrand(); renderUnits(); renderPlans(); applyOffer(); renderHours(); injectSchema(); initPopups();
+    renderBlackFridayBar(); renderBrand(); renderUnits(); renderPlans(); applyOffer(); renderHours(); injectSchema(); initPopups();
   }
   d.readyState !== "loading" ? init() : d.addEventListener("DOMContentLoaded", init);
 })(window, document);
