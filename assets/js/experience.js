@@ -156,7 +156,7 @@
       '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar seu horário.</span></div>' +
       '<div class="quiz-field"><label>Seu nome</label><input type="text" class="quiz-lead-name" autocomplete="name" placeholder="Como podemos te chamar?"></div>' +
       '<div class="quiz-lead-row">' +
-        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="tel" inputmode="tel" placeholder="(81) 90000-0000"></div>' +
+        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="false" inputmode="tel" placeholder="(81) 90000-0000"></div>' +
         '<div class="quiz-field"><label>E-mail <span style="opacity:.55;font-weight:500">(opcional)</span></label><input type="email" class="quiz-lead-email" autocomplete="email" placeholder="voce@email.com"></div>' +
       '</div></div>';
   }
