@@ -243,7 +243,7 @@
     bar.innerHTML =
       '<div class="bf-strip-inner">' +
         '<span class="bf-strip-label">BLACK FRIDAY</span>' +
-        '<span class="bf-strip-copy">Matrícula R$ 0,00 · 1ª mensalidade R$ 19,99 · Pague 12 meses e ganhe 13 meses</span>' +
+        '<span class="bf-strip-copy">ZERO Taxa de Matrícula · 1ª mensalidade R$ 19,99 · Pague 12 meses e ganhe 13 meses</span>' +
         '<a class="bf-strip-cta" href="planos.html#planos" data-cta="black_friday_click">Ver planos <span aria-hidden="true">→</span></a>' +
       '</div>';
     d.body.classList.add("has-bf-campaign");
