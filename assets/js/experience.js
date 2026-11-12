@@ -156,19 +156,23 @@
       '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar seu horário.</span></div>' +
       '<div class="quiz-field"><label>Seu nome</label><input type="text" class="quiz-lead-name" autocomplete="name" placeholder="Como podemos te chamar?"></div>' +
       '<div class="quiz-lead-row">' +
-        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="false" inputmode="tel" placeholder="(81) 90000-0000"></div>' +
+        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="false" inputmode="tel" placeholder="(81) 90000-0000" required></div>' +
         '<div class="quiz-field"><label>E-mail <span style="opacity:.55;font-weight:500">(opcional)</span></label><input type="email" class="quiz-lead-email" autocomplete="email" placeholder="voce@email.com"></div>' +
       '</div></div>';
   }
   function bindLeadFields(body) {
-    var phone = body.querySelector(".quiz-lead-phone");
-    if (!phone) return;
+    var phone = body.querySelector(".quiz-lead-phone"),
+        go = body.querySelector("#quizGo");
+    if (!phone || !go) return;
+    function updateButton() { go.disabled = !phone.value.replace(/\D/g, ""); }
     phone.addEventListener("input", function () {
       var v = phone.value.replace(/\D/g, "").slice(0, 11);
       if (v.length > 6) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2, v.length > 10 ? 7 : 6) + "-" + v.slice(v.length > 10 ? 7 : 6);
       else if (v.length > 2) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2);
       else phone.value = v;
+      updateButton();
     });
+    updateButton();
     body.querySelectorAll(".quiz-lead input").forEach(function (el) {
       el.addEventListener("input", function () { el.classList.remove("quiz-invalid"); });
     });
@@ -334,7 +338,7 @@
         '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
           [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         leadFieldsHTML() +
-        '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
+        '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
         '<button class="quiz-restart">Escolher outro plano</button>';
       bindLeadFields(body);
       function itemNow() { return planItemFor(DATA.unitById(body.querySelector(".quiz-unit").value) || u, preKey); }
@@ -448,7 +452,7 @@
           '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
             [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           leadFieldsHTML() +
-          '<a class="btn-quiz" id="quizGo">' + WA + ' Agendar meus 3 dias grátis</a>' +
+          '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
           '<button class="quiz-restart">Refazer</button>';
         bindLeadFields(body);
         function refreshPrice() {
