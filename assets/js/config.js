@@ -69,7 +69,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Recife", neighborhood: "Casa Amarela",
       address: "Av. Norte Miguel Arraes de Alencar, 6350 - Casa Amarela, Recife - PE, 52071-035",
       phone: "(81) 98943-1738", whatsapp: "5581989431738",
-      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Casa Amarela", "Tamarineira", "Encruzilhada", "Parnamirim", "Vasco da Gama"],
       maps: "https://g.co/kgs/MDRq364", lat: -8.0186, lng: -34.9176,
       image: "https://static.wixstatic.com/media/837beb_499306147b234bbba67f42b5ece6e17b~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AN.png"
@@ -79,7 +79,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Olinda", neighborhood: "Ouro Preto",
       address: "Av. Argentina Castelo Branco, 175 - Ouro Preto, Olinda - PE, 53370-540",
       phone: "(81) 98943-8592", whatsapp: "5581989438592",
-      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Ouro Preto", "Alto da Bondade"],
       maps: "https://maps.app.goo.gl/zuVMjNU1khcbtVf59", lat: -8.0050, lng: -34.8550,
       image: "https://static.wixstatic.com/media/837beb_8f209da034064d0ba9628a9fd9d204ca~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/OP.png"
@@ -89,7 +89,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Olinda", neighborhood: "Peixinhos",
       address: "Av. Antônio da Costa Azevedo, 566 - Peixinhos, Olinda - PE, 53220-130",
       phone: "(81) 98944-4888", whatsapp: "5581989444888",
-      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 3, priceFrom: "R$19,99 + 11x R$ 109,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Peixinhos", "Sítio Novo", "Salgadinho"],
       maps: "https://maps.app.goo.gl/AtURzTjUgjaZowK16", lat: -8.0186, lng: -34.8839,
       image: "https://static.wixstatic.com/media/837beb_2eb8474fbd2a464eaf0460616efe4ebc~mv2.jpg/v1/fill/w_900,h_560,al_c,q_85,enc_auto/PX.jpg"
@@ -99,7 +99,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Recife", neighborhood: "Afogados",
       address: "R. São Miguel, 893 - Afogados, Recife - PE, 50850-000",
       phone: "(81) 98943-4807", whatsapp: "5581989434807",
-      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Afogados", "Mustardinha", "Mangueira", "San Martin"],
       maps: "https://maps.app.goo.gl/oLBbLy97QV9abz8Z6", lat: -8.0769, lng: -34.9069,
       image: "https://static.wixstatic.com/media/837beb_41a09b408639439bb12a7153cc3ace0a~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AFG.png"
@@ -109,7 +109,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Recife", neighborhood: "Beberibe",
       address: "Av. Beberibe, 2600 - Beberibe, Recife - PE, 52130-035",
       phone: "(81) 98235-3800", whatsapp: "5581982353800",
-      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Água Fria", "Beberibe", "Fundão", "Cajueiro"],
       maps: "https://maps.app.goo.gl/67mnmfj3dFcoeNuq6", lat: -8.0086, lng: -34.8919,
       image: "https://static.wixstatic.com/media/837beb_f6a67ac9cc3c4ef99ca13852a6d51fac~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AGUA.png"
@@ -119,7 +119,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Recife", neighborhood: "Bomba do Hemetério",
       address: "R. Padre Oliveira, 772 - Bomba do Hemetério, Recife - PE, 52080-130",
       phone: "(81) 98943-8666", whatsapp: "5581989438666",
-      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Bomba do Hemetério", "Alto José do Pinho", "Dois Unidos", "Arruda"],
       maps: "https://maps.app.goo.gl/9XnC4tkLJmyRwLpS8", lat: -8.0156, lng: -34.9039,
       image: "https://static.wixstatic.com/media/837beb_2c803543c9ed44bca7967e30d6a6b7e4~mv2.png/v1/fill/w_900,h_560,al_c,q_85,enc_auto/BOMBA.png"
@@ -129,7 +129,7 @@ window.CDC_DEFAULT_CONFIG = {
       city: "Recife", neighborhood: "Areias - Estância",
       address: "R. Tucunaré, 55 - Areias, Recife - PE, 50771-510",
       phone: "(81) 98734-8391", whatsapp: "5581987348391",
-      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "R$ 50,00", experimentalDays: 3,
+      group: 2, priceFrom: "R$19,99 + 11x R$ 99,90", matricula: "Sem Taxa de Matricula", experimentalDays: 3,
       neighborhoodsServed: ["Areias", "Tejipió", "Jiquiá", "Estância", "Barro"],
       maps: "https://maps.app.goo.gl/tpCzs3X7ZokMmWkB9", lat: -8.0900, lng: -34.9250,
       image: "https://static.wixstatic.com/media/837beb_404fa4604f4f4a49b83a89f308971e71~mv2.jpg/v1/fill/w_900,h_560,al_c,q_85,enc_auto/AREIAS.jpg"
@@ -256,7 +256,7 @@ window.CDC_DEFAULT_CONFIG.plans = (function () {
       badges: [{ t: "Não compromete limite", c: "green" }, { t: "Carência 30 dias", c: "blue" }],
       features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades", "Sem comprometer limite", "30 dias de carência"] },
     { key: "vip", name: "Anual VIP", desc: "Melhor custo-benefício para acesso total",
-      price: "R$19,99 + 11x R$ 109,90", unit: "", old: "R$ 1.318,80", note: "+ R$ 50,00", featured: true, cta: "Quero o Anual VIP",
+      price: "R$19,99 + 11x R$ 109,90", unit: "", old: "R$ 1.318,80", note: "+ Sem Taxa de Matricula", featured: true, cta: "Quero o Anual VIP",
       badges: [{ t: "Compromete limite do cartão", c: "amber" }, { t: "120 dias de carência", c: "blue" }],
       features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a TODAS as 7 unidades"] },
     { key: "mensal", name: "Mensal", desc: "Máxima flexibilidade",
@@ -270,7 +270,7 @@ window.CDC_DEFAULT_CONFIG.plans = (function () {
       badges: [{ t: "Não compromete limite", c: "green" }],
       features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades", "Sem comprometer limite do cartão"] },
     { key: "vip", name: "Anual VIP", desc: "Plano anual com melhor custo-benefício",
-      price: "R$19,99 + 11x R$ 99,90", unit: "", old: "R$ 1.198,80", note: "+ R$ 50,00", featured: true, cta: "Quero o Anual VIP",
+      price: "R$19,99 + 11x R$ 99,90", unit: "", old: "R$ 1.198,80", note: "+ Sem Taxa de Matricula", featured: true, cta: "Quero o Anual VIP",
       badges: [{ t: "Compromete limite do cartão", c: "amber" }, { t: "120 dias de carência", c: "blue" }],
       features: ["Musculação livre", "Aulas coletivas", "Artes marciais", "Acesso a 4 unidades"] },
     { key: "mensal", name: "Mensal", desc: "Máxima flexibilidade",

@@ -617,6 +617,8 @@ body.has-sticky .fab-whats{transform:translateY(-78px)}
 .quiz-field input::placeholder{color:var(--text-soft);opacity:.75}
 .quiz-field input:focus{outline:none;border-color:var(--brand,#ff5a00);background:var(--surface);box-shadow:0 0 0 3px rgba(255,90,0,.14)}
 .quiz-field input.quiz-invalid{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.13)}
+.quiz-error{display:block;color:#b91c1c;font-size:.8rem;margin-top:6px}
+.quiz-error:empty{display:none}
 
 /* Bloco "Quase lá" — encerra o quiz com um respiro visual antes do CTA */
 .quiz-lead{
