@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://static.wixstatic.com/media/837beb_6709c2c14b9f44e89d303c13b949ece6~mv2.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=20261110-bf">
+<link rel="stylesheet" href="assets/css/styles.css?v=20261110-bf-trial">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://www.academiaciadocorpo.com/"},{"@type":"ListItem","position":2,"name":"Contato","item":"https://www.academiaciadocorpo.com/contato"}]}
 </script>
@@ -70,11 +70,11 @@
           <div class="form-row">
             <div class="field"><label for="unidade">Unidade de interesse</label><select id="unidade" name="unidade"></select></div>
             <div class="field"><label for="motivo">Motivo do contato</label>
-              <select id="motivo" name="motivo"><option>Aula experimental (3 dias)</option><option>Planos e valores</option><option>Sou aluno — suporte</option><option>Clube da Parceria</option><option>Outro</option></select></div>
+              <select id="motivo" name="motivo"><option value="trial">Aula experimental (3 dias)</option><option>Planos e valores</option><option>Sou aluno — suporte</option><option>Clube da Parceria</option><option>Outro</option></select></div>
           </div>
           <div class="field"><label for="mensagem">Mensagem</label><textarea id="mensagem" name="mensagem" placeholder="Conte como podemos ajudar"></textarea></div>
-          <button type="submit" class="btn btn-primary btn-lg btn-block">Enviar pelo WhatsApp</button>
-          <p style="font-size:.8rem;color:var(--text-soft);margin:14px 0 0">Ao enviar, você abre uma conversa no WhatsApp com os dados preenchidos. Tratamos seus dados conforme a LGPD.</p>
+          <button type="submit" id="contactSubmit" class="btn btn-primary btn-lg btn-block">Continuar agendamento</button>
+          <p style="font-size:.8rem;color:var(--text-soft);margin:14px 0 0">Para aula experimental, você completa o agendamento no site. Para os demais assuntos, abrimos uma conversa no WhatsApp. Tratamos seus dados conforme a LGPD.</p>
         </form>
       </div>
     </div>
@@ -96,7 +96,7 @@
 
 <a class="fab-whats" data-cdc="wa-default" href="#" aria-label="Falar no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.115z"/></svg></a>
 
-<script src="assets/js/config.js?v=20260825"></script><script src="assets/js/data-service.js?v=20261007"></script><script src="assets/js/telemetry.js?v=20261104"></script><script src="assets/js/site.js?v=20261110-bf"></script><script src="assets/js/experience.js?v=20260826"></script><script src="assets/js/main.js?v=20260825"></script>
+<script src="assets/js/config.js?v=20260825"></script><script src="assets/js/data-service.js?v=20261007"></script><script src="assets/js/telemetry.js?v=20261104"></script><script src="assets/js/site.js?v=20261110-bf"></script><script src="assets/js/experience.js?v=20261112-trial"></script><script src="assets/js/main.js?v=20260825"></script>
 <script>
 (function(){
   var sel = document.getElementById('unidade');
@@ -104,11 +104,25 @@
   units.forEach(function(u){ var o=document.createElement('option'); o.value=u.id; o.textContent=u.name+' — '+u.city; sel.appendChild(o); });
   var head = window.CDC.data.get().meta.headOffice;
   var he = document.querySelector('[data-cdc="head"]'); if(he) he.textContent = head;
+  var reason = document.getElementById('motivo');
+  function updateContactButton(){
+    document.getElementById('contactSubmit').textContent = reason.value === 'trial' ? 'Continuar agendamento' : 'Enviar pelo WhatsApp';
+  }
+  reason.addEventListener('change', updateContactButton);
+  updateContactButton();
 
   document.getElementById('contactForm').addEventListener('submit', function(e){
     e.preventDefault();
     var f = e.target;
     var unit = window.CDC.data.unitById(sel.value) || window.CDC.data.defaultUnit();
+    if (f.motivo.value === 'trial') {
+      window.CDC.exp.openQuiz({
+        unitId: unit ? unit.id : undefined,
+        lead: { name: (f.nome.value + ' ' + f.sobrenome.value).trim(), phone: f.telefone.value, email: f.email.value },
+        interest: f.mensagem.value.trim()
+      });
+      return;
+    }
     var msg = 'Olá! Vim pelo site da Cia do Corpo.%0A'
       + '%0A*Nome:* '+encodeURIComponent(f.nome.value+' '+f.sobrenome.value)
       + '%0A*Telefone:* '+encodeURIComponent(f.telefone.value)

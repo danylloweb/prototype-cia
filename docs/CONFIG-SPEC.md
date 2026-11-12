@@ -149,15 +149,20 @@ unidade:
 
 ## Captura de leads (quiz → painel)
 
-O quiz pede nome + WhatsApp (e e-mail opcional) antes de abrir o WhatsApp e
+O quiz pede nome + WhatsApp (e e-mail opcional) e
 envia `POST {meta.apiBase}/landing/register-trial` com o header
 `X-Landing-Token: {meta.landingToken}` e o corpo
 `{name, phone, email, plan_id, unit_id, interest, date, time}`:
 
-- `meta.apiBase` e `meta.landingToken` vêm do config publicado; sem eles o
-  site só guarda o lead localmente (`localStorage.cdc_leads`) e segue pro
-  WhatsApp — o envio nunca bloqueia o redirecionamento (keepalive +
-  fire-and-forget).
+- Os CTAs de matrícula e aula experimental, inclusive a opção correspondente
+  no formulário de contato, passam pelo quiz e enviam ao mesmo endpoint.
+- O telefone deve ter 10 ou 11 dígitos, com DDD e sem começar por `55`;
+  entradas inválidas bloqueiam o envio.
+- `meta.apiBase` e `meta.landingToken` vêm do config publicado. Sem eles ou
+  em caso de falha no envio, o quiz informa o erro e permite tentar novamente;
+  uma cópia do lead fica em `localStorage.cdc_leads`.
+- O redirecionamento ocorre somente após resposta bem-sucedida com
+  `error: false` e `data.url`.
 - `unit_id` = `units[].dbId` (id numérico publicado pelo painel);
   `plan_id` = id da linha de `plans` resolvida pela mesma regra do overlay
   (groupLabel ↔ tier; `recurring` = Basic+). Ambos podem ir `null`.

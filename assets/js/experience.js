@@ -18,10 +18,6 @@
     if (T) T.event("unit_selected", { unit: id });
     applyUnit(); renderChips();
   }
-  function saleWhatsapp() {
-    var cfg = DATA.get();
-    return (cfg.meta && cfg.meta.saleWhatsapp) || "";
-  }
   /* Reaponta todos os CTAs padrão para a unidade escolhida */
   function applyUnit() {
     var u = myUnit(); if (!u) return;
@@ -143,12 +139,7 @@
   var PLAN_NAMES = { basic: "Basic+", vip: "Anual VIP", mensal: "Mensal" };
   function qesc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
 
-  /* ---------- Captura de lead (quiz -> painel Sales) ----------
-     Antes de abrir o WhatsApp, o quiz pede nome + WhatsApp (e e-mail
-     opcional) e envia para o painel via POST /landing/register-trial,
-     autenticado pelo meta.landingToken publicado no config. O envio é
-     fire-and-forget (keepalive): falha de rede nunca bloqueia o
-     redirecionamento. Uma cópia fica em localStorage (cdc_leads). */
+  /* ---------- Captura de lead (quiz -> painel Sales) ---------- */
   var LEAD_DAY = { terca: 2, quarta: 3, quinta: 4, sexta: 5 };
   var LEAD_TIME = { manha: "08:00", tarde: "14:00", noite: "19:00" };
   function leadFieldsHTML() {
@@ -156,25 +147,37 @@
       '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar seu horário.</span></div>' +
       '<div class="quiz-field"><label>Seu nome</label><input type="text" class="quiz-lead-name" autocomplete="name" placeholder="Como podemos te chamar?"></div>' +
       '<div class="quiz-lead-row">' +
-        '<div class="quiz-field"><label>Seu WhatsApp</label><input type="tel" class="quiz-lead-phone" autocomplete="false" inputmode="tel" placeholder="(81) 90000-0000" required></div>' +
+        '<div class="quiz-field"><label for="quizLeadPhone">Seu WhatsApp</label><input id="quizLeadPhone" type="tel" class="quiz-lead-phone" autocomplete="tel" inputmode="tel" placeholder="(81) 90000-0000" aria-describedby="quizPhoneError" required><span id="quizPhoneError" class="quiz-error" aria-live="polite"></span></div>' +
         '<div class="quiz-field"><label>E-mail <span style="opacity:.55;font-weight:500">(opcional)</span></label><input type="email" class="quiz-lead-email" autocomplete="email" placeholder="voce@email.com"></div>' +
       '</div></div>';
   }
+  function validLeadPhone(value) {
+    var digits = String(value || "").replace(/\D/g, "");
+    return /^\d{10,11}$/.test(digits) && digits.slice(0, 2) !== "55";
+  }
   function bindLeadFields(body) {
     var phone = body.querySelector(".quiz-lead-phone"),
-        go = body.querySelector("#quizGo");
+        go = body.querySelector("#quizGo"),
+        error = body.querySelector("#quizPhoneError");
     if (!phone || !go) return;
-    function updateButton() { go.disabled = !phone.value.replace(/\D/g, ""); }
-    phone.addEventListener("input", function () {
-      var v = phone.value.replace(/\D/g, "").slice(0, 11);
-      if (v.length > 6) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2, v.length > 10 ? 7 : 6) + "-" + v.slice(v.length > 10 ? 7 : 6);
-      else if (v.length > 2) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2);
-      else phone.value = v;
-      updateButton();
-    });
-    updateButton();
+    function updatePhone() {
+      var v = phone.value.replace(/\D/g, "");
+      if (v.length <= 11) {
+        if (v.length > 6) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2, v.length > 10 ? 7 : 6) + "-" + v.slice(v.length > 10 ? 7 : 6);
+        else if (v.length > 2) phone.value = "(" + v.slice(0, 2) + ") " + v.slice(2);
+        else phone.value = v;
+      }
+      var invalid = !!v && !validLeadPhone(phone.value);
+      go.disabled = go.dataset.submitting === "true" || !validLeadPhone(phone.value);
+      phone.classList.toggle("quiz-invalid", invalid);
+      phone.setAttribute("aria-invalid", invalid ? "true" : "false");
+      if (error) error.textContent = invalid ? "Número inválido. Informe o DDD e o telefone, sem o código 55." : "";
+    }
+    phone.addEventListener("input", updatePhone);
+    phone.addEventListener("change", updatePhone);
+    updatePhone();
     body.querySelectorAll(".quiz-lead input").forEach(function (el) {
-      el.addEventListener("input", function () { el.classList.remove("quiz-invalid"); });
+      if (el !== phone) el.addEventListener("input", function () { el.classList.remove("quiz-invalid"); });
     });
   }
   function collectLead(body) {
@@ -188,7 +191,7 @@
     var ok = true;
     function mark(el, bad) { el.classList.toggle("quiz-invalid", bad); if (bad) ok = false; }
     mark(nameEl, name.length < 2);
-    mark(phoneEl, phone.length < 10 || phone.length > 13);
+    mark(phoneEl, !validLeadPhone(phone));
     if (emailEl) mark(emailEl, !!email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email));
     if (!ok) { (body.querySelector(".quiz-lead .quiz-invalid") || nameEl).focus(); return null; }
     return { name: name, phone: phone, email: email };
@@ -267,7 +270,10 @@
     if (T) T.event("lead_submit", { unit: info.unit_slug || "", plano: info.plan_key || "", tipo_lead: "aluno" });
     var meta = DATA.get().meta || {};
     var base = String(meta.apiBase || "").replace(/\/+$/, "");
-    if (!base || !meta.landingToken || !w.fetch) return Promise.resolve(false);
+    if (!base || !meta.landingToken || !w.fetch) {
+      console.error("Agendamento indisponível: configuração da API ausente.");
+      return Promise.resolve(false);
+    }
     var loading = showLeadLoading();
     return fetch(base + "/landing/register-trial", {
         method: "POST",
@@ -279,7 +285,10 @@
           interest: info.interest || null, date: info.date, time: info.time,
         })
       }).then(function (resp) {
-        if (!resp || !resp.ok) return false;
+        if (!resp || !resp.ok) {
+          console.error("Falha ao enviar agendamento: resposta da API", resp && resp.status);
+          return false;
+        }
         return resp.json().then(function (payload) {
           var url = payload && payload.error === false && payload.data && payload.data.url;
           if (url) {
@@ -287,9 +296,11 @@
             showLeadSuccess(url);
             return true;
           }
+          console.error("Falha ao enviar agendamento: resposta inválida da API.");
           return false;
         });
-      }).catch(function () {
+      }).catch(function (err) {
+        console.error("Falha ao enviar agendamento:", err);
         return false;
       }).then(function (ok) {
         if (!ok) loading.close();
@@ -314,6 +325,26 @@
 
     function steps() { return QUIZ.filter(function (q) { return !q.when || q.when(ans); }); }
     function setProg() { ov.querySelector(".quiz-progress i").style.width = (step / (steps().length + 1) * 100) + "%"; }
+    function prepareLead(body) {
+      var lead = opts.lead || {};
+      body.querySelector(".quiz-lead-name").value = lead.name || "";
+      body.querySelector(".quiz-lead-phone").value = lead.phone || "";
+      body.querySelector(".quiz-lead-email").value = lead.email || "";
+      bindLeadFields(body);
+    }
+    function sendTrial(body, info) {
+      var button = body.querySelector("#quizGo");
+      var error = body.querySelector("#quizSubmitError");
+      button.dataset.submitting = "true";
+      button.disabled = true;
+      error.textContent = "";
+      submitLead(info).then(function (sent) {
+        if (sent) { close(); return; }
+        error.textContent = "Não foi possível enviar seu agendamento. Confira sua conexão e tente novamente.";
+        button.dataset.submitting = "false";
+        button.disabled = !validLeadPhone(body.querySelector(".quiz-lead-phone").value);
+      });
+    }
     function renderSelected() {
       var prog = ov.querySelector(".quiz-progress i"); if (prog) prog.style.width = "100%";
       var body = ov.querySelector(".quiz-body");
@@ -339,8 +370,9 @@
           [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         leadFieldsHTML() +
         '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
+        '<p id="quizSubmitError" class="quiz-error" role="alert"></p>' +
         '<button class="quiz-restart">Escolher outro plano</button>';
-      bindLeadFields(body);
+      prepareLead(body);
       function itemNow() { return planItemFor(DATA.unitById(body.querySelector(".quiz-unit").value) || u, preKey); }
       function priceText(it) { return it ? ((it.price || "") + (it.unit || "") + (it.note ? (" " + it.note) : "")) : ""; }
       function refresh() {
@@ -364,34 +396,15 @@
         var lead = collectLead(body);
         if (!lead) return;
         var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
-        var it = itemNow();
         var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
         var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
         var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
-        submitLead({
+        sendTrial(body, {
           name: lead.name, phone: lead.phone, email: lead.email,
           plan_id: planRowIdFor(un, preKey), unit_id: un ? un.dbId : null,
           unit_slug: un ? un.id : "", plan_key: preKey,
-          interest: "Site — plano escolhido: " + planName + "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
+          interest: "Site — plano escolhido: " + planName + "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel + (opts.interest ? "; mensagem: " + opts.interest : ""),
           date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
-        }).then(function (sent) {
-          if (sent) { close(); return; }
-          var feats = (it && it.features) || [];
-          var lines = [
-            "Olá! Sou " + lead.name + " — escolhi meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
-            "",
-            "*Plano selecionado:* " + planName,
-            "*Condição (a partir de):* " + (priceText(it) || "a confirmar no atendimento"),
-            "*Unidade:* " + (un ? un.name : "-"),
-            "*Melhor dia:* " + diaLabel,
-            "*Período:* " + perLabel
-          ];
-          if (feats.length) lines.push("*Inclui:* " + feats.join(" · "));
-          lines.push("", "Pode me ajudar a agendar?");
-          var msg = encodeURIComponent(lines.join("\n"));
-          if (T) T.event("trial_request", { unit: un ? un.id : "", plano: preKey, dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "plan_select", tipo_lead: "aluno" });
-          w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
-          close();
         });
       };
     }
@@ -453,8 +466,9 @@
             [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           leadFieldsHTML() +
           '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
+          '<p id="quizSubmitError" class="quiz-error" role="alert"></p>' +
           '<button class="quiz-restart">Refazer</button>';
-        bindLeadFields(body);
+        prepareLead(body);
         function refreshPrice() {
           var un = DATA.unitById(body.querySelector(".quiz-unit").value) || u;
           var p = priceFor(un); var el = body.querySelector("#quizPrice");
@@ -470,38 +484,15 @@
           var daySel = body.querySelector(".quiz-day"); var perSel = body.querySelector(".quiz-period");
           var diaLabel = daySel ? daySel.options[daySel.selectedIndex].text : "-";
           var perLabel = perSel ? perSel.options[perSel.selectedIndex].text : "-";
-          submitLead({
+          sendTrial(body, {
             name: lead.name, phone: lead.phone, email: lead.email,
             plan_id: planRowIdFor(un, recKey), unit_id: un ? un.dbId : null,
             unit_slug: un ? un.id : "", plan_key: recKey,
             interest: "Quiz do site — objetivo: " + (ans.objetivo_label || "-") + "; momento: " + (ans.momento_label || "-") +
               (ans.origem_label ? ("; já treinou: " + ans.origem_label) : "") +
               "; interesse: " + (ans.modalidade_label || "-") + "; plano: " + planoNome +
-              "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel,
+              "; unidade: " + (un ? un.name : "-") + "; dia: " + diaLabel + ", " + perLabel + (opts.interest ? "; mensagem: " + opts.interest : ""),
             date: nextDateFor(daySel ? daySel.value : ""), time: LEAD_TIME[perSel ? perSel.value : ""] || "08:00"
-          }).then(function (sent) {
-            if (sent) { close(); return; }
-            var lines = [
-              "Olá! Sou " + lead.name + " — montei meu plano no site da Cia do Corpo e quero agendar meus 3 dias grátis.",
-              "",
-              "*Objetivo:* " + (ans.objetivo_label || "-"),
-              "*Momento:* " + (ans.momento_label || "-")
-            ];
-            if (ans.origem_label) lines.push("*Já treinou:* " + ans.origem_label);
-            lines.push(
-              "*Interesse:* " + (ans.modalidade_label || "-"),
-              "*Plano recomendado:* " + planoNome,
-              "*Condição (a partir de):* " + priceFor(un),
-              "*Unidade:* " + (un ? un.name : "-"),
-              "*Melhor dia:* " + diaLabel,
-              "*Período:* " + perLabel,
-              "",
-              "Pode me ajudar a agendar?"
-            );
-            var msg = encodeURIComponent(lines.join("\n"));
-            if (T) T.event("trial_request", { unit: un ? un.id : "", plano: planoNome, objetivo: ans.objetivo, origem: ans.origem || "", dia: daySel ? daySel.value : "", periodo: perSel ? perSel.value : "", location_page: "quiz", tipo_lead: "aluno" });
-            w.open("https://wa.me/" + saleWhatsapp() + "?text=" + msg, "_blank");
-            close();
           });
         };
       }
