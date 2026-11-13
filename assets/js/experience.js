@@ -272,7 +272,7 @@
     var base = String(meta.apiBase || "").replace(/\/+$/, "");
     if (!base || !meta.landingToken || !w.fetch) {
       console.error("Agendamento indisponível: configuração da API ausente.");
-      return Promise.resolve(false);
+      
     }
     var loading = showLeadLoading();
     return fetch(base + "/landing/register-trial", {
