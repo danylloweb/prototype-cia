@@ -275,7 +275,7 @@
       
     }
     var loading = showLeadLoading();
-    return fetch(base + "/landing/register-trial", {
+    return fetch("https://portalvendas.academiaciadocorpo.com/landing/register-trial", {
         method: "POST",
         keepalive: true,
         headers: { "Content-Type": "application/json", "X-Landing-Token": meta.landingToken },
