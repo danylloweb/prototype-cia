@@ -340,6 +340,24 @@
       error.textContent = "";
       submitLead(info).then(function (sent) {
         if (sent) { close(); return; }
+        var meta = DATA.get().meta || {};
+        var whatsapp = String(meta.saleWhatsapp || "").replace(/\D/g, "");
+        if (whatsapp) {
+          var lines = [
+            "Olá! Sou " + info.name + " e quero agendar meus 3 dias grátis.",
+            "",
+            "*WhatsApp:* " + info.phone,
+            info.email ? "*E-mail:* " + info.email : "",
+            "*Detalhes:* " + (info.interest || "-"),
+            "*Data:* " + (info.date || "-"),
+            "*Horário:* " + (info.time || "-"),
+            "",
+            "Pode me ajudar a agendar?"
+          ].filter(Boolean);
+          if (T) T.event("trial_request", { unit: info.unit_slug || "", plano: info.plan_key || "", tipo_lead: "aluno" });
+          w.location.href = "https://wa.me/" + whatsapp + "?text=" + encodeURIComponent(lines.join("\n"));
+          return;
+        }
         error.textContent = "Não foi possível enviar seu agendamento. Confira sua conexão e tente novamente.";
         button.dataset.submitting = "false";
         button.disabled = !validLeadPhone(body.querySelector(".quiz-lead-phone").value);
