@@ -144,7 +144,7 @@
   var LEAD_TIME = { manha: "08:00", tarde: "14:00", noite: "19:00" };
   function leadFieldsHTML() {
     return '<div class="quiz-lead">' +
-      '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar seu horário.</span></div>' +
+      '<div class="quiz-lead-title">Quase lá! 🧡<span>Pra gente te receber pelo nome e guardar o seu horário.</span></div>' +
       '<div class="quiz-field"><label>Seu nome</label><input type="text" class="quiz-lead-name" autocomplete="name" placeholder="Como podemos te chamar?"></div>' +
       '<div class="quiz-lead-row">' +
         '<div class="quiz-field"><label for="quizLeadPhone">Seu WhatsApp</label><input id="quizLeadPhone" type="tel" class="quiz-lead-phone" autocomplete="tel" inputmode="tel" placeholder="(81) 90000-0000" aria-describedby="quizPhoneError" required><span id="quizPhoneError" class="quiz-error" aria-live="polite"></span></div>' +
@@ -326,7 +326,7 @@
     function steps() { return QUIZ.filter(function (q) { return !q.when || q.when(ans); }); }
     function setProg() { ov.querySelector(".quiz-progress i").style.width = (step / (steps().length + 1) * 100) + "%"; }
     function prepareLead(body) {
-      var lead = opts.lead || {};
+      let lead = opts.lead || {};
       body.querySelector(".quiz-lead-name").value = lead.name || "";
       body.querySelector(".quiz-lead-phone").value = lead.phone || "";
       body.querySelector(".quiz-lead-email").value = lead.email || "";
@@ -369,10 +369,8 @@
       var planName = (planItemFor(u, preKey) || {}).name || PLAN_NAMES[preKey] || "Seu plano";
       var unitOpts = DATA.activeUnits().map(function (x) { return '<option value="' + x.id + '"' + (u && x.id === u.id ? " selected" : "") + '>' + x.name + ' — ' + x.city + '</option>'; }).join("");
       body.innerHTML = '<span class="quiz-step">Seu plano selecionado</span>' +
-        '<div class="quiz-result"><div class="quiz-badge">' + qesc(planName) + '</div>' +
-        '<h3>' + qesc(planName) + ' — ótima escolha</h3>' +
-        '<ul id="quizFeats" style="list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px"></ul>' +
-        '<div id="quizPrice" style="margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
+        '<div class="quiz-badge quiz-badge-small">' + qesc(planName) + '</div>' +
+        leadFieldsHTML() +
         '<div class="quiz-field">' +
           '<div id="quizUnitConfirm"><label style="display:block;margin-bottom:6px">Sua unidade</label>' +
             '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06)">' +
@@ -386,9 +384,12 @@
           [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
           [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
-        leadFieldsHTML() +
-        '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
+        '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar Agora</button>' +
         '<p id="quizSubmitError" class="quiz-error" role="alert"></p>' +
+        '<div class="quiz-result">' +
+        '<h3>' + qesc(planName) + ' — ótima escolha</h3>' +
+        '<ul id="quizFeats" style="list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px"></ul>' +
+        '<div id="quizPrice" style="margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
         '<button class="quiz-restart">Escolher outro plano</button>';
       prepareLead(body);
       function itemNow() { return planItemFor(DATA.unitById(body.querySelector(".quiz-unit").value) || u, preKey); }
@@ -473,18 +474,19 @@
           return price + (/\d/.test(mat) ? (" + matrícula " + mat) : "");
         }
         body.innerHTML = '<span class="quiz-step">Seu plano recomendado</span>' +
-          '<div class="quiz-result"><div class="quiz-badge">' + planoNome + '</div>' +
-          '<h3>' + planoNome + ' — feito pra você</h3>' +
-          '<p>Você quer <b>' + (OBJ[ans.objetivo] || "treinar") + '</b> e curte <b>' + (MOD[ans.modalidade] || "treinar") + '</b>. ' + reason + '</p>' +
-          '<div id="quizPrice" style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
+          '<div class="quiz-badge quiz-badge-small">' + planoNome + '</div>' +
+          leadFieldsHTML() +
           '<div class="quiz-field"><label>Onde quer treinar?</label><select class="quiz-unit">' + unitOpts + '</select></div>' +
           '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
             [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
             [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
-          leadFieldsHTML() +
           '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
           '<p id="quizSubmitError" class="quiz-error" role="alert"></p>' +
+          '<div class="quiz-result">' +
+          '<h3>' + planoNome + ' — feito pra você</h3>' +
+          '<p>Você quer <b>' + (OBJ[ans.objetivo] || "treinar") + '</b> e curte <b>' + (MOD[ans.modalidade] || "treinar") + '</b>. ' + reason + '</p>' +
+          '<div id="quizPrice" style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:.92rem"></div></div>' +
           '<button class="quiz-restart">Refazer</button>';
         prepareLead(body);
         function refreshPrice() {
