@@ -604,6 +604,7 @@ body.has-sticky .fab-whats{transform:translateY(-78px)}
 .quiz-opt .em{font-size:1.4rem}
 .quiz-result{text-align:center;margin-bottom:20px}
 .quiz-badge{display:inline-block;background:var(--brand-grad);color:#fff;font-family:var(--font-display);font-weight:900;font-size:1.1rem;padding:8px 22px;border-radius:999px;text-transform:uppercase;margin-bottom:14px}
+.quiz-badge-small{display:table;margin:0 auto 10px;font-size:.78rem;padding:5px 13px}
 .quiz-result p{color:var(--text-soft)}
 .quiz-field{margin-bottom:18px}
 .quiz-field label{display:block;font-weight:600;font-size:.85rem;margin-bottom:7px}
