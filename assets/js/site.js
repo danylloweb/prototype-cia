@@ -340,6 +340,14 @@
     });
     var def = isUnitPage ? null : DATA.defaultUnit();
     select(isUnitPage ? requestedUnitId : (def && byUnit[def.id] ? def.id : units[0].id));
+    if (host.hasAttribute("data-scroll-featured")) {
+      var featured = host.querySelector(".plan.featured");
+      if (featured) {
+        var header = d.querySelector(".site-header");
+        var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+        w.scrollTo({ top: Math.max(0, w.scrollY + featured.getBoundingClientRect().top - headerBottom - 12), behavior: "smooth" });
+      }
+    }
   }
 
   function init() {
