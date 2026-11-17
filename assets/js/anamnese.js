@@ -986,7 +986,8 @@
   /* ------------------------------------------------------------- payload */
 
   function fullAddress() {
-    var parts = [val("fStreet"), val("fNumber"), val("fComplement"), val("fDistrict"), val("fCity"), val("fState").toUpperCase()];
+    var cep = val("fCep");
+    var parts = [val("fStreet"), val("fNumber"), val("fComplement"), val("fDistrict"), val("fCity"), val("fState").toUpperCase(), cep ? "CEP " + maskCep(cep) : ""];
     return parts.filter(Boolean).join(", ");
   }
 
