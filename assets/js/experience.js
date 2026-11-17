@@ -381,7 +381,7 @@
           '<div id="quizUnitPick" style="display:none"><label>Onde quer treinar?</label><select class="quiz-unit">' + unitOpts + '</select></div>' +
         '</div>' +
         '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
-          [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+          [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
           [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
         '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar Agora</button>' +
@@ -478,7 +478,7 @@
           leadFieldsHTML() +
           '<div class="quiz-field"><label>Onde quer treinar?</label><select class="quiz-unit">' + unitOpts + '</select></div>' +
           '<div class="quiz-field"><label>Melhor dia para sua aula experimental</label><select class="quiz-day">' +
-            [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"],["sexta","Sexta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
+            [["terca","Terça-feira"],["quarta","Quarta-feira"],["quinta","Quinta-feira"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<div class="quiz-field"><label>Qual período?</label><select class="quiz-period">' +
             [["manha","Manhã — 7h às 11h"],["tarde","Tarde — 12h às 18h"],["noite","Noite — 19h às 22h"]].map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join("") + '</select></div>' +
           '<button type="button" class="btn-quiz" id="quizGo" disabled>' + WA + ' Agendar meus 3 dias grátis</button>' +
