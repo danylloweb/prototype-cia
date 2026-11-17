@@ -17,6 +17,8 @@
   var REMOTE_FALLBACK_URL = w.CDC_REMOTE_CONFIG_FALLBACK || "https://portalvendas.academiaciadocorpo.com/public-config";
   var REMOTE_KEY = "cdc_remote_config_v2"; // v2: descarta overlay de planos salvo com a regra antiga
   var EXAMPLE_CONFIG_URL = "/docs/config-exemplo.json";
+  var reloadOnFirstLoad = !document.currentScript ||
+    document.currentScript.getAttribute("data-reload-on-first-load") !== "false";
   var examplePlans = null;
   var examplePlansRequest = null;
 
@@ -214,7 +216,7 @@
         });
       }
       // S3 primeiro; se o CORS bloquear (ou der erro), tenta o painel
-      buscar(REMOTE_URL).catch(function () {
+      return buscar(REMOTE_URL).catch(function () {
         return REMOTE_FALLBACK_URL ? buscar(REMOTE_FALLBACK_URL) : Promise.reject();
       }).then(function (raw) {
         var norm = normalizeRemote(raw);
@@ -227,7 +229,7 @@
         try { w.dispatchEvent(new CustomEvent("cdc:config-updated", { detail: self.get() })); } catch (e) {}
         var flag = "cdc_remote_reload_" + ((norm.meta && norm.meta.version) || "0");
         try {
-          if (!prev && !sessionStorage.getItem(flag)) {
+          if (reloadOnFirstLoad && !prev && !sessionStorage.getItem(flag)) {
             sessionStorage.setItem(flag, "1");
             w.location.reload();
           }

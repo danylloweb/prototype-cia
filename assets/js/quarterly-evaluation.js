@@ -1,15 +1,7 @@
 (function () {
   "use strict";
 
-  const units = [
-    "Afogados",
-    "Água Fria",
-    "Avenida Norte",
-    "Bomba do Hemetério",
-    "Ouro Preto",
-    "Peixinhos",
-    "Areias"
-  ];
+  const units = window.CiaQuarterlyEvaluationService.units.map((unit) => unit.name);
   const roles = [
     "ASG",
     "Gestão",
@@ -226,6 +218,9 @@
   }
 
   function friendlyError(error) {
+    if (error.name === "ConfigurationError" || error instanceof TypeError) {
+      return error.message;
+    }
     if (error.name === "TimeoutError") {
       return "A conexão demorou mais que o esperado. Suas respostas continuam salvas; tente enviar novamente.";
     }
@@ -236,6 +231,9 @@
     }
     if (error.status === 429) {
       return "Recebemos muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.";
+    }
+    if (error.status === 401 || error.status === 403) {
+      return "O serviço de avaliação está indisponível. Suas respostas continuam preenchidas; tente novamente em instantes.";
     }
     if (error.status >= 500) {
       return "O serviço está temporariamente indisponível. Suas respostas continuam preenchidas; tente novamente em instantes.";
@@ -249,6 +247,10 @@
     state.submitting = true;
     let submitError = "";
     nextButton.disabled = true;
+    backButton.disabled = true;
+    stepContent.querySelectorAll("input, textarea, button").forEach((field) => {
+      field.disabled = true;
+    });
     nextButton.classList.add("is-loading");
     nextButton.textContent = "Enviando...";
     nextButton.setAttribute("aria-busy", "true");
@@ -262,6 +264,7 @@
       submitError = friendlyError(error);
     } finally {
       state.submitting = false;
+      backButton.disabled = false;
       nextButton.classList.remove("is-loading");
       nextButton.removeAttribute("aria-busy");
       if (!successView.hidden) return;
@@ -272,6 +275,7 @@
   }
 
   stepContent.addEventListener("click", (event) => {
+    if (state.submitting) return;
     const profileButton = event.target.closest(".profile-option");
     const optionButton = event.target.closest(".answer-option");
     const starButton = event.target.closest(".star-button");
@@ -281,6 +285,7 @@
   });
 
   stepContent.addEventListener("input", (event) => {
+    if (state.submitting) return;
     const field = event.target.dataset.field;
     if (field && (event.target.matches("input") || event.target.matches("textarea"))) {
       answers()[field] = event.target.value;
@@ -303,6 +308,7 @@
   nextButton.addEventListener("click", advanceStep);
 
   backButton.addEventListener("click", () => {
+    if (state.submitting) return;
     if (state.stepIndex > 0) {
       state.stepIndex -= 1;
       renderStep();
