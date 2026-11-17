@@ -174,7 +174,25 @@ envia `POST {meta.apiBase}/landing/register-trial` com o header
 ## Segurança
 
 - **Nunca publicar segredos** neste arquivo (ele é público): tokens de API,
-  `accessToken`, `apiSecret`, credenciais de integrações. Publicar apenas os
-  IDs de tags que já são públicos por natureza (GTM, GA4, Pixel, Clarity).
+  `accessToken`, `apiSecret`, credenciais de integrações. A exceção operacional
+  é `meta.landingToken`, usado nas requisições públicas de landing page: ele
+  fica visível no navegador e não deve ser tratado como credencial secreta.
+  Publicar apenas os IDs de tags que já são públicos por natureza (GTM, GA4,
+  Pixel, Clarity).
 - Credenciais de integrações (Google Ads, Meta CAPI etc.) ficam somente no
   backend do painel.
+
+## Pesquisa Destaques do Trimestre
+
+- A página `/avaliacao-trimestral` envia alunos e funcionários para
+  `POST https://portalvendas.academiaciadocorpo.com/register-satisfaction-survey`,
+  com `X-Landing-Token` obtido de `meta.landingToken`. O Portal precisa publicar
+  esse valor em `/public-config`; sem ele, o envio fica indisponível e pode ser
+  tentado novamente.
+- O token é público para qualquer visitante. O Portal deve limitar seu uso e
+  aceitar CORS para a origem do site, inclusive o preflight `OPTIONS` para
+  `POST` e os headers `Content-Type`, `Accept` e `X-Landing-Token`.
+- Os IDs numéricos de unidade são mantidos no serviço da pesquisa conforme o
+  cadastro do Portal. Mudanças no cadastro precisam ser refletidas ali. Alunos
+  sem nome são enviados como `Aluno anônimo`; trimestre e ano são definidos
+  pelo servidor.
