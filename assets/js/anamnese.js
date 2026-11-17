@@ -165,7 +165,6 @@
       "Confira os detalhes da sua escolha:",
       "",
       "Plano selecionado: " + (plan.plan || "-"),
-      "Condição (a partir de): " + (plan.condition || "a confirmar no atendimento"),
       "Unidade: " + unitName,
       "Melhor dia: " + day,
       "Período: " + period
