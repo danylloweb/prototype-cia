@@ -1,6 +1,7 @@
 (function () {
   "use strict";
 
+  const NOT_APPLICABLE = "not_applicable";
   const units = window.CiaQuarterlyEvaluationService.units.map((unit) => unit.name);
   const roles = [
     "ASG",
@@ -18,15 +19,15 @@
     { field: "name", label: "Qual seu nome?", type: "text", optional: true },
     { field: "unit", label: "Qual unidade você treina?", type: "options", options: units },
     { field: "rating_reception", label: "Como você avalia o atendimento da recepção?", type: "stars", section: "Avaliação geral da equipe" },
-    { field: "rating_weight_training", label: "Como você avalia os professores de musculação?", type: "stars" },
-    { field: "rating_group_classes", label: "Como você avalia os professores de ginástica?", type: "stars" },
-    { field: "rating_muay_thai", label: "Como você avalia os professores de Muay Thai?", type: "stars" },
-    { field: "rating_welcome", label: "Você se sente acolhido(a) e respeitado(a) pelos funcionários da Cia?", type: "stars" },
+    { field: "rating_weight_training", label: "Como você avalia os professores de musculação?", type: "stars", allowNotApplicable: true },
+    { field: "rating_group_classes", label: "Como você avalia os professores de ginástica?", type: "stars", allowNotApplicable: true },
+    { field: "rating_muay_thai", label: "Como você avalia os professores de Artes Marciais?", type: "stars", allowNotApplicable: true },
+    { field: "rating_welcome", label: "O quanto você se sente acolhido(a) e respeitado(a) pelos funcionários da Cia?", type: "stars" },
     { field: "employee_who_makes_day_better", label: "Tem algum(a) funcionário(a) que faz seu dia melhor quando você chega na academia? Quem é?", type: "textarea", section: "Reconhecimento" },
     { field: "recognition_reason", label: "Por que essa pessoa merece reconhecimento?", type: "textarea" },
     { field: "quarterly_highlight", label: "Se pudesse escolher o destaque do Trimestre, quem seria?", type: "textarea" },
-    { field: "special_mention", label: "Existe outro profissional que merece uma menção especial? Quem e por quê?", type: "textarea" },
-    { field: "final_suggestion", label: "Deseja deixar um elogio, crítica ou sugestão final?", type: "textarea", optional: true, section: "Vamos finalizar" }
+    { field: "special_mention", label: "Existe outro profissional que merece uma menção especial? Quem e por quê?", type: "textarea", optional: false },
+    { field: "final_suggestion", label: "Deseja deixar um elogio, crítica ou sugestão final?", type: "conditional-text", section: "Vamos finalizar" }
   ];
   const employeeSteps = [
     { field: "name", label: "Qual seu nome completo?", type: "text" },
@@ -38,7 +39,7 @@
     { field: "additional_nomination", label: "Tem mais alguém que você gostaria de destacar? Quem e por quê?", type: "textarea", optional: true },
     { field: "colleague_attitude", label: "Teve alguma atitude de colega que merece ser valorizada? Qual?", type: "textarea", optional: true, section: "Destaques do time" },
     { field: "professional_highlight_attitude", label: "Que atitude, para você, faz um profissional se destacar na Cia do Corpo?", type: "textarea" },
-    { field: "final_suggestion", label: "Deseja deixar um elogio, crítica ou sugestão final?", type: "textarea", optional: true, section: "Vamos finalizar" }
+    { field: "final_suggestion", label: "Deseja deixar um elogio, crítica ou sugestão final?", type: "conditional-text", section: "Vamos finalizar" }
   ];
 
   const form = document.getElementById("survey-form");
@@ -48,6 +49,7 @@
   const progressFill = document.getElementById("progress-fill");
   const nextButton = document.getElementById("next-button");
   const backButton = document.getElementById("back-button");
+  const requiredNote = document.getElementById("required-note");
   const message = document.getElementById("form-message");
   const formView = document.getElementById("form-view");
   const successView = document.getElementById("success-view");
@@ -118,19 +120,29 @@
   }
 
   function renderStars(step) {
-    const selected = Number(valueFor(step.field));
+    const selected = valueFor(step.field);
     return `<div class="star-rating" role="radiogroup" aria-labelledby="label-${step.field}">
       ${[1, 2, 3, 4, 5].map((rating) => `
-        <button class="star-button${rating <= selected ? " is-active" : ""}" type="button" role="radio" data-rating="${rating}" data-field="${step.field}" aria-checked="${selected === rating}" aria-label="${rating} ${rating === 1 ? "estrela" : "estrelas"}">${rating <= selected ? "★" : "☆"}</button>
+        <button class="star-button${typeof selected === "number" && rating <= selected ? " is-active" : ""}" type="button" role="radio" data-rating="${rating}" data-field="${step.field}" aria-checked="${selected === rating}" aria-label="${rating} ${rating === 1 ? "estrela" : "estrelas"}">${typeof selected === "number" && rating <= selected ? "★" : "☆"}</button>
       `).join("")}
+      ${step.allowNotApplicable ? `<button class="option-button rating-na-button" type="button" role="radio" data-field="${step.field}" aria-checked="${selected === NOT_APPLICABLE}">Não faço / não utilizo</button>` : ""}
     </div>
-    <p class="star-hint">Selecione de 1 a 5 estrelas</p>`;
+    <p class="star-hint">${step.allowNotApplicable ? "Selecione de 1 a 5 estrelas ou marque que não faz/não utiliza." : "Selecione de 1 a 5 estrelas"}</p>`;
   }
 
   function renderField(step) {
     const value = escapeHtml(valueFor(step.field));
     if (step.type === "options") return renderOptions(step);
     if (step.type === "stars") return renderStars(step);
+    if (step.type === "conditional-text") {
+      const choice = valueFor(`${step.field}_choice`);
+      return `<div class="option-list" role="group" aria-labelledby="label-${step.field}">
+        ${["Sim", "Não"].map((option) => `
+          <button class="option-button conditional-choice" type="button" data-value="${option === "Sim" ? "yes" : "no"}" aria-pressed="${choice === (option === "Sim" ? "yes" : "no")}">${option}</button>
+        `).join("")}
+      </div>
+      ${choice === "yes" ? `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" required placeholder="Justifique sua resposta...">${value}</textarea>` : ""}`;
+    }
     if (step.type === "textarea") {
       return `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" ${step.optional ? "" : "required"} placeholder="${step.optional ? "Opcional..." : "Escreva aqui..."}">${value}</textarea>`;
     }
@@ -147,6 +159,8 @@
         ${labelMarkup(step)}
         ${renderField(step)}`;
     }
+
+    requiredNote.hidden = state.stepIndex > 0 && getCurrentStep().optional;
 
     const total = state.profile ? currentSteps().length + 1 : 1;
     const current = Math.min(state.stepIndex + 1, total);
@@ -178,6 +192,20 @@
 
     const step = getCurrentStep();
     const value = valueFor(step.field);
+    if (step.type === "conditional-text") {
+      const choice = valueFor(`${step.field}_choice`);
+      if (choice !== "yes" && choice !== "no") {
+        showMessage("Selecione Sim ou Não antes de avançar.");
+        stepContent.querySelector(".conditional-choice")?.focus();
+        return false;
+      }
+      if (choice === "yes" && (typeof value !== "string" || !value.trim())) {
+        showMessage("Preencha sua resposta antes de avançar.");
+        stepContent.querySelector(`[data-field="${step.field}"]`)?.focus();
+        return false;
+      }
+      return true;
+    }
     if (!step.optional && (value === "" || (typeof value === "string" && !value.trim()))) {
       showMessage("Preencha este campo antes de avançar.");
       const focusTarget = stepContent.querySelector(`[data-field="${step.field}"]`);
@@ -205,6 +233,19 @@
     message.hidden = true;
   }
 
+  function selectConditionalChoice(button) {
+    const step = getCurrentStep();
+    answers()[`${step.field}_choice`] = button.dataset.value;
+    if (button.dataset.value === "no") {
+      delete answers()[step.field];
+    }
+    renderStep();
+    const target = button.dataset.value === "yes"
+      ? stepContent.querySelector(`[data-field="${step.field}"]`)
+      : stepContent.querySelector(`.conditional-choice[data-value="${button.dataset.value}"]`);
+    target?.focus({ preventScroll: true });
+  }
+
   function selectRating(button) {
     const field = button.dataset.field;
     answers()[field] = Number(button.dataset.rating);
@@ -214,6 +255,19 @@
       star.textContent = active ? "★" : "☆";
       star.setAttribute("aria-checked", String(star === button));
     });
+    const notApplicableButton = stepContent.querySelector(".rating-na-button");
+    notApplicableButton?.setAttribute("aria-checked", "false");
+    message.hidden = true;
+  }
+
+  function selectNotApplicable(button) {
+    answers()[button.dataset.field] = NOT_APPLICABLE;
+    stepContent.querySelectorAll(".star-button").forEach((star) => {
+      star.classList.remove("is-active");
+      star.textContent = "☆";
+      star.setAttribute("aria-checked", "false");
+    });
+    button.setAttribute("aria-checked", "true");
     message.hidden = true;
   }
 
@@ -278,10 +332,14 @@
     if (state.submitting) return;
     const profileButton = event.target.closest(".profile-option");
     const optionButton = event.target.closest(".answer-option");
+    const conditionalChoiceButton = event.target.closest(".conditional-choice");
     const starButton = event.target.closest(".star-button");
+    const notApplicableButton = event.target.closest(".rating-na-button");
     if (profileButton) selectProfile(profileButton.dataset.profile);
     if (optionButton) selectOption(optionButton);
+    if (conditionalChoiceButton) selectConditionalChoice(conditionalChoiceButton);
     if (starButton) selectRating(starButton);
+    if (notApplicableButton) selectNotApplicable(notApplicableButton);
   });
 
   stepContent.addEventListener("input", (event) => {
@@ -301,8 +359,7 @@
     }
     state.stepIndex += 1;
     renderStep();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    stepContent.querySelector("input, textarea, .option-button, .star-button")?.focus();
+    stepContent.querySelector("input, textarea, .option-button, .star-button")?.focus({ preventScroll: true });
   }
 
   nextButton.addEventListener("click", advanceStep);
@@ -312,8 +369,7 @@
     if (state.stepIndex > 0) {
       state.stepIndex -= 1;
       renderStep();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      stepContent.querySelector("input, textarea, .option-button, .star-button")?.focus();
+      stepContent.querySelector("input, textarea, .option-button, .star-button")?.focus({ preventScroll: true });
     }
   });
 

@@ -77,6 +77,29 @@ test("aluno sem nome é anônimo; campos opcionais vazios são omitidos", () => 
   assert.deepEqual(plain(payload), { type: "aluno", name: "Aluno anônimo", unit_id: 7 });
 });
 
+test("respostas não aplicáveis omitem as notas de atividades que o aluno não pratica", () => {
+  const payload = createService().buildPayload("Aluno", {
+    unit: "Areias",
+    rating_weight_training: "not_applicable",
+    rating_group_classes: "not_applicable",
+    rating_muay_thai: "not_applicable"
+  });
+  assert.deepEqual(plain(payload), { type: "aluno", name: "Aluno anônimo", unit_id: 7 });
+  assert.throws(() => createService().buildPayload("Aluno", {
+    unit: "Areias", rating_reception: "not_applicable"
+  }), /notas/);
+});
+
+test("sugestão final só é enviada quando a resposta é Sim e contém justificativa", () => {
+  const service = createService();
+  assert.deepEqual(plain(service.buildPayload("Aluno", {
+    unit: "Areias", final_suggestion_choice: "no"
+  })), { type: "aluno", name: "Aluno anônimo", unit_id: 7 });
+  assert.equal(service.buildPayload("Aluno", {
+    unit: "Areias", final_suggestion_choice: "yes", final_suggestion: "Atendimento cordial"
+  }).final_suggestion, "Atendimento cordial");
+});
+
 test("perfil, unidade, nome de funcionário e notas inválidos são rejeitados", () => {
   const service = createService();
   assert.throws(() => service.buildPayload("outro", student), /Perfil inválido/);
@@ -191,7 +214,7 @@ for (const profile of ["Aluno", "Funcionário"]) {
   test(`formulário de ${profile} conserva respostas após erro e só confirma após sucesso`, async () => {
     const elements = {};
     for (const id of ["survey-form", "step-content", "progress-count", "progress-track", "progress-fill",
-      "next-button", "back-button", "form-message", "form-view", "success-view"]) {
+      "next-button", "back-button", "required-note", "form-message", "form-view", "success-view"]) {
       elements[id] = {
         hidden: id === "success-view", disabled: false, style: {}, innerHTML: "", textContent: "",
         handlers: {}, classList: { add() {}, remove() {}, toggle() {} },
@@ -235,8 +258,29 @@ for (const profile of ["Aluno", "Funcionário"]) {
         "quarterly_highlight", "special_mention", "final_suggestion"]
       : ["employee_role", "employee_nomination", "nomination_reason", "admired_qualities",
         "additional_nomination", "colleague_attitude", "professional_highlight_attitude", "final_suggestion"];
+    const notApplicableFields = ["rating_weight_training", "rating_group_classes", "rating_muay_thai"];
     for (const field of fields) {
-      if (field.startsWith("rating_")) clickOption("star-button", { field, rating: "5" });
+      if (field === "final_suggestion") {
+        next();
+        assert.match(elements["form-message"].textContent, /Sim ou Não/);
+        if (profile === "Aluno") {
+          clickOption("conditional-choice", { value: "yes" });
+          assert.match(content.innerHTML, /textarea[^>]*required/);
+          next();
+          assert.match(elements["form-message"].textContent, /Preencha sua resposta/);
+          input(field, "Resposta final_suggestion");
+        } else {
+          clickOption("conditional-choice", { value: "no" });
+          assert.doesNotMatch(content.innerHTML, /textarea[^>]*data-field="final_suggestion"/);
+        }
+        next();
+        continue;
+      }
+      if (field.startsWith("rating_")) {
+        assert.equal(content.innerHTML.includes("Não faço / não utilizo"), notApplicableFields.includes(field));
+      }
+      if (field === "rating_group_classes") clickOption("rating-na-button", { field });
+      else if (field.startsWith("rating_")) clickOption("star-button", { field, rating: "5" });
       else if (field === "employee_role") clickOption("answer-option", { field, value: "Gestão" });
       else input(field, `Resposta ${field}`);
       next();
@@ -245,7 +289,11 @@ for (const profile of ["Aluno", "Funcionário"]) {
     assert.equal(elements["success-view"].hidden, true);
     assert.equal(elements["form-view"].hidden, false);
     assert.match(elements["form-message"].textContent, /indisponível/);
-    assert.match(content.innerHTML, /Resposta final_suggestion/);
+    if (profile === "Aluno") {
+      assert.match(content.innerHTML, /Resposta final_suggestion/);
+    } else {
+      assert.doesNotMatch(content.innerHTML, /textarea[^>]*data-field="final_suggestion"/);
+    }
     assert.equal(elements["back-button"].disabled, false);
     next();
     await new Promise(setImmediate);
@@ -253,6 +301,14 @@ for (const profile of ["Aluno", "Funcionário"]) {
     assert.equal(elements["form-view"].hidden, true);
     assert.deepEqual(submissions[0], submissions[1]);
     assert.equal(submissions[0].answers.unit, "Cia Concept Casa Caiada");
+    if (profile === "Aluno") {
+      assert.equal(submissions[0].answers.rating_group_classes, "not_applicable");
+      assert.equal(submissions[0].answers.final_suggestion_choice, "yes");
+      assert.equal(submissions[0].answers.final_suggestion, "Resposta final_suggestion");
+    } else {
+      assert.equal(submissions[0].answers.final_suggestion_choice, "no");
+      assert.equal("final_suggestion" in submissions[0].answers, false);
+    }
   });
 }
 
