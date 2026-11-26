@@ -16,6 +16,9 @@
     "rating_reception", "rating_weight_training", "rating_group_classes",
     "rating_muay_thai", "rating_welcome"
   ];
+  const NOT_APPLICABLE_RATING_FIELDS = [
+    "rating_weight_training", "rating_group_classes", "rating_muay_thai"
+  ];
   const STUDENT_FIELDS = [
     "rating_reception",
     "rating_weight_training",
@@ -83,6 +86,7 @@
     fields.forEach((field) => {
       const value = answers[field];
       if (value == null || value === "") return;
+      if (NOT_APPLICABLE_RATING_FIELDS.includes(field) && value === "not_applicable") return;
       if (RATING_FIELDS.includes(field)) {
         if (!Number.isInteger(value) || value < 1 || value > 5) {
           throw new TypeError("As notas devem ser números inteiros de 1 a 5.");
