@@ -2,6 +2,7 @@
   "use strict";
 
   const NOT_APPLICABLE = "not_applicable";
+  const MAX_TEXTAREA_LENGTH = 500;
   const units = window.CiaQuarterlyEvaluationService.units.map((unit) => unit.name);
   const roles = [
     "ASG",
@@ -34,12 +35,10 @@
     { field: "unit", label: "Qual unidade você trabalha?", type: "options", options: units },
     { field: "employee_role", label: "Qual sua função?", type: "options", options: roles },
     { field: "employee_nomination", label: "Quem você indicaria como Funcionário(a) do Trimestre?", type: "textarea", optional: true, section: "Reconhecimento" },
-    { field: "nomination_reason", label: "Por que essa pessoa merece ser reconhecida?", type: "textarea", optional: true },
-    { field: "admired_qualities", label: "Quais qualidades você mais admira nela?", type: "textarea", optional: true },
-    { field: "additional_nomination", label: "Tem mais alguém que você gostaria de destacar? Quem e por quê?", type: "textarea", optional: true },
-    { field: "colleague_attitude", label: "Teve alguma atitude de colega que merece ser valorizada? Qual?", type: "textarea", optional: true, section: "Destaques do time" },
+    { field: "nomination_reason", label: "O que essa pessoa fez que merece ser reconhecido?", type: "textarea", optional: true },
+    { field: "additional_nomination", label: "Mais algum colega merece ser lembrado? Quem e por quê?", type: "textarea", optional: true },
     { field: "professional_highlight_attitude", label: "Que atitude, para você, faz um profissional se destacar na Cia do Corpo?", type: "textarea" },
-    { field: "final_suggestion", label: "Deseja deixar um elogio, crítica ou sugestão final?", type: "conditional-text", section: "Vamos finalizar" }
+    { field: "final_suggestion", label: "Quer deixar um elogio ou sugestão final?", type: "conditional-text", section: "Vamos finalizar" }
   ];
 
   const form = document.getElementById("survey-form");
@@ -141,10 +140,10 @@
           <button class="option-button conditional-choice" type="button" data-value="${option === "Sim" ? "yes" : "no"}" aria-pressed="${choice === (option === "Sim" ? "yes" : "no")}">${option}</button>
         `).join("")}
       </div>
-      ${choice === "yes" ? `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" required placeholder="Justifique sua resposta...">${value}</textarea>` : ""}`;
+      ${choice === "yes" ? `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" maxlength="${MAX_TEXTAREA_LENGTH}" required placeholder="Justifique sua resposta...">${value}</textarea>` : ""}`;
     }
     if (step.type === "textarea") {
-      return `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" ${step.optional ? "" : "required"} placeholder="${step.optional ? "Opcional..." : "Escreva aqui..."}">${value}</textarea>`;
+      return `<textarea class="textarea-field" id="answer-${step.field}" data-field="${step.field}" maxlength="${MAX_TEXTAREA_LENGTH}" ${step.optional ? "" : "required"} placeholder="${step.optional ? "Opcional..." : "Escreva aqui..."}">${value}</textarea>`;
     }
     return `<input class="text-field" id="answer-${step.field}" data-field="${step.field}" type="text" value="${value}" ${step.optional ? "" : "required"} placeholder="${step.optional ? "Seu nome (opcional)" : "Seu nome completo"}" autocomplete="name">`;
   }

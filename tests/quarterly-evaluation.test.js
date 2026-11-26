@@ -236,7 +236,7 @@ for (const profile of ["Aluno", "Funcionário"]) {
     vm.runInNewContext(appSource, { window, document });
     const content = elements["step-content"];
     const clickOption = (kind, dataset) => {
-      const button = { dataset };
+      const button = { dataset, setAttribute() {} };
       content.handlers.click({ target: { closest: (selector) => selector === `.${kind}` ? button : null } });
     };
     const input = (field, value) => content.handlers.input({
@@ -258,6 +258,10 @@ for (const profile of ["Aluno", "Funcionário"]) {
         "quarterly_highlight", "special_mention", "final_suggestion"]
       : ["employee_role", "employee_nomination", "nomination_reason", "admired_qualities",
         "additional_nomination", "colleague_attitude", "professional_highlight_attitude", "final_suggestion"];
+    const textareaFields = profile === "Aluno"
+      ? ["employee_who_makes_day_better", "quarterly_highlight", "special_mention"]
+      : ["employee_nomination", "nomination_reason", "admired_qualities", "additional_nomination",
+        "colleague_attitude", "professional_highlight_attitude"];
     const notApplicableFields = ["rating_weight_training", "rating_group_classes", "rating_muay_thai"];
     for (const field of fields) {
       if (field === "final_suggestion") {
@@ -265,7 +269,7 @@ for (const profile of ["Aluno", "Funcionário"]) {
         assert.match(elements["form-message"].textContent, /Sim ou Não/);
         if (profile === "Aluno") {
           clickOption("conditional-choice", { value: "yes" });
-          assert.match(content.innerHTML, /textarea[^>]*required/);
+          assert.match(content.innerHTML, /textarea[^>]*maxlength="500"[^>]*required/);
           next();
           assert.match(elements["form-message"].textContent, /Preencha sua resposta/);
           input(field, "Resposta final_suggestion");
@@ -278,6 +282,9 @@ for (const profile of ["Aluno", "Funcionário"]) {
       }
       if (field.startsWith("rating_")) {
         assert.equal(content.innerHTML.includes("Não faço / não utilizo"), notApplicableFields.includes(field));
+      }
+      if (textareaFields.includes(field)) {
+        assert.match(content.innerHTML, /textarea[^>]*maxlength="500"/);
       }
       if (field === "rating_group_classes") clickOption("rating-na-button", { field });
       else if (field.startsWith("rating_")) clickOption("star-button", { field, rating: "5" });
