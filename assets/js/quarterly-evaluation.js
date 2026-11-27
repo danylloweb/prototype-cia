@@ -22,7 +22,7 @@
     { field: "rating_reception", label: "Como você avalia o atendimento da recepção?", type: "stars", section: "Avaliação geral da equipe" },
     { field: "rating_weight_training", label: "Como você avalia os professores de musculação?", type: "stars", allowNotApplicable: true },
     { field: "rating_group_classes", label: "Como você avalia os professores de ginástica?", type: "stars", allowNotApplicable: true },
-    { field: "rating_muay_thai", label: "Como você avalia os professores de Artes Marciais?", type: "stars", allowNotApplicable: true },
+    { field: "rating_muay_thai", label: "Como você avalia os professores de Cross?", type: "stars", allowNotApplicable: true },
     { field: "rating_welcome", label: "O quanto você se sente acolhido(a) e respeitado(a) pelos funcionários da Cia?", type: "stars" },
     { field: "employee_who_makes_day_better", label: "Tem algum(a) funcionário(a) que faz seu dia melhor quando você chega na academia? Quem é?", type: "textarea", section: "Reconhecimento" },
     { field: "recognition_reason", label: "Por que essa pessoa merece reconhecimento?", type: "textarea" },
